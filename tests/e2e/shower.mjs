@@ -135,7 +135,7 @@ try {
   await page.getByText(/You’re bringing/).waitFor({ timeout: 8000 })
   const claim = since(n).find((c) => c.fn === 'registry_claim')
   ok('signing in finishes the claim, with the number chosen', claim?.args.p_token === TOKEN && claim?.args.p_item === 'r1' && claim?.args.p_qty === 2, JSON.stringify(claim))
-  ok('the guest stays signed in after the claim', (await page.getByLabel('Your full name').count()) === 0 && (await page.getByText(/Ana Santos/).count()) >= 1)
+  ok('the guest stays signed in after the claim', (await page.getByLabel('Your full name').count()) === 0 && (await page.getByText(/Hi, Ana/).count()) >= 1)
   ok('the guest pass is remembered', (await page.evaluate(() => localStorage.getItem('wedding-photo-guest'))).includes(TOKEN))
   shots.push(['shower-registry-claimed', await page.screenshot({ fullPage: true })])
 
