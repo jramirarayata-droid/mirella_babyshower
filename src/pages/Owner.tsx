@@ -306,7 +306,7 @@ export default function Owner() {
           space={newLoginFor === 'none' ? null : newLoginFor}
           spaces={spaces}
           onClose={() => setNewLoginFor(null)}
-          onSaved={() => (setNewLoginFor(null), void reload())}
+          onSaved={() => void reload()}
         />
       )}
       {linking && <LinkForm account={linking} spaces={spaces} onClose={() => setLinking(null)} onSaved={() => void reload()} />}
