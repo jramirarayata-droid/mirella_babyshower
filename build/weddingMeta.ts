@@ -133,18 +133,34 @@ function sharePage(meta: Meta): string {
 `
 }
 
+/** The site's root is the sign-in & plans page: its preview describes the service. */
+const DEFAULT_SITE = 'https://mirella-babyshower.mirandella.workers.dev/'
+function mainPageMeta(siteUrl?: string) {
+  const base = (siteUrl || DEFAULT_SITE).replace(/\/?$/, '/')
+  return {
+    title: 'Baby Shower Websites · A soft little website for your baby shower',
+    description: 'Invitations, RSVPs, a gift wishlist, guessing games and a gender reveal — all in one gentle place your guests open on their phones. Plans from ₱999.',
+    image: `${base}og-main.png`,
+    url: base,
+  }
+}
+
 export function weddingMeta({ supabaseUrl, anonKey, siteUrl }: Options): Plugin {
   let meta: Meta | null = null
   const get = async () => (meta ??= await loadMeta(supabaseUrl, anonKey))
   return {
     name: 'site-meta',
     async transformIndexHtml(html) {
-      const m = await get()
-      const tags = [`<title>${esc(m.title)}</title>`, `<meta name="description" content="${esc(m.description)}" />`, ogTags({ ...m, url: siteUrl })].join('\n    ')
+      // Each shower's own address (/<slug>/) gets its own preview from the Worker (worker/index.js).
+      const m = mainPageMeta(siteUrl)
+      const tags = [`<title>${esc(m.title)}</title>`, `<meta name="description" content="${esc(m.description)}" />`, ogTags(m)].join('\n    ')
       return html.replace('<!-- wedding-meta -->', tags)
     },
     async generateBundle() {
+      // Old invitation links (/i/?c=…) belong to the original shower.
       this.emitFile({ type: 'asset', fileName: 'i/index.html', source: sharePage(await get()) })
+      // For the Worker: where to read each shower's preview. The same public values the website's own code uses.
+      if (supabaseUrl && anonKey) this.emitFile({ type: 'asset', fileName: 'site-config.json', source: JSON.stringify({ supabaseUrl, anonKey }) })
     },
   }
 }

@@ -629,6 +629,8 @@ try {
   const op = await octx.newPage()
   await op.goto(`${BASE}#/`)
   await op.getByRole('heading', { name: 'Our Prenup Film' }).waitFor({ timeout: 20000 })
+  // The gallery loads on its own; wait for it before measuring.
+  await op.getByRole('heading', { name: /Our Story/ }).first().waitFor({ timeout: 20000 }).catch(() => {})
   const pos = await op.evaluate(() => {
     const y = (re) => [...document.querySelectorAll('h2')].find((h) => re.test(h.textContent ?? ''))?.getBoundingClientRect().top ?? -1
     return { film: y(/Our Prenup Film/), gallery: y(/Our Story/) }

@@ -187,7 +187,8 @@ try {
   await page.getByRole('heading', { name: 'All baby showers' }).waitFor({ timeout: 15000 })
   ok('owner signs in to the owner page', true)
   ok('owner sees every shower', (await page.getByRole('heading', { name: /^(Mir & Ella Baby Shower|Baby Cruz|Baby Lim)$/ }).count()) === 3)
-  ok('owner sees Plans & discounts with the sale on', (await page.getByRole('heading', { name: 'Plans & discounts' }).count()) === 1 && (await page.getByText('On sale').count()) === 1)
+  await page.getByText('On sale', { exact: true }).first().waitFor({ timeout: 8000 }).catch(() => {})
+  ok('owner sees Plans & discounts with the sale on', (await page.getByRole('heading', { name: 'Plans & discounts' }).count()) === 1 && (await page.getByText('On sale', { exact: true }).count()) === 1)
   shots.push(['spaces-owner', await page.screenshot({ fullPage: true })])
 
   await page.getByRole('button', { name: 'New shower' }).click()
