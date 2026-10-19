@@ -31,7 +31,7 @@ export async function saveEntourageLinks(links: EntourageLink[]): Promise<void> 
   if (links.length) {
     const { error } = await supabase
       .from('entourage_links')
-      .upsert(links.map((l) => ({ member_id: l.memberId, invitation_id: l.invitationId, guest_id: l.guestId })), { onConflict: 'member_id' })
+      .upsert(links.map((l) => ({ member_id: l.memberId, invitation_id: l.invitationId, guest_id: l.guestId })), { onConflict: 'space_id,member_id' })
     if (error) throw fail('saveEntourageLinks:upsert', error)
   }
 }

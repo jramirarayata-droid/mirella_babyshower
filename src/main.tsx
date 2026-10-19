@@ -1,3 +1,4 @@
+import './lib/space' // first: keeps each shower's remembered settings apart
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'

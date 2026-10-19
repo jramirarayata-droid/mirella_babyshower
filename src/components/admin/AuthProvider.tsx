@@ -34,11 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    await signInAdmin(email, password)
+  const signIn = useCallback(async (usernameOrEmail: string, password: string, requireAdmin = true) => {
+    await signInAdmin(usernameOrEmail, password, requireAdmin)
     const { data } = await supabase.auth.getSession()
     setSession(data.session)
-    setIsAdmin(true)
+    setIsAdmin(requireAdmin ? true : await checkIsAdmin())
   }, [])
 
   const signOut = useCallback(async () => {

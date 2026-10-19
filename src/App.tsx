@@ -1,5 +1,5 @@
-import { lazy, Suspense, type ComponentType } from 'react'
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { lazy, Suspense, type ComponentType, type ReactElement } from 'react'
+import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { isSupabaseConfigured } from './lib/supabase'
 import { AuthProvider } from './components/admin/AuthProvider'
 import { HostProvider } from './components/host/HostProvider'
@@ -13,6 +13,10 @@ import { ThemeProvider } from './theme/ThemeProvider'
 import { CrashTest, PageErrorBoundary } from './components/ui/ErrorBoundary'
 import Home from './pages/Home'
 import RSVP from './pages/RSVP'
+import { SpaceProvider, useSpace } from './hooks/useSpace'
+import { FeatureGate, SpaceGate } from './components/space/Locked'
+import { spaceSlug, spaceUrl } from './lib/space'
+import type { Feature } from './lib/plans'
 import NotFound from './pages/NotFound'
 
 /*
@@ -81,6 +85,44 @@ const AdminRegistry = page(() => import('./pages/AdminRegistry'))
 const AdminReveal = page(() => import('./pages/AdminReveal'))
 const AdminPredictions = page(() => import('./pages/AdminPredictions'))
 const AdminNames = page(() => import('./pages/AdminNames'))
+const Landing = page(() => import('./pages/Landing'))
+const Owner = page(() => import('./pages/Owner'))
+
+/*
+ * The site's root ("/") is the sign-in and plans page. Each baby shower lives
+ * at "/<its address>/". Until the database has spaces (migration 046), the
+ * root keeps showing the shower's home page as before.
+ */
+function RootOrHome() {
+  const { info, loading } = useSpace()
+  if (spaceSlug) return <Home />
+  if (loading) return <PageLoader />
+  return info?.legacy ? <Home /> : <Landing />
+}
+
+function RootOrLogin() {
+  const { info, loading } = useSpace()
+  if (spaceSlug) return <AdminLogin />
+  if (loading) return <PageLoader />
+  return info?.legacy ? <AdminLogin /> : <Navigate to="/" replace />
+}
+
+/** Admin pages opened at the site's root move to the shower's own address, so links they share are right. */
+function AdminHome({ children }: { children: ReactElement }) {
+  const { info, loading } = useSpace()
+  const { pathname, search } = useLocation()
+  if (spaceSlug) return children
+  if (loading) return <PageLoader />
+  if (info?.legacy || !info?.slug) return children
+  window.location.replace(spaceUrl(info.slug, pathname + search))
+  return <PageLoader />
+}
+
+const gated = (feature: Feature, el: ReactElement, admin = false) => (
+  <FeatureGate feature={feature} admin={admin}>
+    {el}
+  </FeatureGate>
+)
 
 /*
  * HashRouter is used on purpose: the site is served as static files, so
@@ -93,6 +135,7 @@ export default function App() {
   return (
     <HashRouter>
       <ScrollToTop />
+      <SpaceProvider>
       <ToastProvider>
         <ThemeProvider>
         <AuthProvider>
@@ -101,27 +144,31 @@ export default function App() {
           <PageErrorBoundary variant="guest">
           <CrashTest />
           <Suspense fallback={<PageLoader />}>
+            <SpaceGate>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<RootOrHome />} />
+              <Route path="/owner" element={<Owner />} />
               <Route path="/rsvp" element={<RSVP />} />
-              <Route path="/seat" element={<FindSeat />} />
+              <Route path="/seat" element={gated('seating', <FindSeat />)} />
               <Route path="/i/:code" element={<VirtualInvitation />} />
               <Route path="/i" element={<Navigate to="/" replace />} />
-              <Route path="/raffle" element={<Raffle />} />
-              <Route path="/photos" element={<GuestPhotos />} />
+              <Route path="/raffle" element={gated('raffle', <Raffle />)} />
+              <Route path="/photos" element={gated('guest_photos', <GuestPhotos />)} />
               <Route path="/photos/show" element={<Navigate to="/present/guests" replace />} />
-              <Route path="/present/:source" element={<Present />} />
+              <Route path="/present/:source" element={gated('slideshow', <Present />)} />
               <Route path="/registry" element={<Registry />} />
-              <Route path="/predict" element={<Predictions />} />
-              <Route path="/names" element={<NameIdeas />} />
-              <Route path="/show/:what" element={<ShowerScreen />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/predict" element={gated('predictions', <Predictions />)} />
+              <Route path="/names" element={gated('names', <NameIdeas />)} />
+              <Route path="/show/:what" element={gated('big_screen', <ShowerScreen />)} />
+              <Route path="/admin/login" element={<RootOrLogin />} />
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute>
-                    <AdminLayout />
-                  </ProtectedRoute>
+                  <AdminHome>
+                    <ProtectedRoute>
+                      <AdminLayout />
+                    </ProtectedRoute>
+                  </AdminHome>
                 }
               >
                 <Route index element={<AdminDashboard />} />
@@ -129,25 +176,26 @@ export default function App() {
                 <Route path="responses" element={<AdminResponses />} />
                 <Route path="guests" element={<AdminGuests />} />
                 <Route path="outfits" element={<AdminOutfits />} />
-                <Route path="media" element={<AdminMedia />} />
+                <Route path="media" element={gated('gallery', <AdminMedia />, true)} />
                 <Route path="look" element={<AdminLookFeel />} />
                 <Route path="share" element={<AdminShare />} />
                 <Route path="questions" element={<AdminQuestions />} />
-                <Route path="seating" element={<AdminSeating />} />
-                <Route path="raffle" element={<AdminRaffle />} />
+                <Route path="seating" element={gated('seating', <AdminSeating />, true)} />
+                <Route path="raffle" element={gated('raffle', <AdminRaffle />, true)} />
                 <Route path="registry" element={<AdminRegistry />} />
-                <Route path="reveal" element={<AdminReveal />} />
-                <Route path="predictions" element={<AdminPredictions />} />
-                <Route path="names" element={<AdminNames />} />
-                <Route path="guest-photos" element={<AdminGuestPhotos />} />
-                <Route path="music" element={<AdminMusic />} />
+                <Route path="reveal" element={gated('reveal', <AdminReveal />, true)} />
+                <Route path="predictions" element={gated('predictions', <AdminPredictions />, true)} />
+                <Route path="names" element={gated('names', <AdminNames />, true)} />
+                <Route path="guest-photos" element={gated('guest_photos', <AdminGuestPhotos />, true)} />
+                <Route path="music" element={gated('music', <AdminMusic />, true)} />
                 <Route path="schedule" element={<AdminSchedule />} />
-                <Route path="printables" element={<AdminPrintables />} />
+                <Route path="printables" element={gated('printables', <AdminPrintables />, true)} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="*" element={<Navigate to="/admin" replace />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </SpaceGate>
           </Suspense>
           </PageErrorBoundary>
           </MusicPlayer>
@@ -155,6 +203,7 @@ export default function App() {
         </AuthProvider>
         </ThemeProvider>
       </ToastProvider>
+      </SpaceProvider>
     </HashRouter>
   )
 }

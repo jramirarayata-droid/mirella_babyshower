@@ -3,6 +3,7 @@ import type { Tables } from '../types/database'
 import type { GalleryImage } from '../types/wedding'
 import { FRIENDLY_ERRORS, FriendlyError, logError } from '../utils/errors'
 import { compressImage } from '../utils/media'
+import { spaceFolder } from '../lib/space'
 
 export const GALLERY_LIMIT = 30
 export const VIDEO_MAX_MB = 30
@@ -55,7 +56,7 @@ const newId = () =>
 
 async function uploadToBucket(folder: string, file: File): Promise<string> {
   const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin'
-  const path = `${folder}/${newId()}.${ext}`
+  const path = `${spaceFolder()}${folder}/${newId()}.${ext}`
   const { error } = await supabase.storage
     .from(WEDDING_ASSETS_BUCKET)
     .upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type })

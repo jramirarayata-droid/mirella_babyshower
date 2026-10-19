@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { spaceHeaders } from './space'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
@@ -20,6 +21,8 @@ export const supabase = createClient(
       autoRefreshToken: true,
       detectSessionInUrl: false,
     },
+    // Tells the database which baby shower this page is for (see lib/space.ts).
+    global: { headers: spaceHeaders() },
   },
 )
 

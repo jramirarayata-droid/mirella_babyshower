@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { weddingMeta } from './build/weddingMeta'
 
-// The app uses hash-based routing (/#/rsvp), so a relative base path works for
-// both a project page (https://user.github.io/repo/) and a custom domain.
-// Override with VITE_BASE_PATH if you ever need an absolute base.
+// Each baby shower has its own address (/<slug>/#/…), so the site's files are
+// always loaded from the root ("/"). Override with VITE_BASE_PATH if the site
+// ever moves into a sub-folder.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
-    base: env.VITE_BASE_PATH ?? './',
+    base: env.VITE_BASE_PATH ?? '/',
     plugins: [
       react(),
       tailwindcss(),

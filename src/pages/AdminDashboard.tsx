@@ -18,6 +18,7 @@ import { Skeleton } from '../components/ui/Skeleton'
 import { StatCard } from '../components/admin/StatCard'
 import { BarChartCard } from '../components/admin/BarChartCard'
 import { PageHeader, Panel } from '../components/admin/PageHeader'
+import { PlanSummary } from '../components/space/PlanSummary'
 
 const ACTION_LABEL: Record<string, string> = {
   invitation_created: 'Invitation created',
@@ -139,6 +140,8 @@ export default function AdminDashboard() {
           </>
         }
       />
+
+      <PlanSummary />
 
       {settings && (
         <Link

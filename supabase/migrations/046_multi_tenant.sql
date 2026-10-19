@@ -515,6 +515,23 @@ as $$
 $$;
 grant execute on function public.space_public(text) to anon, authenticated;
 
+-- The space this page is for (from the x-space header; the default space without one).
+create or replace function public.space_here()
+returns jsonb language sql stable security definer set search_path = ''
+as $$
+  select coalesce(
+    (select jsonb_build_object(
+        'exists', true, 'id', s.id, 'slug', s.slug, 'title', s.title, 'isDefault', s.is_default,
+        'open', public.space_is_open(s.id), 'activeUntil', s.active_until,
+        'plan', jsonb_build_object('id', p.id, 'name', p.name, 'guestLimit', p.guest_limit, 'features', to_jsonb(p.features)),
+        'guests', case when public.is_admin() then
+                    (select count(*) from public.invitations i where i.space_id = s.id and i.is_active) end)
+     from public.spaces s join public.plans p on p.id = s.plan_id
+     where s.id = public.current_space_id()),
+    jsonb_build_object('exists', false));
+$$;
+grant execute on function public.space_here() to anon, authenticated;
+
 -- Signed in: who am I, and which showers can I manage?
 create or replace function public.my_account()
 returns jsonb language plpgsql stable security definer set search_path = ''
