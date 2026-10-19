@@ -38,7 +38,7 @@ export function RevealAnswer({ reveal, big = false, celebrate = true }: { reveal
   const reduce = useReducedMotion()
   if (!reveal.answer) return null
   const colours = ANSWER_COLOURS[reveal.answer]
-  const main = colours[0]!
+  const main = reveal.answer === 'twins' ? '#B07AB8' : (colours[2] ?? colours[0]!)
   return (
     <div className="relative">
       {celebrate && <Confetti colors={colours} count={big ? 90 : 46} big={big} />}

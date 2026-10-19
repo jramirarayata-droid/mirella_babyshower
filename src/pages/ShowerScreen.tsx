@@ -79,9 +79,9 @@ export default function ShowerScreen() {
             <CoupleNames names={settings.babyName} />
           </p>
         )}
-        <h1 className="mt-2 text-[clamp(2.6rem,6vw,5.5rem)] leading-tight text-ink">{TITLES[what]}</h1>
+        <h1 className="mt-1 text-[clamp(2.2rem,min(5vw,8vh),5rem)] leading-tight text-ink">{TITLES[what]}</h1>
         <Ornament className="mt-4" />
-        <div className="mt-[5vh] w-full max-w-6xl flex-1">
+        <div className="mt-[3vh] w-full max-w-6xl flex-1">
           {what === 'reveal' ? <RevealScreen token={host.token} /> : what === 'predictions' ? <PredictionsScreen /> : <NamesScreen />}
         </div>
       </div>
@@ -116,10 +116,10 @@ function RevealScreen({ token }: { token: string | null }) {
   if (reveal.revealed) return <RevealAnswer reveal={reveal} big />
   return (
     <div className="relative mx-auto flex max-w-4xl flex-col items-center">
-      <div className="relative w-[min(42vw,22rem)]">
+      <div className="relative w-[min(30vh,40vw,18rem)]">
         <div className="aspect-square rounded-full border-2 border-champagne/50 bg-paper/70 shadow-card" />
         <motion.span
-          className="absolute inset-0 grid place-items-center font-serif text-[min(16vw,10rem)] text-champagne"
+          className="absolute inset-0 grid place-items-center font-serif text-[min(18vh,20vw,9rem)] text-champagne"
           animate={reduce ? undefined : drum ? { scale: [1, 1.15, 1], rotate: [0, -6, 6, 0] } : { scale: [1, 1.05, 1] }}
           transition={{ duration: drum ? 0.4 : 3, repeat: Infinity }}
         >
@@ -127,13 +127,13 @@ function RevealScreen({ token }: { token: string | null }) {
         </motion.span>
         <CloudsAround />
       </div>
-      <p className="mt-[5vh] max-w-2xl text-[clamp(1.2rem,2.2vw,2rem)] leading-relaxed text-ink-soft">{drum ? 'Drumroll, please…' : reveal.message}</p>
-      {reveal.revealAt && new Date(reveal.revealAt).getTime() > Date.now() && !drum && <RoundCountdown at={reveal.revealAt} big showSeconds className="mt-[4vh]" onDone={reload} />}
+      <p className="mt-[3vh] max-w-2xl text-[clamp(1.1rem,min(2vw,3vh),1.8rem)] leading-relaxed text-ink-soft">{drum ? 'Drumroll, please…' : reveal.message}</p>
+      {reveal.revealAt && new Date(reveal.revealAt).getTime() > Date.now() && !drum && <RoundCountdown at={reveal.revealAt} big showSeconds className="mt-[3vh]" onDone={reload} />}
       <button
         type="button"
         disabled={busy}
         onClick={() => void now()}
-        className="mt-[5vh] inline-flex min-h-16 items-center gap-3 rounded-full bg-ink px-12 text-sm font-medium uppercase tracking-[0.3em] text-ivory shadow-card transition hover:bg-ink-soft disabled:opacity-60"
+        className="mt-[3vh] inline-flex min-h-14 items-center gap-3 rounded-full bg-ink px-12 text-sm font-medium uppercase tracking-[0.3em] text-ivory shadow-card transition hover:bg-ink-soft disabled:opacity-60"
       >
         <Sparkles aria-hidden="true" className="size-5" /> {busy ? 'Revealing…' : 'Reveal now'}
       </button>

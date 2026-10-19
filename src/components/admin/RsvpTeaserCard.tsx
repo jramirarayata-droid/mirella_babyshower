@@ -92,7 +92,7 @@ export function RsvpTeaserCard() {
         <div>
           <TextField label="Highlighted amount" value={t.highlight} onChange={(v) => set({ highlight: v })} maxLength={40} hint="Shown big and gold." />
           <div className="mt-2 flex flex-wrap gap-2">
-            {['up to ₱25,000', '₱25,000 in prizes', 'up to ₱10,000', 'exciting prizes'].map((l) => (
+            {['a baby basket', 'a spa voucher', 'up to ₱5,000', 'lovely prizes'].map((l) => (
               <button
                 key={l}
                 type="button"

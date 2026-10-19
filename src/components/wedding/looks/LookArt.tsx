@@ -103,13 +103,13 @@ export function RoundCountdown({
           aria-hidden="true"
           className={cn(
             'lux-ring grid place-items-center rounded-full border',
-            big ? 'size-[min(18vw,15rem)]' : 'size-[4.6rem] sm:size-24',
+            big ? 'size-[min(17vh,15vw,12rem)]' : 'size-[4.6rem] sm:size-24',
             onPhoto ? 'border-white/60 text-white' : 'border-champagne/60 bg-paper/70 text-ink shadow-soft',
           )}
         >
           <div className="text-center leading-none">
-            <span className={cn('block font-serif', big ? 'text-[min(7vw,6rem)]' : 'text-2xl sm:text-3xl', !onPhoto && 'text-gold')}>{v}</span>
-            <span className={cn('mt-1 block uppercase', big ? 'text-[min(1.6vw,1.2rem)] tracking-[0.3em]' : 'text-[0.56rem] tracking-[0.16em] sm:text-[0.62rem] sm:tracking-[0.22em]', onPhoto ? 'text-white/80' : 'text-muted')}>{label}</span>
+            <span className={cn('block font-serif', big ? 'text-[min(6.5vh,6vw,4.5rem)]' : 'text-2xl sm:text-3xl', !onPhoto && 'text-gold')}>{v}</span>
+            <span className={cn('mt-1 block uppercase', big ? 'text-[min(1.6vh,1.4vw,1rem)] tracking-[0.25em]' : 'text-[0.56rem] tracking-[0.16em] sm:text-[0.62rem] sm:tracking-[0.22em]', onPhoto ? 'text-white/80' : 'text-muted')}>{label}</span>
           </div>
         </div>
       ))}

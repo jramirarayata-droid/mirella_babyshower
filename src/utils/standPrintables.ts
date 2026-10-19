@@ -45,7 +45,7 @@ export interface FaceText {
   title: string
   /** Italic line under it (e.g. the guest's table). */
   sub?: string
-  /** Tiny line at the bottom (e.g. "Mir & Ella · December 19, 2026"). */
+  /** Tiny line at the bottom (e.g. "Baby Santos · March 13, 2027"). */
   footer?: string
   /** The monogram, small, above everything. */
   seal?: { text: string; art?: MonogramArt | null }

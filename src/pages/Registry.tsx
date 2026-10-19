@@ -148,8 +148,8 @@ function ItemCard({ item, busy, onClaim, onUnclaim }: { item: RegistryItem; busy
       {item.image ? (
         <img src={item.image} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover" />
       ) : (
-        <div aria-hidden="true" className="grid aspect-[4/3] w-full place-items-center bg-[linear-gradient(160deg,var(--color-linen),var(--color-cream))]">
-          <Gift className="size-12 text-champagne" strokeWidth={1.1} />
+        <div aria-hidden="true" className="grid h-24 w-full place-items-center bg-[linear-gradient(160deg,var(--color-linen),var(--color-cream))]">
+          <Gift className="size-9 text-champagne" strokeWidth={1.2} />
         </div>
       )}
       <div className="relative z-[2] flex flex-1 flex-col p-5">

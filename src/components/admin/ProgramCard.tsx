@@ -149,7 +149,7 @@ export function ProgramCard() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <TextField label="Section title" value={settings.programTitle} onChange={(v) => set({ programTitle: v })} maxLength={80} placeholder="Program" />
-          <TextField label="Subtitle (optional)" value={settings.programSubtitle} onChange={(v) => set({ programSubtitle: v })} maxLength={300} placeholder="e.g. Saturday, December 19" />
+          <TextField label="Subtitle (optional)" value={settings.programSubtitle} onChange={(v) => set({ programSubtitle: v })} maxLength={300} placeholder="e.g. Saturday afternoon" />
         </div>
 
         <div>

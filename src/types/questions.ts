@@ -52,8 +52,8 @@ export interface RsvpTeaser {
 
 export const DEFAULT_RSVP_TEASER: RsvpTeaser = {
   enabled: false,
-  title: 'Confirm your attendance for a chance to win',
-  highlight: 'up to ₱25,000',
+  title: 'RSVP early for a chance to win',
+  highlight: 'a baby basket',
   note: 'in our baby shower raffle, drawn at the shower — be there to win!',
 }
 
