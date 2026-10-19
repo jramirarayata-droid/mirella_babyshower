@@ -1,2 +1,5 @@
-https://multi-tenant-mirella-babyshower.mirandella.workers.dev/i/?c=sample-01
+https://mirella-babyshower.mirandella.workers.dev/
+https://mirella-babyshower.mirandella.workers.dev/mirella/
+https://mirella-babyshower.mirandella.workers.dev/mirella/i/?c=sample-01
 https://mirella-babyshower.mirandella.workers.dev/i/?c=sample-01
+https://mirella-babyshower.mirandella.workers.dev/og-main.png

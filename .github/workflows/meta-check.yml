@@ -18,9 +18,6 @@ jobs:
             grep -oE '<title>[^<]*</title>|<meta (property|name)="(og:[a-z:]+|twitter:[a-z]+|description)" content="[^"]*"' /tmp/p.html | head -20
             grep -o 'location.replace([^)]*)' /tmp/p.html | head -2
           done
-          echo "=== js bundle mentions supabase.co?"
-          JS=$(curl -s https://multi-tenant-mirella-babyshower.mirandella.workers.dev/ | grep -oE '/assets/index-[^"]+\.js' | head -1)
-          echo "js: $JS"; curl -s "https://multi-tenant-mirella-babyshower.mirandella.workers.dev$JS" | grep -oE 'https://[a-z0-9]+\.supabase\.co|project-not-configured' | sort -u
       - name: Save the result to the meta-check-results branch
         if: always()
         run: |
