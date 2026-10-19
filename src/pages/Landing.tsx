@@ -8,7 +8,7 @@ import { toFriendlyMessage } from '../utils/errors'
 import { Button } from '../components/ui/Button'
 import { FieldError, TextField } from '../components/ui/FormField'
 import { Ornament } from '../components/ui/Ornament'
-import { ContactLink, CONTACT_URL } from '../components/space/Locked'
+import { ContactLink, CONTACT_PHONES } from '../components/space/Locked'
 import { CORE_FEATURES, FEATURE_LABELS, peso, type Feature, type Plan } from '../lib/plans'
 import { spaceUrl } from '../lib/space'
 import { loadMyAccount, loadPlans, type MyAccount } from '../services/spaceService'
@@ -138,7 +138,7 @@ export default function Landing() {
           <a href="#plans" onClick={(e) => (e.preventDefault(), document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' }))} className="text-ink-soft hover:text-ink">
             Plans
           </a>
-          {CONTACT_URL && (
+          {CONTACT_PHONES.length > 0 && (
             <ContactLink className="hidden min-h-9 items-center rounded-full border border-champagne/60 px-4 text-ink transition hover:bg-champagne-light/40 sm:inline-flex">
               Message us
             </ContactLink>
@@ -166,7 +166,7 @@ export default function Landing() {
               >
                 See the plans <ArrowRight aria-hidden="true" className="size-4" />
               </a>
-              {CONTACT_URL && (
+              {CONTACT_PHONES.length > 0 && (
                 <ContactLink className="inline-flex min-h-11 items-center gap-2 rounded-md border border-champagne/70 px-5 text-ink transition hover:bg-champagne-light/40">
                   <MessageCircleHeart aria-hidden="true" className="size-4" /> Message us
                 </ContactLink>
@@ -233,8 +233,11 @@ export default function Landing() {
             ))}
           </ol>
           <div className="mt-10 text-center">
+            <p className="mb-4 text-sm text-ink-soft">
+              Call or text <span className="font-medium tabular-nums text-ink">{CONTACT_PHONES.join(' or ')}</span>
+            </p>
             <ContactLink className="inline-flex min-h-11 items-center gap-2 rounded-md bg-ink px-6 font-medium text-ivory shadow-soft transition hover:bg-ink-soft">
-              <MessageCircleHeart aria-hidden="true" className="size-4" /> {CONTACT_URL ? 'Message us to get started' : 'Message the site owner to get started'}
+              <MessageCircleHeart aria-hidden="true" className="size-4" /> Message us to get started
             </ContactLink>
           </div>
         </section>

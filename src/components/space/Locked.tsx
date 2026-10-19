@@ -1,20 +1,54 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Lock, MessageCircleHeart, Sparkles } from 'lucide-react'
+import { Lock, MessageCircleHeart, MessageSquare, Phone, Sparkles } from 'lucide-react'
 import { useSpace } from '../../hooks/useSpace'
 import { FEATURE_LABELS, type Feature } from '../../lib/plans'
 import { Ornament } from '../ui/Ornament'
 import { PageLoader } from '../ui/Spinner'
+import { Modal } from '../ui/Modal'
 
-/** Where people message the site owner (set VITE_CONTACT_URL, e.g. https://m.me/yourpage). */
+/** Where people reach the site owner: an optional link (VITE_CONTACT_URL) and phone numbers. */
 export const CONTACT_URL = (import.meta.env.VITE_CONTACT_URL as string | undefined)?.trim() || ''
+export const CONTACT_PHONES = ((import.meta.env.VITE_CONTACT_PHONES as string | undefined) ?? '0930 003 0316, 0909 630 8233')
+  .split(',')
+  .map((n) => n.trim())
+  .filter(Boolean)
 
+const intl = (n: string) => `+63${n.replace(/\D/g, '').replace(/^0/, '')}`
+
+/** Opens the contact link, or a small window with the phone numbers (call or text). */
 export function ContactLink({ children, className }: { children: ReactNode; className?: string }) {
-  if (!CONTACT_URL) return <span className={className}>{children}</span>
+  const [open, setOpen] = useState(false)
+  if (CONTACT_URL) {
+    return (
+      <a href={CONTACT_URL} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+      </a>
+    )
+  }
   return (
-    <a href={CONTACT_URL} target="_blank" rel="noopener noreferrer" className={className}>
-      {children}
-    </a>
+    <>
+      <button type="button" onClick={() => setOpen(true)} className={className}>
+        {children}
+      </button>
+      <Modal open={open} onClose={() => setOpen(false)} title="Get in touch" description="Call or text us — we’ll help you pick a plan and set up your baby shower website." size="sm">
+        <ul className="space-y-3">
+          {CONTACT_PHONES.map((n) => (
+            <li key={n} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-ivory px-4 py-3">
+              <span className="font-medium tabular-nums text-ink">{n}</span>
+              <span className="flex gap-2">
+                <a href={`tel:${intl(n)}`} className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-ink px-3 text-sm text-ivory hover:bg-ink-soft">
+                  <Phone aria-hidden="true" className="size-4" /> Call
+                </a>
+                <a href={`sms:${intl(n)}`} className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-champagne/70 px-3 text-sm text-ink hover:bg-champagne-light/40">
+                  <MessageSquare aria-hidden="true" className="size-4" /> Text
+                </a>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Modal>
+    </>
   )
 }
 
