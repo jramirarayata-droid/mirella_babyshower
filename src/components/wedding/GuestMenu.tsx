@@ -12,6 +12,7 @@ import { CoupleNames } from './CoupleNames'
 import { useShowerActivities } from '../shower/ShowerFun'
 import { cn } from '../ui/cn'
 import { useSpace } from '../../hooks/useSpace'
+import { GUEST_PAGE_FEATURE, pageFeature } from '../../lib/plans'
 
 /** The guest this phone remembers (updates when it changes). */
 export function useKnownGuest(): KnownGuest | null {
@@ -69,6 +70,7 @@ export function GuestMenu({ tone = 'light' }: { tone?: 'light' | 'onPhoto' }) {
   const host = useHost()
   const guest = useKnownGuest()
   const { settings } = useWeddingSettings()
+  const space = useSpace()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const reduce = useReducedMotion()
@@ -208,7 +210,13 @@ export function GuestMenu({ tone = 'light' }: { tone?: 'light' | 'onPhoto' }) {
                         { to: '/show/predictions', label: 'Present the predictions', hint: 'Team Girl vs Team Boy, and the winners', icon: Trophy },
                         { to: '/show/names', label: 'Present the name ideas', hint: 'Every name guests suggested', icon: PenLine },
                       ] as const
-                    ).map((it) => {
+                    )
+                      .filter((it) => {
+                        // Only what this shower's plan includes.
+                        const f = pageFeature(it.to, GUEST_PAGE_FEATURE)
+                        return !f || space.has(f)
+                      })
+                      .map((it) => {
                       const Icon = it.icon
                       return (
                         <li key={it.to}>
