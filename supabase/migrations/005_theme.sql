@@ -3,7 +3,7 @@
 --  Run AFTER 004. Safe to re-run. (Already applied to the live project.)
 -- =============================================================================
 alter table public.wedding_settings
-  add column if not exists theme jsonb not null default '{"template": "classic"}'::jsonb;
+  add column if not exists theme jsonb not null default '{"template": "clouds-blue"}'::jsonb;
 
 alter table public.wedding_settings drop constraint if exists wedding_settings_theme_is_object;
 alter table public.wedding_settings add constraint wedding_settings_theme_is_object

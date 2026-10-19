@@ -29,11 +29,11 @@ alter table public.wedding_settings add constraint wedding_settings_motif_is_arr
 -- Sample motif + sample entourage (replace in Admin). Only filled when empty.
 update public.wedding_settings
 set motif_colors = '[
-  {"id":"m1","name":"Champagne","hex":"#D8C3A0"},
-  {"id":"m2","name":"Sage","hex":"#9FAC97"},
-  {"id":"m3","name":"Dusty Rose","hex":"#C9A19A"},
-  {"id":"m4","name":"Taupe","hex":"#A8977A"},
-  {"id":"m5","name":"Ivory","hex":"#F3EBDD"}
+  {"id":"m1","name":"Baby Blue","hex":"#A9C8EA"},
+  {"id":"m2","name":"Blush Pink","hex":"#F4C2CB"},
+  {"id":"m3","name":"Mint","hex":"#BFE3D0"},
+  {"id":"m4","name":"Butter Yellow","hex":"#F7E3A1"},
+  {"id":"m5","name":"Cream","hex":"#F7EFDF"}
 ]'::jsonb
 where jsonb_array_length(motif_colors) = 0;
 
