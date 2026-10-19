@@ -20,7 +20,7 @@ import NotFound from './pages/NotFound'
  * page file that no longer exists. Reload once to pick up the new version
  * instead of showing a blank page.
  */
-const RELOAD_KEY = 'wedding-chunk-reload'
+const RELOAD_KEY = 'shower-chunk-reload'
 function page<T extends ComponentType>(load: () => Promise<{ default: T }>) {
   return lazy(() =>
     load()
@@ -73,11 +73,19 @@ const AdminGuestPhotos = page(() => import('./pages/AdminGuestPhotos'))
 const AdminMusic = page(() => import('./pages/AdminMusic'))
 const AdminRaffle = page(() => import('./pages/AdminRaffle'))
 const AdminSchedule = page(() => import('./pages/AdminSchedule'))
+const Registry = page(() => import('./pages/Registry'))
+const Predictions = page(() => import('./pages/Predictions'))
+const NameIdeas = page(() => import('./pages/NameIdeas'))
+const ShowerScreen = page(() => import('./pages/ShowerScreen'))
+const AdminRegistry = page(() => import('./pages/AdminRegistry'))
+const AdminReveal = page(() => import('./pages/AdminReveal'))
+const AdminPredictions = page(() => import('./pages/AdminPredictions'))
+const AdminNames = page(() => import('./pages/AdminNames'))
 
 /*
- * HashRouter is used on purpose: GitHub Pages is static hosting with no
- * server-side rewrites, so /rsvp or /admin would 404 on refresh with
- * BrowserRouter. With hash routes (/#/rsvp) every refresh and deep link works.
+ * HashRouter is used on purpose: the site is served as static files, so
+ * /rsvp or /admin would 404 on refresh with BrowserRouter. With hash routes
+ * (/#/rsvp) every refresh and deep link works.
  */
 export default function App() {
   if (!isSupabaseConfigured) return <SetupNotice />
@@ -103,6 +111,10 @@ export default function App() {
               <Route path="/photos" element={<GuestPhotos />} />
               <Route path="/photos/show" element={<Navigate to="/present/guests" replace />} />
               <Route path="/present/:source" element={<Present />} />
+              <Route path="/registry" element={<Registry />} />
+              <Route path="/predict" element={<Predictions />} />
+              <Route path="/names" element={<NameIdeas />} />
+              <Route path="/show/:what" element={<ShowerScreen />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route
                 path="/admin"
@@ -123,6 +135,10 @@ export default function App() {
                 <Route path="questions" element={<AdminQuestions />} />
                 <Route path="seating" element={<AdminSeating />} />
                 <Route path="raffle" element={<AdminRaffle />} />
+                <Route path="registry" element={<AdminRegistry />} />
+                <Route path="reveal" element={<AdminReveal />} />
+                <Route path="predictions" element={<AdminPredictions />} />
+                <Route path="names" element={<AdminNames />} />
                 <Route path="guest-photos" element={<AdminGuestPhotos />} />
                 <Route path="music" element={<AdminMusic />} />
                 <Route path="schedule" element={<AdminSchedule />} />

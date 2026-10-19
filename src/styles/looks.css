@@ -178,6 +178,8 @@ html[data-style='clouds'] .hero-paper {
   background-image:
     radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--color-champagne) 22%, var(--color-ivory)), transparent 70%),
     linear-gradient(180deg, color-mix(in srgb, var(--color-champagne) 12%, var(--color-ivory)), var(--color-ivory));
+  background-size: 100% 100%;
+  background-position: 0 0;
 }
 html[data-style='clouds'] .hero-eyebrow {
   font-family: var(--font-script);

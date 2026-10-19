@@ -51,35 +51,65 @@ function parts(ms: number) {
   return { days: Math.floor(m / 1440), hours: Math.floor((m % 1440) / 60), minutes: m % 60 }
 }
 
-/** Days, hours and minutes to the shower in three rings. Hidden once it has started. */
-export function RoundCountdown({ date, time, className, onPhoto = false }: { date: string; time?: string; className?: string; onPhoto?: boolean }) {
-  const target = targetOf(date, time)
+/** Days, hours and minutes (and seconds) to the shower — or to `at` — in rings. Hidden once the moment arrives. */
+export function RoundCountdown({
+  date = '',
+  time,
+  at,
+  className,
+  onPhoto = false,
+  big = false,
+  showSeconds = false,
+  onDone,
+}: {
+  date?: string
+  time?: string
+  /** An exact moment (ISO) instead of a date and time, e.g. the gender reveal. */
+  at?: string | null
+  className?: string
+  onPhoto?: boolean
+  /** For the big screen. */
+  big?: boolean
+  showSeconds?: boolean
+  /** Called once when the moment arrives. */
+  onDone?: () => void
+}) {
+  const target = at ? new Date(at).getTime() : targetOf(date, time)
   const [now, setNow] = useState(() => Date.now())
+  const near = Number.isFinite(target) && target - now < 3 * 3600_000
   useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), 30_000)
+    const id = window.setInterval(() => setNow(Date.now()), showSeconds || near ? 1000 : 30_000)
     return () => window.clearInterval(id)
-  }, [])
-  if (!Number.isFinite(target) || target - now <= 0) return null
+  }, [showSeconds, near])
+  const done = Number.isFinite(target) && target - now <= 0
+  useEffect(() => {
+    if (done) onDone?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done])
+  if (!Number.isFinite(target) || done) return null
   const p = parts(target - now)
+  const secs = Math.max(0, Math.floor((target - now) / 1000) % 60)
   const cells: [number, string][] = [
-    [p.days, p.days === 1 ? 'day' : 'days'],
+    ...(p.days > 0 || !showSeconds ? ([[p.days, p.days === 1 ? 'day' : 'days']] as [number, string][]) : []),
     [p.hours, p.hours === 1 ? 'hour' : 'hours'],
     [p.minutes, p.minutes === 1 ? 'minute' : 'minutes'],
+    ...(showSeconds ? ([[secs, secs === 1 ? 'second' : 'seconds']] as [number, string][]) : []),
   ]
   return (
-    <div className={cn('lux-rings flex items-center justify-center gap-3 sm:gap-5', className)} role="timer" aria-label={`${p.days} days, ${p.hours} hours and ${p.minutes} minutes to go`}>
+    <div className={cn('lux-rings flex items-center justify-center', big ? 'gap-[3vw]' : 'gap-3 sm:gap-5', className)} role="timer" aria-label={`${p.days} days, ${p.hours} hours and ${p.minutes} minutes to go`}>
       {cells.map(([v, label]) => (
         <div
           key={label}
           aria-hidden="true"
           className={cn(
-            'lux-ring grid size-[4.6rem] place-items-center rounded-full border sm:size-24',
+            'lux-ring grid place-items-center rounded-full border',
+            big ? 'size-[min(18vw,15rem)]' : 'size-[4.6rem] sm:size-24',
             onPhoto ? 'border-white/60 text-white' : 'border-champagne/60 bg-paper/70 text-ink shadow-soft',
           )}
         >
           <div className="text-center leading-none">
-            <span className={cn('block font-serif text-2xl sm:text-3xl', !onPhoto && 'text-gold')}>{v}</span>
-            <span className={cn('mt-1 block text-[0.58rem] uppercase tracking-[0.25em] sm:text-[0.62rem]', onPhoto ? 'text-white/80' : 'text-muted')}>{label}</span>
+            <span className={cn('block font-serif', big ? 'text-[min(7vw,6rem)]' : 'text-2xl sm:text-3xl', !onPhoto && 'text-gold')}>{v}</span>
+            <span className={cn('mt-1 block uppercase', big ? 'text-[min(1.6vw,1.2rem)] tracking-[0.3em]' : 'text-[0.56rem] tracking-[0.16em] sm:text-[0.62rem] sm:tracking-[0.22em]', onPhoto ? 'text-white/80' : 'text-muted')}>{label}</span>
           </div>
         </div>
       ))}

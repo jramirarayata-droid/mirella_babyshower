@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { Armchair, Camera, Clapperboard, Gift, Images, Info, KeyRound, LogOut, Mail, Menu, X } from 'lucide-react'
+import { Armchair, Baby, Camera, Clapperboard, Gift, Images, Info, KeyRound, LogOut, Mail, Menu, PenLine, Sparkles, Trophy, X } from 'lucide-react'
 import { useHost } from '../../hooks/hostContext'
 import { useWeddingSettings } from '../../hooks/useWeddingSettings'
 import { useDisplayPrefs } from '../../hooks/useDisplayPrefs'
@@ -9,6 +9,7 @@ import { getGuestPhotosInfo } from '../../services/guestPhotosService'
 import { isFinderOpen, isRsvpOpen } from '../../services/settingsService'
 import { firstName, forgetKnownGuest, knownGuest, type KnownGuest } from '../../utils/guestIdentity'
 import { CoupleNames } from './CoupleNames'
+import { useShowerActivities } from '../shower/ShowerFun'
 import { cn } from '../ui/cn'
 
 /** The guest this phone remembers (updates when it changes). */
@@ -37,6 +38,7 @@ interface Item {
 export function useGuestLinks(): Item[] {
   const { settings } = useWeddingSettings()
   const display = useDisplayPrefs()
+  const fun = useShowerActivities()
   const [photos, setPhotos] = useState(false)
   useEffect(() => {
     let alive = true
@@ -52,6 +54,9 @@ export function useGuestLinks(): Item[] {
   if (isRsvpOpen(settings)) items.push({ to: '/rsvp', label: settings.rsvpButtonLabel.trim().toUpperCase() === 'RSVP' ? 'RSVP' : settings.rsvpButtonLabel, hint: 'Let us know if you can come', icon: Mail })
   if (isFinderOpen(settings.seatingConfig, display?.revealAt)) items.push({ to: '/seat', label: 'Find my seat', hint: 'Your table at the shower', icon: Armchair })
   if (photos) items.push({ to: '/photos', label: 'Photos', hint: 'See and share photos from the shower', icon: Camera })
+  if (fun?.registry) items.push({ to: '/registry', label: 'Gift wishlist', hint: 'What the baby still needs', icon: Gift })
+  if (fun?.predict) items.push({ to: '/predict', label: 'Baby predictions', hint: fun.predictOpen ? 'Guess the birthday, weight and boy or girl' : 'See the guesses', icon: Baby })
+  if (fun?.names) items.push({ to: '/names', label: 'Name ideas', hint: 'Suggest a name for the baby', icon: PenLine })
   return items
 }
 
@@ -197,6 +202,9 @@ export function GuestMenu({ tone = 'light' }: { tone?: 'light' | 'onPhoto' }) {
                         { to: '/raffle', label: 'Raffle & Bingo', hint: 'Spin, draw and present', icon: Gift },
                         { to: '/present/guests', label: 'Present guest photos', hint: 'Photos shared by guests, live', icon: Images },
                         { to: '/present/ours', label: 'Present our photos & videos', hint: 'From the shower website', icon: Clapperboard },
+                        { to: '/show/reveal', label: 'Present the gender reveal', hint: 'Countdown, then the big moment', icon: Sparkles },
+                        { to: '/show/predictions', label: 'Present the predictions', hint: 'Team Girl vs Team Boy, and the winners', icon: Trophy },
+                        { to: '/show/names', label: 'Present the name ideas', hint: 'Every name guests suggested', icon: PenLine },
                       ] as const
                     ).map((it) => {
                       const Icon = it.icon

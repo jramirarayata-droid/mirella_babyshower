@@ -3,6 +3,7 @@
 @theme {
   --font-serif: 'Cormorant Garamond', 'Cormorant', Georgia, 'Times New Roman', serif;
   --font-sans: 'Jost', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --font-script: var(--font-serif);
 
   --color-ivory: #faf7f2;
   --color-cream: #f3ede3;

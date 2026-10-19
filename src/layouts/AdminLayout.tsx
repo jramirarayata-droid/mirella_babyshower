@@ -1,7 +1,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Armchair, CalendarClock, Camera, Music, ExternalLink, Search, Gift, Baby, ListChecks, Images, LayoutDashboard, Palette, LogOut, Mail, Menu, MessageSquareHeart, PanelLeftClose, PanelLeftOpen, Pin, PinOff, Printer, QrCode, Settings, Shirt, UserPlus, X } from 'lucide-react'
+import { Armchair, CalendarClock, Camera, Music, ExternalLink, Search, Gift, Baby, ListChecks, Images, LayoutDashboard, Palette, LogOut, Mail, Menu, MessageSquareHeart, PanelLeftClose, PanelLeftOpen, Pin, PinOff, Printer, QrCode, Settings, Shirt, UserPlus, X, Sparkles, Trophy, PenLine, Ticket } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../hooks/useToast'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
@@ -34,7 +34,16 @@ const NAV_GROUPS: { title: string | null; items: { to: string; label: string; ic
       { to: '/admin/guests', label: 'Extra guests', icon: UserPlus },
       { to: '/admin/questions', label: 'RSVP Questions', icon: ListChecks },
       { to: '/admin/seating', label: 'Seating', icon: Armchair },
-      { to: '/admin/raffle', label: 'Raffle', icon: Gift },
+    ],
+  },
+  {
+    title: 'Shower fun',
+    items: [
+      { to: '/admin/registry', label: 'Gift Registry', icon: Gift },
+      { to: '/admin/reveal', label: 'Gender Reveal', icon: Sparkles },
+      { to: '/admin/predictions', label: 'Predictions', icon: Trophy },
+      { to: '/admin/names', label: 'Name Ideas', icon: PenLine },
+      { to: '/admin/raffle', label: 'Raffle & Bingo', icon: Ticket },
     ],
   },
   {

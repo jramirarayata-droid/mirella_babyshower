@@ -21,6 +21,8 @@ import { GiftCard } from '../components/wedding/GiftCard'
 import { Reveal } from '../components/wedding/Reveal'
 import { RSVPCallout } from '../components/wedding/RSVPCallout'
 import { Footer } from '../components/wedding/Footer'
+import { GenderRevealSection } from '../components/shower/GenderReveal'
+import { ShowerFun } from '../components/shower/ShowerFun'
 import { PageLoader } from '../components/ui/Spinner'
 import { PublicError } from '../components/wedding/PublicError'
 import { isRsvpOpen, orderMedia } from '../services/settingsService'
@@ -65,6 +67,7 @@ export default function Home() {
       <main>
         <Introduction settings={settings} />
         {settings.verseVisible && <VerseHighlight text={settings.verseText} reference={settings.verseReference} />}
+        <GenderRevealSection />
         {/* Photos and videos, in the order set in Admin → Photos & Video. */}
         {orderMedia(
           [
@@ -112,6 +115,7 @@ export default function Home() {
         ) : (
           <MotifSection title={settings.motifTitle} colors={settings.motifColors} />
         )}
+        <ShowerFun />
         {gift && (
           <section aria-label={gift.title} className="px-5 pt-8 sm:px-8">
             <Reveal>
