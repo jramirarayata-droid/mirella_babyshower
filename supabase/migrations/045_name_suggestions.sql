@@ -122,20 +122,25 @@ create or replace function public.name_ideas_list()
 returns jsonb language sql stable security definer set search_path = ''
 as $$
   select case when not public.names_visible() and not public.is_admin() then '[]'::jsonb else coalesce((
-    select jsonb_agg(g order by (g->>'count')::int desc, g->>'name')
+    select jsonb_agg(q.g order by q.n desc, q.name)
     from (
-      select jsonb_build_object(
-        'name', min(s.suggestion),
-        'forGender', case when count(distinct s.for_gender) = 1 then min(s.for_gender) else 'any' end,
-        'count', count(*),
-        'by', (select jsonb_agg(public.short_guest_name(x.by_name)) from (select by_name from public.name_suggestions t
-               where t.status = 'visible' and public.normalize_name(t.suggestion) = public.normalize_name(s.suggestion) order by t.created_at limit 6) x),
-        'notes', (select jsonb_agg(x.note) from (select note from public.name_suggestions t
-               where t.status = 'visible' and t.note is not null and public.normalize_name(t.suggestion) = public.normalize_name(s.suggestion) order by t.created_at limit 3) x)) g
-      from public.name_suggestions s
-      where s.status = 'visible'
-      group by public.normalize_name(s.suggestion)
-      limit 200) q), '[]'::jsonb) end;
+      select a.n, a.name, jsonb_build_object(
+        'name', a.name,
+        'forGender', a.for_gender,
+        'count', a.n,
+        'by', (select jsonb_agg(public.short_guest_name(x.by_name)) from (select t.by_name from public.name_suggestions t
+               where t.status = 'visible' and public.normalize_name(t.suggestion) = a.k order by t.created_at limit 6) x),
+        'notes', (select jsonb_agg(x.note) from (select t.note from public.name_suggestions t
+               where t.status = 'visible' and t.note is not null and public.normalize_name(t.suggestion) = a.k order by t.created_at limit 3) x)) as g
+      from (
+        -- one row per name (same name typed differently counts once)
+        select public.normalize_name(s.suggestion) as k, min(s.suggestion) as name, count(*)::int as n,
+               case when count(distinct s.for_gender) = 1 then min(s.for_gender) else 'any' end as for_gender
+        from public.name_suggestions s
+        where s.status = 'visible'
+        group by public.normalize_name(s.suggestion)
+        order by count(*) desc
+        limit 200) a) q), '[]'::jsonb) end;
 $$;
 
 revoke all on function public.name_ideas_info(text) from public;
