@@ -16,23 +16,29 @@ import type {
   RSVPResponse,
   VehicleType,
 } from '../types/rsvp'
-import { FRIENDLY_ERRORS, FriendlyError, logError } from '../utils/errors'
+import { FRIENDLY_ERRORS, FriendlyError, logError, planLimitError } from '../utils/errors'
 import { normalizeSpaces } from '../utils/validation'
 import { mapTable } from './seatingService'
+import { loginEmail } from './spaceService'
 import type { SeatingTable } from '../types/seating'
 
 // ----- Auth ---------------------------------------------------------------------
 
-export async function signInAdmin(email: string, password: string): Promise<void> {
-  const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
+/**
+ * Signs in with a username (logins the owner created) or an email.
+ * `requireAdmin`: on a shower's own page the login must be able to manage that shower.
+ */
+export async function signInAdmin(usernameOrEmail: string, password: string, requireAdmin = true): Promise<void> {
+  const { error } = await supabase.auth.signInWithPassword({ email: loginEmail(usernameOrEmail), password })
   if (error) {
     logError('signInAdmin', error)
-    throw new FriendlyError('The email or password is incorrect.')
+    throw new FriendlyError('The username or password is incorrect.')
   }
+  if (!requireAdmin) return
   const admin = await checkIsAdmin()
   if (!admin) {
     await supabase.auth.signOut()
-    throw new FriendlyError('This account does not have administrator access.')
+    throw new FriendlyError('This login can’t manage this baby shower. If your plan has just ended or isn’t switched on yet, please message us.')
   }
 }
 
@@ -213,8 +219,9 @@ export async function loadAdminData(): Promise<AdminData> {
 
 // ----- Invitations --------------------------------------------------------------
 
-function invitationError(context: string, error: { code?: string } | null): never {
+function invitationError(context: string, error: { code?: string; hint?: string; message?: string } | null): never {
   logError(context, error)
+  planLimitError(error)
   if (error?.code === '23505') {
     throw new FriendlyError('An active invitation with this name already exists. Add a detail to make it unique, e.g. "Maria Santos (Tita)".')
   }

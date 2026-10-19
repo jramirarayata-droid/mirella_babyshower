@@ -33,3 +33,15 @@ export function logError(context: string, error: unknown): void {
     console.error(`[${context}]`, error)
   }
 }
+
+/**
+ * The database refuses things the shower's plan doesn't include (more guests
+ * than the plan allows, a look or feature from a bigger plan). Its message is
+ * written for people, so it is shown as is.
+ */
+export function planLimitError(error: { hint?: string; message?: string } | null | undefined): void {
+  if (error?.hint && error.hint.startsWith('plan_') && error.message) throw new FriendlyError(error.message)
+  if (error?.message && /row-level security policy "Plan includes it/.test(error.message)) {
+    throw new FriendlyError('This is part of a bigger plan. Message us to upgrade.')
+  }
+}

@@ -2,6 +2,7 @@ import { supabase, WEDDING_ASSETS_BUCKET } from '../lib/supabase'
 import type { Tables } from '../types/database'
 import type { GiftSettings, PublicGift } from '../types/wedding'
 import { FriendlyError, logError } from '../utils/errors'
+import { spaceFolder } from '../lib/space'
 
 type GiftRow = { title: string | null; message: string | null; qr_image_url: string | null }
 
@@ -76,7 +77,7 @@ export async function uploadGiftQr(file: File): Promise<string> {
   if (file.size > 5 * 1024 * 1024) throw new FriendlyError('Please choose an image smaller than 5 MB.')
   const ext = file.type === 'image/jpeg' ? 'jpg' : file.type.split('/')[1]
   const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`
-  const path = `gift/${id}.${ext}`
+  const path = `${spaceFolder()}gift/${id}.${ext}`
   const { error } = await supabase.storage.from(WEDDING_ASSETS_BUCKET).upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type })
   if (error) {
     logError('uploadGiftQr', error)

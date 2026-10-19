@@ -22,6 +22,7 @@ import { parseThemeSettings, type ThemeSettings } from '../theme/themes'
 import type { BuiltinKey, RsvpConfig, RsvpTeaser } from '../types/questions'
 import { parseSeatingConfig } from './seatingService'
 import type { SeatingConfig } from '../types/seating'
+import { spaceFolder } from '../lib/space'
 
 /** Is the guest seat finder switched on right now? */
 export function isFinderOpen(c: SeatingConfig, revealAt?: string | null): boolean {
@@ -473,7 +474,7 @@ export async function uploadWeddingAsset(file: File, name: 'hero' | 'logo' | 'ba
 
   const ext = file.type === 'image/jpeg' ? 'jpg' : file.type.split('/')[1]
   // A timestamped path avoids stale CDN caches when the image is replaced.
-  const path = `${name}-${Date.now()}.${ext}`
+  const path = `${spaceFolder()}${name}-${Date.now()}.${ext}`
   const { error } = await supabase.storage.from(WEDDING_ASSETS_BUCKET).upload(path, file, {
     cacheControl: '31536000',
     upsert: false,

@@ -1,10 +1,14 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Armchair, CalendarClock, Camera, Music, ExternalLink, Search, Gift, Baby, ListChecks, Images, LayoutDashboard, Palette, LogOut, Mail, Menu, MessageSquareHeart, PanelLeftClose, PanelLeftOpen, Pin, PinOff, Printer, QrCode, Settings, Shirt, UserPlus, X, Sparkles, Trophy, PenLine, Ticket } from 'lucide-react'
+import { Lock, Crown, Armchair, CalendarClock, Camera, Music, ExternalLink, Search, Gift, Baby, ListChecks, Images, LayoutDashboard, Palette, LogOut, Mail, Menu, MessageSquareHeart, PanelLeftClose, PanelLeftOpen, Pin, PinOff, Printer, QrCode, Settings, Shirt, UserPlus, X, Sparkles, Trophy, PenLine, Ticket } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../hooks/useToast'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
+import { useSpace } from '../hooks/useSpace'
+import { ADMIN_PAGE_FEATURE } from '../lib/plans'
+import { spaceSlug, spaceUrl } from '../lib/space'
+import { loadMyAccount } from '../services/spaceService'
 import type { AdminOutletContext } from '../hooks/useAdminData'
 import { loadAdminData, type AdminData } from '../services/adminService'
 import { toFriendlyMessage } from '../utils/errors'
@@ -81,6 +85,17 @@ export default function AdminLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const { settings } = useWeddingSettings()
+  const space = useSpace()
+  const [isOwner, setIsOwner] = useState(false)
+  useEffect(() => {
+    if (session) void loadMyAccount().then((a) => setIsOwner(Boolean(a?.superAdmin)))
+  }, [session])
+  const locked = (to: string) => {
+    const f = ADMIN_PAGE_FEATURE[to]
+    return f ? !space.has(f) : false
+  }
+  // "View website": this shower's own address (the site's root is the sign-in page).
+  const websiteHref = spaceSlug || !space.info?.slug || space.info.legacy ? '#/' : spaceUrl(space.info.slug, '/')
   const [menuOpen, setMenuOpen] = useState(false)
   // Desktop sidebar: open (default) or icons only; when icons only it can open on hover.
   const [side, setSide] = useState<SidebarPrefs>(readSidebar)
@@ -270,7 +285,8 @@ export default function AdminLayout() {
                   }
                 >
                   <item.icon aria-hidden="true" className="size-[18px] shrink-0" strokeWidth={1.6} />
-                  {!slim && item.label}
+                  {!slim && <span className="flex-1">{item.label}</span>}
+                  {!slim && locked(item.to) && <Lock aria-label="Not in your plan" className="size-3.5 shrink-0 opacity-60" />}
                 </NavLink>
               ))}
             </div>
@@ -278,8 +294,19 @@ export default function AdminLayout() {
         ))}
       </nav>
       <div className="shrink-0 space-y-1 border-t border-line pt-3">
+        {isOwner && (
+          <a
+            href={spaceUrl(null, '/owner')}
+            title={slim ? 'Owner page' : undefined}
+            aria-label={slim ? 'Owner page' : undefined}
+            className={cn('flex min-h-11 items-center gap-3 whitespace-nowrap rounded-lg px-3 text-[0.95rem] text-ink-soft transition hover:bg-cream hover:text-ink', slim && 'justify-center px-0')}
+          >
+            <Crown aria-hidden="true" className="size-[18px] shrink-0" strokeWidth={1.6} />
+            {!slim && 'Owner page'}
+          </a>
+        )}
         <a
-          href="#/"
+          href={websiteHref}
           target="_blank"
           rel="noopener noreferrer"
           title={slim ? 'View website' : undefined}
@@ -299,7 +326,13 @@ export default function AdminLayout() {
           <LogOut aria-hidden="true" className="size-[18px] shrink-0" strokeWidth={1.6} />
           {!slim && 'Logout'}
         </button>
-        {!slim && session?.user.email && <p className="truncate px-3 pt-1 text-xs text-muted">{session.user.email}</p>}
+        {!slim && space.info?.plan && (
+          <p className="truncate px-3 pt-1 text-xs text-muted">
+            {space.info.plan.name}
+            {space.info.plan.guestLimit && space.info.guests != null ? ` · ${space.info.guests}/${space.info.plan.guestLimit} guests` : ''}
+          </p>
+        )}
+        {!slim && session?.user.email && <p className="truncate px-3 pt-1 text-xs text-muted">{String(session.user.user_metadata?.username ?? session.user.email.replace(/@accounts\.invalid$/, ''))}</p>}
       </div>
     </div>
   )

@@ -4,6 +4,7 @@ import { listMediaSections } from './mediaSectionsService'
 import { listGuestPhotos, type GuestPhoto } from './guestPhotosService'
 import { parseVideoUrl } from '../utils/media'
 import { supabase } from '../lib/supabase'
+import { DEFAULT_SLUG, spaceSlug } from '../lib/space'
 
 /** One thing on the big screen. */
 export type Slide =
@@ -43,7 +44,8 @@ export async function allGuestPhotos(): Promise<GuestPhoto[]> {
 export function watchGuestPhotos(onChange: () => void, onReconnect: () => void): () => void {
   let joinedBefore = false
   const channel = supabase
-    .channel('guest-photos')
+    // Each shower has its own channel (the original keeps the old name) — see guest_photo_topic().
+    .channel(spaceSlug && spaceSlug !== DEFAULT_SLUG ? `guest-photos:${spaceSlug}` : 'guest-photos')
     .on('broadcast', { event: 'changed' }, () => onChange())
     .subscribe((status) => {
       if (status !== 'SUBSCRIBED') return

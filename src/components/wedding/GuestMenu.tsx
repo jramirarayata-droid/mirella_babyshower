@@ -11,6 +11,8 @@ import { firstName, forgetKnownGuest, knownGuest, type KnownGuest } from '../../
 import { CoupleNames } from './CoupleNames'
 import { useShowerActivities } from '../shower/ShowerFun'
 import { cn } from '../ui/cn'
+import { useSpace } from '../../hooks/useSpace'
+import { GUEST_PAGE_FEATURE, pageFeature } from '../../lib/plans'
 
 /** The guest this phone remembers (updates when it changes). */
 export function useKnownGuest(): KnownGuest | null {
@@ -39,6 +41,7 @@ export function useGuestLinks(): Item[] {
   const { settings } = useWeddingSettings()
   const display = useDisplayPrefs()
   const fun = useShowerActivities()
+  const { has } = useSpace()
   const [photos, setPhotos] = useState(false)
   useEffect(() => {
     let alive = true
@@ -52,8 +55,8 @@ export function useGuestLinks(): Item[] {
   if (!settings) return []
   const items: Item[] = [{ to: '/#details', label: 'Shower details', hint: 'Date, venue and what to know', icon: Info }]
   if (isRsvpOpen(settings)) items.push({ to: '/rsvp', label: settings.rsvpButtonLabel.trim().toUpperCase() === 'RSVP' ? 'RSVP' : settings.rsvpButtonLabel, hint: 'Let us know if you can come', icon: Mail })
-  if (isFinderOpen(settings.seatingConfig, display?.revealAt)) items.push({ to: '/seat', label: 'Find my seat', hint: 'Your table at the shower', icon: Armchair })
-  if (photos) items.push({ to: '/photos', label: 'Photos', hint: 'See and share photos from the shower', icon: Camera })
+  if (has('seating') && isFinderOpen(settings.seatingConfig, display?.revealAt)) items.push({ to: '/seat', label: 'Find my seat', hint: 'Your table at the shower', icon: Armchair })
+  if (photos && has('guest_photos')) items.push({ to: '/photos', label: 'Photos', hint: 'See and share photos from the shower', icon: Camera })
   if (fun?.registry) items.push({ to: '/registry', label: 'Gift wishlist', hint: 'What the baby still needs', icon: Gift })
   if (fun?.predict) items.push({ to: '/predict', label: 'Baby predictions', hint: fun.predictOpen ? 'Guess the birthday, weight and boy or girl' : 'See the guesses', icon: Baby })
   if (fun?.names) items.push({ to: '/names', label: 'Name ideas', hint: 'Suggest a name for the baby', icon: PenLine })
@@ -67,6 +70,7 @@ export function GuestMenu({ tone = 'light' }: { tone?: 'light' | 'onPhoto' }) {
   const host = useHost()
   const guest = useKnownGuest()
   const { settings } = useWeddingSettings()
+  const space = useSpace()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const reduce = useReducedMotion()
@@ -206,7 +210,13 @@ export function GuestMenu({ tone = 'light' }: { tone?: 'light' | 'onPhoto' }) {
                         { to: '/show/predictions', label: 'Present the predictions', hint: 'Team Girl vs Team Boy, and the winners', icon: Trophy },
                         { to: '/show/names', label: 'Present the name ideas', hint: 'Every name guests suggested', icon: PenLine },
                       ] as const
-                    ).map((it) => {
+                    )
+                      .filter((it) => {
+                        // Only what this shower's plan includes.
+                        const f = pageFeature(it.to, GUEST_PAGE_FEATURE)
+                        return !f || space.has(f)
+                      })
+                      .map((it) => {
                       const Icon = it.icon
                       return (
                         <li key={it.to}>

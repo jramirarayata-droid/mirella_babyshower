@@ -281,6 +281,7 @@ export async function getRevealSettings(): Promise<RevealSettings> {
 export async function saveRevealSettings(s: RevealSettings): Promise<void> {
   const { error } = await supabase
     .from('gender_reveal')
+    // One row per shower: the key is (space_id, id); space_id is filled in by the database.
     .upsert({ id: 1, enabled: s.enabled, answer: s.answer, reveal_at: s.revealAt, title: s.title.trim().slice(0, 80) || 'Boy or Girl?', message: s.message.trim().slice(0, 300) })
   if (error) fail('saveRevealSettings', error, 'The gender reveal couldn’t be saved.')
 }

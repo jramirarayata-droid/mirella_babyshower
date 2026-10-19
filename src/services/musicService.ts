@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase'
 import { FriendlyError, logError } from '../utils/errors'
 import { getAdminPreference, saveAdminPreference } from './preferencesService'
+import { spaceFolder } from '../lib/space'
 
 /** Pages the song can play on. */
 export const MUSIC_PAGES = [
@@ -84,7 +85,7 @@ export async function uploadSong(file: File): Promise<{ url: string; path: strin
   if (!AUDIO_TYPES.includes(type)) throw new FriendlyError('Please choose an MP3 or M4A song.')
   if (file.size > MAX_SONG_MB * 1048576) throw new FriendlyError(`That file is over ${MAX_SONG_MB} MB. Please choose a smaller one (most songs are 3–8 MB).`)
   const ext = type === 'audio/mpeg' ? 'mp3' : type === 'audio/ogg' ? 'ogg' : 'm4a'
-  const path = `music/${crypto.randomUUID()}.${ext}`
+  const path = `${spaceFolder()}music/${crypto.randomUUID()}.${ext}`
   const { error } = await supabase.storage.from('wedding-assets').upload(path, file, { contentType: type, cacheControl: '31536000', upsert: false })
   if (error) {
     logError('uploadSong', error)

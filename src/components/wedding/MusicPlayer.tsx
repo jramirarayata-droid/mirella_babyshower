@@ -9,6 +9,7 @@ import { isThemePreviewFrame } from '../../theme/applyTheme'
 import { useWeddingSettings } from '../../hooks/useWeddingSettings'
 import { CoupleNames } from './CoupleNames'
 import { cn } from '../ui/cn'
+import { useSpace } from '../../hooks/useSpace'
 
 const MUTE_KEY = 'wedding-music-off'
 const WELCOME_KEY = 'wedding-welcome-seen'
@@ -52,8 +53,9 @@ export function MusicPlayer({ children }: { children?: ReactNode }) {
   const started = useRef(false)
   const preview = isThemePreviewFrame()
 
-  // Load the settings once a guest is on a public page.
-  const wanted = page !== null && !preview
+  // Load the settings once a guest is on a public page (and the shower's plan has music).
+  const { has } = useSpace()
+  const wanted = page !== null && !preview && has('music')
   useEffect(() => {
     if (!wanted || music) return
     let alive = true

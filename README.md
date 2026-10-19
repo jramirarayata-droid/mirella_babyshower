@@ -93,6 +93,47 @@ Keep keys and passwords out of the code, commits and chat. `.env` is git-ignored
 
 ---
 
+## Many baby showers on one site
+
+The site can host many baby showers, each with its own data, plan and web address.
+
+- **The site's root** (`https://<site>/`) is the sign-in and plans page.
+- **Each shower** lives at `https://<site>/<address>/`, e.g. `/baby-cruz/`. Guests use that link, and the shower's admin is at `/<address>/#/admin`. The original shower is at `/mirella/`. Old links such as `/#/rsvp` still open it.
+- **Plans** (table `plans`): Little Sprout, Sweet Bundle and Full Celebration. Each has a price, a guest limit and a list of features. You can edit prices and features in the table; the website reads them from there.
+- **Spaces** (table `spaces`): one row per shower. It holds the address (`slug`), `plan_id`, `is_active` (the on/off switch) and `active_until` (optional end date). Guests and the customer can only use a shower while it is switched on.
+- **Accounts** (table `accounts`): one row per login, with username, name and `is_super_admin`. Passwords are never stored in our tables: Supabase Auth keeps them.
+- **Who manages what** (table `admin_users`): which logins manage which shower.
+
+### How the data is kept apart
+
+The website sends the shower's address in an `x-space` request header. Every table has a `space_id`. A restrictive row-level-security policy only lets a request see and change rows of that shower, and only while it is switched on (the super admin always can). The database functions run as the `tenant_fn` role, which does not skip row-level security, so they are limited to the shower too. Plan limits are checked by the database:
+
+- the guest limit;
+- the looks (Little Sprout: Clouds only);
+- co-host logins (Full Celebration only);
+- writes to games and features outside the plan.
+
+Uploaded files go in a folder per shower (`<space id>/…`).
+
+### Setting it up (once)
+
+1. Back up the database. Supabase → Database → Backups, or download a dump.
+2. Run `supabase/migrations/046_multi_tenant.sql` in the SQL Editor. The existing shower becomes the default space `mirella` on the Full Celebration plan, and the existing admin becomes the super admin.
+3. Deploy the Edge Function `supabase/functions/owner-users` (name `owner-users`). It creates logins and sets passwords. It uses the project's own keys, which Supabase provides automatically; nothing needs pasting.
+4. Optional: set `VITE_CONTACT_URL` in Cloudflare → Build → Variables, e.g. your Messenger link `https://m.me/yourpage`. The "Message us" buttons open it.
+5. Merge the branch so Cloudflare publishes the new website.
+
+### Adding a customer
+
+1. Sign in at the site's root with your own email and password. You land on the **Owner page**.
+2. Click **New shower**: give it a name, an address (e.g. `baby-cruz`) and a plan, and tick **Switched on** once they've paid.
+3. Click **Add login**: pick a username. A friendly password is suggested. Click **Create login**, then **Copy message**, and send it to your customer. The password is shown only then; use **Password** to set a new one later.
+4. To end access, click **Switch off**, or set an **Open until** date.
+
+### Database tests
+
+`tests/db/run.sh` builds a throwaway local PostgreSQL that imitates Supabase. It runs every migration and then checks the separation, the plan limits and the existing guest flows. It never touches a real project.
+
 ## Local development
 
 ```bash

@@ -31,6 +31,7 @@ import type { PublicGift } from '../types/wedding'
 import { formatWeddingDate } from '../utils/formatting'
 import { GALLERY_LAYOUTS, type GalleryLayout } from '../types/wedding'
 import { isThemePreviewFrame } from '../theme/applyTheme'
+import { useSpace } from '../hooks/useSpace'
 
 export default function Home() {
   const { settings, loading, error, refresh } = useWeddingSettings()
@@ -38,6 +39,7 @@ export default function Home() {
   const gallery = useGallery()
   const display = useDisplayPrefs()
   const program = useProgram(Boolean(settings?.programVisible))
+  const space = useSpace()
   const [gift, setGift] = useState<PublicGift | null>(null)
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function Home() {
       <main>
         <Introduction settings={settings} />
         {settings.verseVisible && <VerseHighlight text={settings.verseText} reference={settings.verseReference} />}
-        <GenderRevealSection />
+        {space.has('reveal') && <GenderRevealSection />}
         {/* Photos and videos, in the order set in Admin → Photos & Video. */}
         {orderMedia(
           [

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, CheckCircle2, ExternalLink, Monitor, RotateCcw, Save, Smartphone, TriangleAlert } from 'lucide-react'
+import { Check, CheckCircle2, ExternalLink, Lock, Monitor, RotateCcw, Save, Smartphone, TriangleAlert } from 'lucide-react'
+import { useSpace } from '../hooks/useSpace'
 import { useToast } from '../hooks/useToast'
 import { setCachedWeddingSettings, useWeddingSettings } from '../hooks/useWeddingSettings'
 import { updateTheme } from '../services/settingsService'
@@ -42,6 +43,7 @@ const isLightEnough = (hex: string) => contrast(hex, '#000000') >= 12
 
 export default function AdminLookFeel() {
   const toast = useToast()
+  const space = useSpace()
   const { settings } = useWeddingSettings()
   const [values, setValues] = useState<ThemeSettings | null>(null)
   const [savedJson, setSavedJson] = useState('')
@@ -118,6 +120,9 @@ export default function AdminLookFeel() {
   const bgTooDark = !currentStyle.allowsDark && !isLightEnough(bg)
 
   const pickTemplate = (t: Template) => setValues({ template: t.id })
+  // Little Sprout: the Clouds look (any colour) and the classic style; the rest can be previewed, not published.
+  const lookLocked = (id: string) => !space.has('looks_all') && !/^(classic|clouds-)/.test(id)
+  const pickedLocked = lookLocked(values.template)
   const set = <K extends keyof ThemeSettings>(k: K, v: ThemeSettings[K]) => setValues({ ...values, [k]: v })
   const clear = (k: keyof ThemeSettings) => {
     const next = { ...values }
@@ -126,6 +131,10 @@ export default function AdminLookFeel() {
   }
 
   const save = async () => {
+    if (pickedLocked) {
+      toast.error('This look is part of the Sweet Bundle and Full Celebration plans. Message us to upgrade.')
+      return
+    }
     if (bgTooDark) {
       toast.error(`Please choose a lighter background colour — the ${currentStyle.name} style is designed for light pages.`)
       return
@@ -159,13 +168,19 @@ export default function AdminLookFeel() {
               Undo changes
             </Button>
             <SaveStatus dirty={dirty} saving={saving} />
-            <Button onClick={() => void save()} loading={saving} loadingText="Saving…" disabled={!dirty || bgTooDark} icon={<Save aria-hidden="true" className="size-4" />}>
+            <Button onClick={() => void save()} loading={saving} loadingText="Saving…" disabled={!dirty || bgTooDark || pickedLocked} icon={<Save aria-hidden="true" className="size-4" />}>
               Save & publish
             </Button>
           </>
         }
       />
 
+      {pickedLocked && (
+        <p className="mb-6 flex items-center gap-2 rounded-xl border border-champagne/50 bg-champagne-light/30 px-4 py-3 text-sm text-ink-soft">
+          <Lock aria-hidden="true" className="size-4 shrink-0 text-gold" />
+          You’re previewing a look from a bigger plan. Your plan includes the Over the Moon (Clouds) look in every colour — message us to upgrade for the rest.
+        </p>
+      )}
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
         <div className="space-y-6">
           {/* Templates */}
@@ -226,7 +241,10 @@ export default function AdminLookFeel() {
                       </div>
                       <div className="flex items-start justify-between gap-2 border-t border-line bg-paper px-3 py-2.5">
                         <span className="min-w-0">
-                          <span className="block text-sm font-medium text-ink">{t.name}</span>
+                          <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
+                            {t.name}
+                            {lookLocked(t.id) && <Lock aria-label="Bigger plan" className="size-3 text-muted" />}
+                          </span>
                           <span className="block truncate text-xs text-muted">{t.description}</span>
                         </span>
                         <span className="flex shrink-0 gap-1 pt-0.5" aria-hidden="true">

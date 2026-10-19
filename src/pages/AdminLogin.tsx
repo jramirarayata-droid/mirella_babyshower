@@ -29,7 +29,7 @@ export default function AdminLogin() {
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     if (!email.trim() || !password) {
-      setError('Please enter your email and password.')
+      setError('Please enter your username and password.')
       return
     }
     setSubmitting(true)
@@ -53,10 +53,10 @@ export default function AdminLogin() {
           </p>
           <Ornament className="mt-5" />
           <h1 className="mt-6 text-4xl text-ink">Admin Login</h1>
-          <p className="mt-2 text-sm text-muted">Sign in to manage invitations and RSVPs.</p>
+          <p className="mt-2 text-sm text-muted">Sign in to manage your baby shower.</p>
         </div>
         <form onSubmit={submit} noValidate className="mt-10 space-y-5 rounded-xl border border-line bg-paper p-6 shadow-card sm:p-8">
-          <TextField label="Email" type="email" autoComplete="username" value={email} onChange={setEmail} required autoFocus />
+          <TextField label="Username" autoComplete="username" autoCapitalize="none" spellCheck={false} value={email} onChange={setEmail} required autoFocus />
           <TextField label="Password" type="password" autoComplete="current-password" value={password} onChange={setPassword} required />
           <FieldError>{error}</FieldError>
           <Button type="submit" fullWidth size="md" loading={submitting} loadingText="Signing in…" icon={<Lock aria-hidden="true" className="size-4" />}>

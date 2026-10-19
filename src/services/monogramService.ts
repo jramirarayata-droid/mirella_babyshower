@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase'
 import { FriendlyError, logError } from '../utils/errors'
 import { getAdminPreference, saveAdminPreference } from './preferencesService'
 import { getDisplayPrefs } from './displayPrefsService'
+import { spaceFolder } from '../lib/space'
 
 /** Look & Feel → Monogram: the couple's own monogram image. */
 export interface MonogramSettings {
@@ -75,7 +76,7 @@ export async function uploadMonogram(file: File): Promise<{ url: string; path: s
   const { aspect, h } = await aspectOf(body).catch(() => {
     throw new FriendlyError('That image couldn’t be opened. Please try another file.')
   })
-  const path = `monogram/${crypto.randomUUID()}.${isSvg ? 'svg' : 'png'}`
+  const path = `${spaceFolder()}monogram/${crypto.randomUUID()}.${isSvg ? 'svg' : 'png'}`
   const { error } = await supabase.storage.from('wedding-assets').upload(path, body, { contentType: isSvg ? 'image/svg+xml' : 'image/png', cacheControl: '31536000', upsert: false })
   if (error) {
     logError('uploadMonogram', error)

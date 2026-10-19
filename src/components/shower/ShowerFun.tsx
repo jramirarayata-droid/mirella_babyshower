@@ -4,6 +4,7 @@ import { Baby, Gift, PenLine, type LucideIcon } from 'lucide-react'
 import { getNameIdeasInfo, getPredictionsInfo, getRegistry } from '../../services/showerService'
 import { Reveal } from '../wedding/Reveal'
 import { Ornament } from '../ui/Ornament'
+import { useSpace } from '../../hooks/useSpace'
 
 interface Card {
   to: string
@@ -24,6 +25,7 @@ let activities: Promise<ShowerActivities> | null = null
 
 /** Which shower activities are on (for the home page and the guest menu; asked once per visit). */
 export function useShowerActivities(): ShowerActivities | null {
+  const { has } = useSpace()
   const [on, setOn] = useState<ShowerActivities | null>(null)
   useEffect(() => {
     let alive = true
@@ -38,7 +40,8 @@ export function useShowerActivities(): ShowerActivities | null {
       alive = false
     }
   }, [])
-  return on
+  // Games outside the shower's plan stay hidden.
+  return on && { ...on, predict: on.predict && has('predictions'), names: on.names && has('names') }
 }
 
 /** Home page: the wishlist, the predictions game and name ideas, as three friendly cards. */

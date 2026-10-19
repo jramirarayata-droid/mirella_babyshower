@@ -16,7 +16,7 @@ export async function getAdminPreference<T>(key: string): Promise<T | null> {
 export async function saveAdminPreference(key: string, value: unknown): Promise<void> {
   const { error } = await supabase
     .from('admin_preferences')
-    .upsert({ key, value: value as Json, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+    .upsert({ key, value: value as Json, updated_at: new Date().toISOString() }, { onConflict: 'space_id,key' })
   if (error) {
     logError('saveAdminPreference', error)
     throw new FriendlyError('We couldn’t save your setup. Please try again.')
