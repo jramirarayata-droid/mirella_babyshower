@@ -1,0 +1,386 @@
+/*
+ * Website-only design looks (Admin → Look & Feel). Each builds on the Classic
+ * base in index.css and only adds decoration and type — layouts, forms and
+ * buttons keep working exactly the same. The admin pages never get these
+ * (they always run as "classic"), and Printables use their own print styles.
+ *
+ * Deliberately unlayered so these win over Tailwind utilities.
+ */
+
+/* ======================================================== Sweet Greenery */
+/* Painted watercolour greenery (eucalyptus, willow and seeded sprigs) over
+   fine lines, with a fine script for the baby's name. id: "leaf". */
+
+html[data-style='leaf'] .hero-names {
+  font-family: var(--font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.05;
+  font-size: clamp(3.4rem, 13vw, 7rem);
+  padding-block: 0.08em;
+}
+html[data-style='leaf'] .hero-photo .hero-names {
+  font-size: clamp(3.8rem, 15vw, 8.5rem);
+}
+html[data-style='leaf'] .hero-names [aria-label='and'] {
+  font-style: normal;
+  margin-inline: 0.12em;
+}
+
+html[data-style='leaf'] .hero {
+  overflow-x: clip;
+}
+html[data-style='leaf'] .hero-arch-wrap {
+  margin-top: 4rem;
+  margin-bottom: 3rem;
+}
+@media (min-width: 640px) {
+  html[data-style='leaf'] .hero-arch-wrap {
+    margin-top: 5rem;
+  }
+}
+
+/* The hero photo: a clean rectangle on paper, framed by gold lines and greenery */
+html[data-style='leaf'] .hero-arch {
+  aspect-ratio: 4 / 5;
+  width: min(64vw, 320px);
+  border-radius: 2px;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  box-shadow: 0 26px 50px -30px rgb(0 0 0 / 0.4);
+}
+html[data-style='leaf'] .hero-arch-photo {
+  border-radius: 2px;
+}
+
+/* A small painted sprig above every section title */
+html[data-style='leaf'] main .section-title .eyebrow::before {
+  content: '';
+  display: block;
+  width: 132px;
+  height: 38px;
+  margin: 0 auto 0.85rem;
+  background: url('../assets/looks/greenery-sprig.webp') center / contain no-repeat;
+}
+html[data-style='leaf'] main .section-title h2 {
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Cards: a fine gold inner line with greenery in two corners */
+html[data-style='leaf'] .fine-frame {
+  border-radius: 4px !important;
+}
+html[data-style='leaf'] .fine-frame::after {
+  inset: 12px;
+  border-radius: 2px;
+  border-color: color-mix(in srgb, var(--color-champagne) 60%, transparent);
+}
+html[data-style='leaf'] .fine-frame:not(button)::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    url('../assets/looks/greenery-corner.webp') top left / 104px no-repeat,
+    url('../assets/looks/greenery-corner-br.webp') bottom right / 104px no-repeat;
+}
+@media (min-width: 640px) {
+  html[data-style='leaf'] .fine-frame:not(button)::before {
+    inset: -10px;
+    background-size: 132px, 132px;
+  }
+}
+
+/* Icons sit in a fine double gold ring */
+html[data-style='leaf'] .lux-icon {
+  box-shadow:
+    0 0 0 4px var(--color-ivory),
+    0 0 0 5px color-mix(in srgb, var(--color-champagne) 30%, transparent);
+}
+
+/* The RSVP button gets a fine gold halo */
+html[data-style='leaf'] .lux-cta {
+  box-shadow:
+    0 0 0 3px var(--color-ivory),
+    0 0 0 4px color-mix(in srgb, var(--color-champagne) 70%, transparent) !important;
+}
+
+/* ===================================================== shared: script names */
+html:is([data-style='garden'], [data-style='clouds'], [data-style='balloons']) .hero-names {
+  font-family: var(--font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.1;
+  padding-block: 0.1em;
+  font-size: clamp(3.4rem, 13vw, 6.8rem);
+}
+html:is([data-style='garden'], [data-style='clouds'], [data-style='balloons']) .hero-photo .hero-names {
+  font-size: clamp(3.8rem, 15vw, 8rem);
+}
+html:is([data-style='garden'], [data-style='clouds'], [data-style='balloons']) .hero-names [aria-label='and'] {
+  font-style: normal;
+  margin-inline: 0.24em;
+}
+html:is([data-style='garden'], [data-style='clouds'], [data-style='balloons'], [data-style='arch']) .hero {
+  overflow-x: clip;
+}
+
+/* ===================================================== Little Blossom */
+/* Painted blooms resting across the foot of the arched photo; one posy on
+   each card. id: "garden". */
+
+html[data-style='garden'] .hero-arch-wrap {
+  margin-bottom: 2.5rem;
+}
+html[data-style='garden'] .hero-arch {
+  border-color: color-mix(in srgb, var(--color-champagne) 55%, transparent);
+}
+html[data-style='garden'] main .section-title h2 {
+  font-style: italic;
+  font-weight: 400;
+}
+html[data-style='garden'] .fine-frame {
+  border-radius: 6px !important;
+}
+html[data-style='garden'] .fine-frame::after {
+  inset: 12px;
+  border-radius: 3px;
+}
+html[data-style='garden'] .fine-frame:not(button)::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: -14px;
+  width: 112px;
+  height: 112px;
+  z-index: 1;
+  pointer-events: none;
+  background: url('../assets/looks/garden-corner.webp') top left / contain no-repeat;
+}
+@media (min-width: 640px) {
+  html[data-style='garden'] .fine-frame:not(button)::before {
+    width: 138px;
+    height: 138px;
+    left: -18px;
+    top: -18px;
+  }
+}
+
+/* ===================================================== Over the Moon */
+/* A soft sky: the hero is washed from the page colour into a pale sky with
+   puffy clouds, a crescent moon and stars around the arched photo (BabyArt);
+   a little cloud over each section title; pillowy cards. id: "clouds". */
+
+html[data-style='clouds'] .hero-paper {
+  background-image:
+    radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--color-champagne) 22%, var(--color-ivory)), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-champagne) 12%, var(--color-ivory)), var(--color-ivory));
+  background-size: 100% 100%;
+  background-position: 0 0;
+}
+html[data-style='clouds'] .hero-eyebrow {
+  font-family: var(--font-script);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  line-height: 1.2;
+  color: var(--color-gold);
+}
+html[data-style='clouds'] .hero-photo .hero-eyebrow {
+  color: rgb(255 255 255 / 0.92);
+}
+html[data-style='clouds'] .hero-arch-wrap {
+  margin-top: 3.5rem;
+  margin-bottom: 2rem;
+}
+html[data-style='clouds'] .hero-arch {
+  border-color: color-mix(in srgb, var(--color-champagne) 55%, transparent);
+  box-shadow:
+    0 0 0 6px var(--color-ivory),
+    0 0 0 7px color-mix(in srgb, var(--color-champagne) 28%, transparent),
+    0 26px 50px -30px rgb(0 0 0 / 0.3);
+}
+html[data-style='clouds'] main .section-title .eyebrow::before {
+  content: '';
+  display: block;
+  width: 58px;
+  height: 32px;
+  margin: 0 auto 0.75rem;
+  background-color: color-mix(in srgb, var(--color-champagne) 75%, transparent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 64'%3E%3Cpath d='M24 58C12 58 4 50.5 4 41.5S11.6 25 22.4 25c1.6-11 11-19 22.6-19 9.3 0 17.3 5.3 21 13 2.4-1 5-1.5 7.8-1.5 10.6 0 19.4 7.6 20.9 17.6C105.6 36 116 44.6 116 47.6 116 53.4 110.8 58 104.4 58Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 64'%3E%3Cpath d='M24 58C12 58 4 50.5 4 41.5S11.6 25 22.4 25c1.6-11 11-19 22.6-19 9.3 0 17.3 5.3 21 13 2.4-1 5-1.5 7.8-1.5 10.6 0 19.4 7.6 20.9 17.6C105.6 36 116 44.6 116 47.6 116 53.4 110.8 58 104.4 58Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+html[data-style='clouds'] main .section-title h2 {
+  font-family: var(--font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+html[data-style='clouds'] main > section:nth-of-type(even) {
+  background-image: linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-champagne) 9%, transparent) 30%, transparent);
+}
+html[data-style='clouds'] .fine-frame {
+  border-radius: 28px !important;
+  background-color: color-mix(in srgb, var(--color-champagne) 6%, var(--color-paper)) !important;
+}
+html[data-style='clouds'] .fine-frame::after {
+  inset: 10px;
+  border-radius: 20px;
+  border-style: dashed;
+}
+html[data-style='clouds'] .lux-icon {
+  border-radius: 9999px;
+}
+html[data-style='clouds'] .lux-cta,
+html[data-style='clouds'] .lux-pill,
+html[data-style='clouds'] .lux-link {
+  border-radius: 999px;
+}
+
+/* ===================================================== Boho Rainbow */
+/* Muted rainbow arches behind the photo (and behind the names on a full
+   photo); cards with arched tops; a small rainbow over each section title.
+   No script — airy, spaced type. id: "arch". */
+
+html[data-style='arch'] .hero-names {
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+html[data-style='arch'] .hero-arch-wrap {
+  margin-top: 4rem;
+}
+html[data-style='arch'] .hero-photo .hero-copy {
+  position: relative;
+  isolation: isolate;
+}
+html[data-style='arch'] .hero-photo .hero-copy::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(92vw, 620px);
+  aspect-ratio: 2 / 1;
+  transform: translate(-50%, -64%);
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 999px 999px 0 0;
+  background:
+    radial-gradient(circle at 50% 100%, transparent 0 34%, color-mix(in srgb, #b8c7a8 70%, var(--color-champagne)) 34% 44%, color-mix(in srgb, #ead39b 70%, var(--color-champagne)) 44% 54%, color-mix(in srgb, #e2a77f 65%, var(--color-champagne)) 54% 64%, color-mix(in srgb, var(--color-champagne) 88%, #3b2416) 64% 72%, transparent 72%);
+  opacity: 0.8;
+}
+html[data-style='arch'] .hero-photo .hero-copy.items-start::before {
+  left: min(40vw, 300px);
+  top: auto;
+  bottom: 0;
+  transform: translate(-50%, 0);
+}
+html[data-style='arch'] main .section-title .eyebrow::before {
+  content: '';
+  display: block;
+  width: 58px;
+  height: 30px;
+  margin: 0 auto 0.8rem;
+  background: radial-gradient(circle at 50% 100%, transparent 0 30%, color-mix(in srgb, #b8c7a8 70%, var(--color-champagne)) 30% 46%, color-mix(in srgb, #ead39b 70%, var(--color-champagne)) 46% 62%, color-mix(in srgb, #e2a77f 65%, var(--color-champagne)) 62% 78%, color-mix(in srgb, var(--color-champagne) 88%, #3b2416) 78% 94%, transparent 94%);
+  border-radius: 999px 999px 0 0;
+}
+html[data-style='arch'] main .section-title h2 {
+  font-style: italic;
+  font-weight: 300;
+}
+html[data-style='arch'] .fine-frame {
+  border-radius: 999px 999px 10px 10px / 220px 220px 10px 10px !important;
+  padding-top: 4.5rem !important;
+}
+html[data-style='arch'] .fine-frame::after {
+  inset: 10px;
+  border-radius: 999px 999px 6px 6px / 212px 212px 6px 6px;
+}
+html[data-style='arch'] .lux-cta {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-champagne) 70%, var(--color-ink)) !important;
+}
+html[data-style='arch'] .hero-arch {
+  border-color: color-mix(in srgb, var(--color-champagne) 70%, transparent);
+}
+
+/* ===================================================== Oh Baby! Balloons */
+/* A round photo with balloons floating up round it (BabyArt); soft rounded
+   cards tinted by the accent, a balloon on each; round buttons. id: "balloons". */
+
+html[data-style='balloons'] .hero-eyebrow {
+  font-family: var(--font-script);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  font-size: clamp(1.7rem, 5.5vw, 2.3rem);
+  color: var(--color-gold);
+}
+html[data-style='balloons'] .hero-arch-wrap {
+  margin-top: 4rem;
+  margin-bottom: 2rem;
+}
+html[data-style='balloons'] .hero-arch {
+  aspect-ratio: 1 / 1;
+  width: min(66vw, 320px);
+  border-radius: 9999px;
+  padding: 6px;
+  border-color: color-mix(in srgb, var(--color-champagne) 60%, transparent);
+  box-shadow:
+    0 0 0 6px var(--color-ivory),
+    0 0 0 7px color-mix(in srgb, var(--color-champagne) 30%, transparent),
+    0 24px 50px -30px rgb(0 0 0 / 0.35);
+}
+html[data-style='balloons'] .hero-arch-photo {
+  border-radius: 9999px;
+}
+html[data-style='balloons'] main .section-title .eyebrow::before {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 46px;
+  margin: 0 auto 0.6rem;
+  background:
+    radial-gradient(ellipse 9px 11px at 20px 13px, color-mix(in srgb, #f4b8c5 70%, var(--color-champagne)) 98%, transparent),
+    radial-gradient(ellipse 10px 12px at 32px 11px, color-mix(in srgb, var(--color-champagne) 85%, #fff) 98%, transparent),
+    radial-gradient(ellipse 9px 11px at 44px 14px, color-mix(in srgb, #a9c8ea 70%, var(--color-champagne)) 98%, transparent),
+    linear-gradient(color-mix(in srgb, var(--color-ink) 30%, transparent), color-mix(in srgb, var(--color-ink) 30%, transparent)) 31.5px 23px / 1px 22px no-repeat;
+}
+html[data-style='balloons'] main .section-title h2 {
+  font-family: var(--font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+html[data-style='balloons'] .fine-frame {
+  border-radius: 24px !important;
+  background-color: color-mix(in srgb, var(--color-champagne) 8%, var(--color-paper)) !important;
+}
+html[data-style='balloons'] .fine-frame::after {
+  inset: 10px;
+  border-radius: 16px;
+  border-style: dashed;
+}
+html[data-style='balloons'] .fine-frame:not(button)::before {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: -30px;
+  width: 26px;
+  height: 58px;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 12px 15px at 13px 15px, color-mix(in srgb, #f4b8c5 70%, var(--color-champagne)) 98%, transparent),
+    linear-gradient(color-mix(in srgb, var(--color-ink) 30%, transparent), color-mix(in srgb, var(--color-ink) 30%, transparent)) 12.5px 30px / 1px 28px no-repeat;
+}
+html[data-style='balloons'] .lux-icon {
+  border-radius: 9999px;
+}
+html[data-style='balloons'] .lux-cta,
+html[data-style='balloons'] .lux-pill,
+html[data-style='balloons'] .lux-link {
+  border-radius: 999px;
+}

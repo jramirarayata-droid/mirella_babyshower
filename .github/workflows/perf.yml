@@ -1,0 +1,49 @@
+name: Speed check
+
+# Loads the live public pages like a guest's phone (slow 4G) and records what
+# was downloaded. Read-only. Runs for branches named perf-*.
+on:
+  push:
+    branches: ['perf-*']
+
+permissions:
+  contents: write
+
+jobs:
+  perf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies and build (to list bundle sizes)
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npm run build
+          mkdir -p /tmp/perf-out
+          (cd dist/assets && ls -S -l | awk '{printf "%8.1f KB  %s\n", $5/1024, $9}' | head -40) > /tmp/perf-out/bundle.txt
+          du -sh dist >> /tmp/perf-out/bundle.txt
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          SITE_URL: ${{ vars.SITE_URL }}
+      - name: Install the browser
+        run: npm i --no-save playwright@1.55 && npx playwright install --with-deps chromium
+      - name: Measure the live site
+        env:
+          SITE: ${{ vars.SITE_URL }}
+        run: |
+          if [ -z "$SITE" ]; then echo "Set the repository variable SITE_URL first" > /tmp/perf-out/hosts.txt; exit 0; fi
+          echo "$SITE $(curl -s -o /dev/null -w '%{http_code}' $SITE)" > /tmp/perf-out/hosts.txt
+          node tests/perf/measure.mjs $SITE /tmp/perf-out || true
+          for u in $SITE $SITE/i/; do echo "== $u"; curl -sI "$u" | grep -iE "^(HTTP|cache-control|content-type|location)"; done > /tmp/perf-out/headers.txt
+          curl -s $SITE | grep -oE '<meta property="og:[a-z:]+" content="[^"]*"' >> /tmp/perf-out/headers.txt || true
+      - name: Publish results to the test-results branch
+        if: always()
+        run: |
+          cd /tmp/perf-out
+          git init -q -b test-results
+          git config user.name ci && git config user.email ci@example.com
+          git add -A && git commit -qm "perf results ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" test-results

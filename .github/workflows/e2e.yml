@@ -1,0 +1,60 @@
+name: Browser test
+
+# Runs the end-to-end browser check (mocked backend, nothing live is touched)
+# for branches named e2e-*.
+on:
+  push:
+    branches: ['e2e-*']
+
+permissions:
+  contents: write
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Build against a mock backend
+        # Type-check and lint output is kept with the results, so a failing build can be read there.
+        run: |
+          mkdir -p /tmp/e2e-out
+          set -o pipefail
+          (npx tsc -b && npx vite build) 2>&1 | tee /tmp/e2e-out/build.txt
+          npx eslint . > /tmp/e2e-out/lint.txt 2>&1 || true
+        env:
+          VITE_SUPABASE_URL: https://mock.supabase.test
+          VITE_SUPABASE_ANON_KEY: mock-anon-key
+          SITE_URL: http://localhost:4173/
+      - name: Install the browser
+        run: npm i --no-save playwright@1.55 && npx playwright install --with-deps chromium
+      - name: Run
+        run: |
+          npx vite preview --port 4173 --strictPort &
+          sleep 3
+          set -o pipefail
+          mkdir -p /tmp/e2e-out
+          status=0
+          node tests/e2e/media.mjs http://localhost:4173/ /tmp/e2e-out | tee /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/seating.mjs http://localhost:4173/ /tmp/e2e-out | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/printables.mjs http://localhost:4173/ /tmp/e2e-out | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/raffle.mjs http://localhost:4173/ /tmp/e2e-out | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/invitations.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/admin-polish.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/looks.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/resilience.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/drive.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/program.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
+          exit $status
+      - name: Publish results to the test-results branch
+        if: always()
+        run: |
+          cd /tmp/e2e-out
+          git init -q -b test-results
+          git config user.name ci && git config user.email ci@example.com
+          git add -A && git commit -qm "e2e results ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" test-results

@@ -1,0 +1,30 @@
+name: Check branch
+
+# Lint, typecheck and build every branch. Nothing is deployed from here
+# (Cloudflare deploys main by itself).
+on:
+  push:
+    branches-ignore: [test-results]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck and build
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          SITE_URL: ${{ vars.SITE_URL }}
