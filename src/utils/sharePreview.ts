@@ -5,6 +5,7 @@ import { resolveTheme } from '../theme/themes'
 import type { WeddingSettings } from '../types/wedding'
 import { formatWeddingDate } from './formatting'
 import { logError } from './errors'
+import { spaceFolder } from '../lib/space'
 
 /*
  * The Messenger / Facebook link-preview image: an invitation card drawn on the
@@ -180,7 +181,7 @@ export function syncSharePreview(s: WeddingSettings, force = false): Promise<str
       const saved = (await getAdminPreference<Saved>('share_preview')) ?? {}
       if (!force && saved.sig === sig && saved.url) return saved.url
       const blob = await renderSharePreview(s)
-      const path = `share/invite-preview-${Date.now()}.jpg`
+      const path = `${spaceFolder()}share/invite-preview-${Date.now()}.jpg`
       const { error } = await supabase.storage.from(WEDDING_ASSETS_BUCKET).upload(path, blob, { cacheControl: '31536000', upsert: false, contentType: 'image/jpeg' })
       if (error) throw error
       const url = supabase.storage.from(WEDDING_ASSETS_BUCKET).getPublicUrl(path).data.publicUrl
