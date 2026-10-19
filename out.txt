@@ -1,0 +1,59 @@
+=================== https://mirella-babyshower.mirandella.workers.dev/
+status 200 type text/html final https://mirella-babyshower.mirandella.workers.dev/
+<title>Baby Shower Websites · A soft little website for your baby shower</title>
+<meta name="description" content="Invitations, RSVPs, a gift wishlist, guessing games and a gender reveal — all in one gentle place your guests open on their phones. Plans from ₱999."
+<meta property="og:type" content="website"
+<meta property="og:title" content="Baby Shower Websites · A soft little website for your baby shower"
+<meta property="og:description" content="Invitations, RSVPs, a gift wishlist, guessing games and a gender reveal — all in one gentle place your guests open on their phones. Plans from ₱999."
+<meta property="og:url" content="https://mirella-babyshower.mirandella.workers.dev/"
+<meta property="og:image" content="https://mirella-babyshower.mirandella.workers.dev/og-main.png"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta name="twitter:card" content="summary_large_image"
+<meta name="twitter:title" content="Baby Shower Websites · A soft little website for your baby shower"
+<meta name="twitter:description" content="Invitations, RSVPs, a gift wishlist, guessing games and a gender reveal — all in one gentle place your guests open on their phones. Plans from ₱999."
+<meta name="twitter:image" content="https://mirella-babyshower.mirandella.workers.dev/og-main.png"
+=================== https://mirella-babyshower.mirandella.workers.dev/mirella/
+status 200 type text/html final https://mirella-babyshower.mirandella.workers.dev/mirella/
+<title>Baby Santos · Baby Shower · March 13, 2027</title>
+<meta name="description" content="A little one is on the way! Join us for an afternoon of games, sweet treats and lots of love as we get ready to welcome our baby."
+<meta property="og:type" content="website"
+<meta property="og:title" content="Baby Santos · Baby Shower · March 13, 2027"
+<meta property="og:description" content="A little one is on the way! Join us for an afternoon of games, sweet treats and lots of love as we get ready to welcome our baby."
+<meta property="og:url" content="https://mirella-babyshower.mirandella.workers.dev/mirella/"
+<meta property="og:image" content="https://xemrpybvxlhiastmawjl.supabase.co/storage/v1/object/public/wedding-assets/share/invite-preview-1792422722460.jpg"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta name="twitter:card" content="summary_large_image"
+<meta name="twitter:title" content="Baby Santos · Baby Shower · March 13, 2027"
+<meta name="twitter:description" content="A little one is on the way! Join us for an afternoon of games, sweet treats and lots of love as we get ready to welcome our baby."
+<meta name="twitter:image" content="https://xemrpybvxlhiastmawjl.supabase.co/storage/v1/object/public/wedding-assets/share/invite-preview-1792422722460.jpg"
+=================== https://mirella-babyshower.mirandella.workers.dev/mirella/i/?c=sample-01
+status 200 type text/html; charset=utf-8 final https://mirella-babyshower.mirandella.workers.dev/mirella/i/?c=sample-01
+<title>You’re invited · Baby Santos’s Baby Shower · March 13, 2027</title>
+<meta name="description" content="Tap to open your personal baby shower invitation."
+<meta property="og:type" content="website"
+<meta property="og:title" content="You’re invited · Baby Santos’s Baby Shower · March 13, 2027"
+<meta property="og:description" content="Tap to open your personal baby shower invitation."
+<meta property="og:image" content="https://xemrpybvxlhiastmawjl.supabase.co/storage/v1/object/public/wedding-assets/share/invite-preview-1792422722460.jpg"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta name="twitter:card" content="summary_large_image"
+location.replace("/mirella/#/i/sample-01")
+=================== https://mirella-babyshower.mirandella.workers.dev/i/?c=sample-01
+status 200 type text/html final https://mirella-babyshower.mirandella.workers.dev/i/?c=sample-01
+<title>You’re invited · Baby Santos’s Baby Shower · March 13, 2027</title>
+<meta name="description" content="Tap to open your personal baby shower invitation."
+<meta property="og:type" content="website"
+<meta property="og:title" content="You’re invited · Baby Santos’s Baby Shower · March 13, 2027"
+<meta property="og:description" content="Tap to open your personal baby shower invitation."
+<meta property="og:image" content="https://xemrpybvxlhiastmawjl.supabase.co/storage/v1/object/public/wedding-assets/share/invite-preview-1792422722460.jpg"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta name="twitter:card" content="summary_large_image"
+<meta name="twitter:title" content="You’re invited · Baby Santos’s Baby Shower · March 13, 2027"
+<meta name="twitter:description" content="Tap to open your personal baby shower invitation."
+<meta name="twitter:image" content="https://xemrpybvxlhiastmawjl.supabase.co/storage/v1/object/public/wedding-assets/share/invite-preview-1792422722460.jpg"
+location.replace((function (c)
+=================== https://mirella-babyshower.mirandella.workers.dev/og-main.png
+status 200 type image/png final https://mirella-babyshower.mirandella.workers.dev/og-main.png
