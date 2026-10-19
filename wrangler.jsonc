@@ -5,6 +5,9 @@
   "compatibility_date": "2026-06-01",
   // Build the site before every upload (branch previews skip the dashboard's build command).
   "build": { "command": "npm run build" },
+  // Serve on mirella-babyshower.<account>.workers.dev, and give branch previews their own addresses there.
+  "workers_dev": true,
+  "preview_urls": true,
   "assets": {
     "directory": "./dist",
     // Unknown paths fall back to the app (pages use #/ links, so this is just a safety net).
