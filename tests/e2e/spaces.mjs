@@ -15,7 +15,7 @@ const ok = (name, pass, detail = '') => {
 
 const PLANS = [
   { id: 'sprout', name: 'Little Sprout', tagline: 'Everything you need to invite and RSVP', price_php: 999, guest_limit: 40, features: [], highlight: false, sort: 1 },
-  { id: 'bundle', name: 'Sweet Bundle', tagline: 'The full guest experience', price_php: 1999, guest_limit: 120, features: ['looks_all', 'predictions', 'names', 'reveal', 'guest_photos', 'gallery', 'printables'], highlight: true, sort: 2 },
+  { id: 'bundle', name: 'Sweet Bundle', tagline: 'The full guest experience', price_php: 1999, guest_limit: 120, features: ['looks_all', 'predictions', 'names', 'reveal', 'guest_photos', 'gallery', 'printables'], highlight: true, sort: 2, sale_price_php: 1499, sale_label: 'Holiday sale', sale_ends: null },
   { id: 'full', name: 'Full Celebration', tagline: 'Everything', price_php: 3499, guest_limit: null, features: ['looks_all', 'predictions', 'names', 'reveal', 'guest_photos', 'gallery', 'printables', 'raffle', 'big_screen', 'slideshow', 'music', 'seating', 'cohost'], highlight: false, sort: 3 },
 ]
 const planJson = (id) => {
@@ -121,7 +121,8 @@ try {
   ok('root shows the sign-in card', await page.getByLabel('Username').isVisible())
   await page.getByRole('heading', { name: 'Little Sprout' }).waitFor({ timeout: 8000 })
   ok('root shows the three plans', (await page.getByRole('heading', { name: /^(Little Sprout|Sweet Bundle|Full Celebration)$/ }).count()) === 3)
-  ok('plan prices show in pesos', (await page.getByText('₱1,999').count()) >= 1)
+  ok('plan prices show in pesos', (await page.getByText('₱3,499').count()) >= 1)
+  ok('a plan on sale shows the sale price and what you save', (await page.getByText('₱1,499').count()) >= 1 && (await page.getByText(/Holiday sale · Save ₱500/).count()) === 1)
   shots.push(['spaces-landing', await page.screenshot({ fullPage: true })])
   ok('root sends no space header', headersSeen.has('(none)') && !headersSeen.has('baby-cruz'))
 
@@ -186,6 +187,7 @@ try {
   await page.getByRole('heading', { name: 'All baby showers' }).waitFor({ timeout: 15000 })
   ok('owner signs in to the owner page', true)
   ok('owner sees every shower', (await page.getByRole('heading', { name: /^(Mir & Ella Baby Shower|Baby Cruz|Baby Lim)$/ }).count()) === 3)
+  ok('owner sees Plans & discounts with the sale on', (await page.getByRole('heading', { name: 'Plans & discounts' }).count()) === 1 && (await page.getByText('On sale').count()) === 1)
   shots.push(['spaces-owner', await page.screenshot({ fullPage: true })])
 
   await page.getByRole('button', { name: 'New shower' }).click()

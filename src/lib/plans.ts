@@ -81,6 +81,24 @@ export interface Plan {
   guestLimit: number | null
   features: Feature[]
   highlight: boolean
+  /** A discount the owner set (null = none). */
+  salePricePhp: number | null
+  saleLabel: string
+  /** Last day of the sale (YYYY-MM-DD), or null for no end date. */
+  saleEnds: string | null
 }
+
+/** Today in the Philippines, as YYYY-MM-DD. */
+const manilaToday = () => new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10)
+
+/** The sale price if a discount is running today, otherwise null. */
+export function activeSale(p: Plan): number | null {
+  if (p.salePricePhp == null || p.salePricePhp >= p.pricePhp) return null
+  if (p.saleEnds && p.saleEnds < manilaToday()) return null
+  return p.salePricePhp
+}
+
+/** What the customer pays today. */
+export const priceToday = (p: Plan) => activeSale(p) ?? p.pricePhp
 
 export const peso = (n: number) => `₱${n.toLocaleString('en-PH')}`

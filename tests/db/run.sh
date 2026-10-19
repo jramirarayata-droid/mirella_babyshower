@@ -18,6 +18,7 @@ for f in "$R"/supabase/migrations/0[0-3]*.sql "$R"/supabase/migrations/04[0-5]*.
 $PSQL -U supabase_admin -d sb -f test_users.sql >/dev/null
 $PSQL -U postgres -d sb -f "$R/supabase/seed.sql" >/dev/null
 $PSQL -U postgres -d sb -f "$R/supabase/migrations/046_multi_tenant.sql" >/dev/null 2>&1
+$PSQL -U postgres -d sb -f "$R/supabase/migrations/047_plan_discounts.sql" >/dev/null 2>&1
 out=$(psql -U postgres -d sb -f isolation_test.sql 2>&1; psql -U postgres -d sb -f regression_test.sql 2>&1)
 echo "$out" | grep -E "PASS|FAIL|ERROR" | sed -E 's/^psql:[^ ]* //; s/^NOTICE:  //'
 echo "$out" | grep -qE "FAIL|ERROR" && exit 1 || echo "all passed"

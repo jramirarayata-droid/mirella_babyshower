@@ -9,13 +9,13 @@ import { Modal } from '../components/ui/Modal'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { FieldError, TextField } from '../components/ui/FormField'
 import { PageLoader } from '../components/ui/Spinner'
-import { peso, type Plan } from '../lib/plans'
+import { activeSale, peso, type Plan } from '../lib/plans'
 import { spaceUrl } from '../lib/space'
 import { copyText } from '../utils/share'
 import { toFriendlyMessage } from '../utils/errors'
 import {
-  loadMyAccount, loadPlans, ownerAccounts, ownerCreateLogin, ownerDeleteLogin, ownerSaveSpace, ownerSetMember, ownerSetPassword, ownerSpaces,
-  type OwnerAccount, type OwnerSpace, type SpaceInput,
+  loadMyAccount, loadPlans, ownerAccounts, ownerCreateLogin, ownerDeleteLogin, ownerSavePlan, ownerSaveSpace, ownerSetMember, ownerSetPassword, ownerSpaces,
+  type OwnerAccount, type OwnerSpace, type PlanInput, type SpaceInput,
 } from '../services/spaceService'
 
 const today = () => new Date().toISOString().slice(0, 10)
@@ -250,6 +250,8 @@ export default function Owner() {
             </ul>
           )}
         </section>
+
+        <PlansEditor plans={plans} onSaved={() => void reload()} />
 
         <section aria-labelledby="logins-heading" className="space-y-4">
           <h2 id="logins-heading" className="font-serif text-2xl text-ink">
@@ -625,5 +627,137 @@ function PasswordForm({ account, onClose }: { account: OwnerAccount; onClose: ()
       </form>
       <FieldError>{error}</FieldError>
     </Modal>
+  )
+}
+
+/** Plans & discounts: usual price, guest limit, and a sale shown on the main page. */
+function PlansEditor({ plans, onSaved }: { plans: Plan[]; onSaved: () => void }) {
+  return (
+    <section aria-labelledby="plans-heading" className="space-y-4">
+      <div>
+        <h2 id="plans-heading" className="font-serif text-2xl text-ink">
+          Plans &amp; discounts
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          Put a plan on sale and the main page shows the old price crossed out next to the new one. With a last day set, the sale ends by itself.
+        </p>
+      </div>
+      <ul className="grid gap-4 lg:grid-cols-3">
+        {plans.map((p) => (
+          <li key={p.id}>
+            <PlanRow plan={p} onSaved={onSaved} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+function PlanRow({ plan, onSaved }: { plan: Plan; onSaved: () => void }) {
+  const toast = useToast()
+  const [v, setV] = useState<PlanInput>({
+    id: plan.id,
+    pricePhp: plan.pricePhp,
+    guestLimit: plan.guestLimit,
+    salePricePhp: plan.salePricePhp,
+    saleLabel: plan.saleLabel,
+    saleEnds: plan.saleEnds,
+  })
+  const [saving, setSaving] = useState(false)
+  const set = (patch: Partial<PlanInput>) => setV((cur) => ({ ...cur, ...patch }))
+  const onSale = v.salePricePhp != null
+  const preview = activeSale({ ...plan, ...v })
+  const percent = (pct: number) => set({ salePricePhp: Math.max(0, Math.round((v.pricePhp * (100 - pct)) / 100 / 10) * 10) })
+  const num = (t: string) => (t.trim() === '' ? null : Math.max(0, Math.floor(Number(t.replace(/[^0-9]/g, '')) || 0)))
+
+  const save = async () => {
+    if (onSale && (v.salePricePhp ?? 0) >= v.pricePhp) {
+      toast.show('The sale price must be lower than the usual price.', 'error')
+      return
+    }
+    setSaving(true)
+    try {
+      await ownerSavePlan({ ...v, saleLabel: onSale ? v.saleLabel : '', saleEnds: onSale ? v.saleEnds : null })
+      toast.show(`${plan.name} saved.`)
+      onSaved()
+    } catch (e) {
+      toast.show(toFriendlyMessage(e), 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const input = 'min-h-10 w-full rounded-md border border-line bg-paper px-3 text-sm'
+  return (
+    <div className="h-full rounded-xl border border-line bg-paper p-5 shadow-card">
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="font-serif text-2xl text-ink">{plan.name}</h3>
+        {preview != null && <Badge tone="rose">On sale</Badge>}
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <label className="text-sm">
+          <span className="mb-1 block font-medium text-ink">Usual price (₱)</span>
+          <input inputMode="numeric" value={String(v.pricePhp)} onChange={(e) => set({ pricePhp: num(e.target.value) ?? 0 })} className={input} />
+        </label>
+        <label className="text-sm">
+          <span className="mb-1 block font-medium text-ink">Guest limit</span>
+          <input
+            inputMode="numeric"
+            placeholder="unlimited"
+            value={v.guestLimit == null ? '' : String(v.guestLimit)}
+            onChange={(e) => set({ guestLimit: num(e.target.value) || null })}
+            className={input}
+          />
+        </label>
+      </div>
+      <label className="mt-4 flex min-h-10 items-center gap-2.5 text-sm">
+        <input
+          type="checkbox"
+          checked={onSale}
+          onChange={(e) => (e.target.checked ? percent(20) : set({ salePricePhp: null }))}
+          className="size-4 accent-ink"
+        />
+        <span className="font-medium text-ink">Discount</span>
+      </label>
+      {onSale && (
+        <div className="mt-2 space-y-3 rounded-lg bg-cream/60 p-3">
+          <div className="flex flex-wrap items-end gap-2">
+            <label className="flex-1 text-sm">
+              <span className="mb-1 block font-medium text-ink">Sale price (₱)</span>
+              <input inputMode="numeric" value={v.salePricePhp == null ? '' : String(v.salePricePhp)} onChange={(e) => set({ salePricePhp: num(e.target.value) ?? 0 })} className={input} />
+            </label>
+            {[10, 20, 30, 50].map((pct) => (
+              <Button key={pct} size="sm" variant="ghost" onClick={() => percent(pct)}>
+                {pct}% off
+              </Button>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-sm">
+              <span className="mb-1 block font-medium text-ink">Label</span>
+              <input maxLength={40} placeholder="e.g. Holiday sale" value={v.saleLabel} onChange={(e) => set({ saleLabel: e.target.value })} className={input} />
+            </label>
+            <label className="text-sm">
+              <span className="mb-1 block font-medium text-ink">Last day (optional)</span>
+              <input type="date" min={today()} value={v.saleEnds ?? ''} onChange={(e) => set({ saleEnds: e.target.value || null })} className={input} />
+            </label>
+          </div>
+        </div>
+      )}
+      <p className="mt-4 text-sm text-ink-soft">
+        Main page shows:{' '}
+        {preview != null ? (
+          <>
+            <strong className="text-ink">{peso(preview)}</strong> <span className="text-muted line-through">{peso(v.pricePhp)}</span>{' '}
+            <span className="text-rose">({v.saleLabel.trim() || 'Sale'} · save {peso(v.pricePhp - preview)})</span>
+          </>
+        ) : (
+          <strong className="text-ink">{peso(v.pricePhp)}</strong>
+        )}
+      </p>
+      <Button className="mt-4" size="sm" onClick={() => void save()} loading={saving} loadingText="Saving…">
+        Save {plan.name}
+      </Button>
+    </div>
   )
 }

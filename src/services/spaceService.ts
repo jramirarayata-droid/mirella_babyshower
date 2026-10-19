@@ -123,7 +123,7 @@ export async function loadMyAccount(): Promise<MyAccount | null> {
 export async function loadPlans(): Promise<Plan[]> {
   const { data, error } = await supabase
     .from('plans' as never)
-    .select('id,name,tagline,price_php,guest_limit,features,highlight,sort')
+    .select('*') // works before and after the discount columns (047) exist
     .order('sort' as never)
   if (error) {
     logError('loadPlans', error)
@@ -137,7 +137,37 @@ export async function loadPlans(): Promise<Plan[]> {
     guestLimit: p.guest_limit == null ? null : Number(p.guest_limit),
     features: (p.features as Feature[]) ?? [],
     highlight: p.highlight === true,
+    salePricePhp: p.sale_price_php == null ? null : Number(p.sale_price_php),
+    saleLabel: String(p.sale_label ?? ''),
+    saleEnds: p.sale_ends == null ? null : String(p.sale_ends),
   }))
+}
+
+export interface PlanInput {
+  id: string
+  pricePhp: number
+  guestLimit: number | null
+  salePricePhp: number | null
+  saleLabel: string
+  saleEnds: string | null
+}
+
+/** Owner: price, guest limit and discount of a plan. */
+export async function ownerSavePlan(p: PlanInput): Promise<void> {
+  const { error } = await supabase.rpc('owner_save_plan' as never, {
+    p_id: p.id,
+    p_price: p.pricePhp,
+    p_guest_limit: p.guestLimit,
+    p_sale_price: p.salePricePhp,
+    p_sale_label: p.saleLabel,
+    p_sale_ends: p.saleEnds,
+  } as never)
+  if (error) {
+    logError('ownerSavePlan', error)
+    if ((error.message ?? '').includes('sale price')) throw new FriendlyError('The sale price must be lower than the usual price.')
+    if ((error.message ?? '').includes('owner_save_plan')) throw new FriendlyError('Discounts need the 047 database update first.')
+    throw new FriendlyError('That didn’t save. Please try again.')
+  }
 }
 
 // ----------------------------------------------------------------- owner (super admin)

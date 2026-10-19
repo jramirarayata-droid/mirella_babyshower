@@ -89,3 +89,24 @@ do $$ begin
   raise notice 'FAIL Cora blocked from the default space files';
 exception when others then raise notice 'PASS Cora blocked from the default space files'; end $$;
 reset role;
+
+-- discounts (047)
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', false);
+select public.owner_save_plan('bundle', 1999, 120, 1499, 'Holiday sale', current_date + 30);
+select 'PASS owner puts Sweet Bundle on sale' where (select sale_price_php from public.plans where id = 'bundle') = 1499;
+do $$ begin
+  perform public.owner_save_plan('bundle', 1999, 120, 2500, 'Oops', null);
+  raise notice 'FAIL a sale price above the usual price is refused';
+exception when others then raise notice 'PASS a sale price above the usual price is refused'; end $$;
+reset role;
+set role anon;
+select 'PASS guests can read the sale price' where (select sale_price_php from public.plans where id = 'bundle') = 1499;
+reset role;
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"33333333-3333-3333-3333-333333333333","role":"authenticated"}', false);
+do $$ begin
+  perform public.owner_save_plan('bundle', 1, 120, null, '', null);
+  raise notice 'FAIL a customer cannot change plan prices';
+exception when others then raise notice 'PASS a customer cannot change plan prices'; end $$;
+reset role;

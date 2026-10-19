@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  ArrowRight, Baby, CalendarHeart, Camera, Check, Gift, Lock, LogOut, Mail, MessageCircleHeart, Minus, Palette, PartyPopper, Printer, Sparkles,
+  ArrowRight, Baby, CalendarHeart, Camera, Check, Gift, Lock, LogOut, Mail, MessageCircleHeart, Minus, Palette, PartyPopper, Printer, Sparkles, Tag,
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { toFriendlyMessage } from '../utils/errors'
@@ -9,7 +9,7 @@ import { Button } from '../components/ui/Button'
 import { FieldError, TextField } from '../components/ui/FormField'
 import { Ornament } from '../components/ui/Ornament'
 import { ContactLink, CONTACT_PHONES } from '../components/space/Locked'
-import { CORE_FEATURES, FEATURE_LABELS, peso, type Feature, type Plan } from '../lib/plans'
+import { activeSale, CORE_FEATURES, FEATURE_LABELS, peso, type Feature, type Plan } from '../lib/plans'
 import { spaceUrl } from '../lib/space'
 import { loadMyAccount, loadPlans, type MyAccount } from '../services/spaceService'
 import { cn } from '../components/ui/cn'
@@ -252,6 +252,7 @@ export default function Landing() {
 }
 
 function PlanCard({ plan }: { plan: Plan }) {
+  const sale = activeSale(plan)
   return (
     <article
       aria-labelledby={`plan-${plan.id}`}
@@ -269,10 +270,30 @@ function PlanCard({ plan }: { plan: Plan }) {
         {plan.name}
       </h3>
       <p className="mt-1 text-sm text-muted">{plan.tagline}</p>
-      <p className="mt-5 font-serif text-5xl text-ink">
-        {peso(plan.pricePhp)}
-        <span className="ml-1 font-sans text-sm text-muted">one-time</span>
-      </p>
+      {sale != null ? (
+        <div className="mt-5">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-rose/10 px-3 py-1 text-xs font-semibold text-rose ring-1 ring-inset ring-rose/25">
+            <Tag aria-hidden="true" className="size-3.5" />
+            {plan.saleLabel || 'Sale'} · Save {peso(plan.pricePhp - sale)}
+          </span>
+          <p className="mt-3 font-serif text-5xl text-ink">
+            <span className="sr-only">Now </span>
+            {peso(sale)}
+            <span className="ml-2 align-middle font-sans text-lg text-muted line-through decoration-rose/60">
+              <span className="sr-only">was </span>
+              {peso(plan.pricePhp)}
+            </span>
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            One-time{plan.saleEnds ? ` · sale price until ${new Date(`${plan.saleEnds}T00:00:00`).toLocaleDateString('en-PH', { month: 'long', day: 'numeric' })}` : ''}
+          </p>
+        </div>
+      ) : (
+        <p className="mt-5 font-serif text-5xl text-ink">
+          {peso(plan.pricePhp)}
+          <span className="ml-1 font-sans text-sm text-muted">one-time</span>
+        </p>
+      )}
       <p className="mt-2 text-sm text-ink-soft">{plan.guestLimit ? `Up to ${plan.guestLimit} invited guests` : 'Unlimited guests'}</p>
       <ul className="mt-6 flex-1 space-y-2.5 text-sm">
         {CORE_FEATURES.map((f) => (
