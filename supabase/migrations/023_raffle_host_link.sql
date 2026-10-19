@@ -26,7 +26,7 @@ as $$
   from (select coalesce((select value from public.admin_preferences where key = 'raffle'), '{}'::jsonb) as cfg) c;
 $$;
 
--- Names are masked right now (until the wedding day, or always / never).
+-- Names are masked right now (until the shower day, or always / never).
 create or replace function public.raffle_is_masked()
 returns boolean language sql stable security definer set search_path = ''
 as $$

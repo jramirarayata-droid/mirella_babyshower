@@ -11,7 +11,7 @@ export interface RaffleSettings {
   /** Whose names are on the wheel. */
   pool: 'all' | 'groom' | 'bride'
   attendingOnly: boolean
-  /** auto = names partly hidden until the wedding day; on / off = always / never. */
+  /** auto = names partly hidden until the shower day; on / off = always / never. */
   mask: 'auto' | 'on' | 'off'
   removeWinners: boolean
   extraNames: string[]
@@ -164,7 +164,7 @@ export function maskName(n: string): string {
     .join(' ')
 }
 
-/** Are names masked right now? auto = until the wedding day (Philippine time). */
+/** Are names masked right now? auto = until the shower day (Philippine time). */
 export function namesMasked(mask: RaffleSettings['mask'], weddingDate: string | undefined): boolean {
   if (mask === 'on') return true
   if (mask === 'off') return false

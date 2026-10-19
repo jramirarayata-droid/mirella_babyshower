@@ -44,7 +44,7 @@ export const attendanceLabel = (s: RSVPStatus | AttendanceStatus): string =>
 export const guestStatusLabel = (s: GuestStatus): string =>
   s === 'approved' ? 'Approved' : s === 'declined' ? 'Declined' : 'Pending'
 
-/** "Saturday, December 19, 2026" style date from an ISO YYYY-MM-DD string. */
+/** "Saturday, March 13, 2027" style date from an ISO YYYY-MM-DD string. */
 export function formatWeddingDate(isoDate: string, style: 'long' | 'full' = 'long'): string {
   const d = parseISODate(isoDate)
   if (!d) return isoDate

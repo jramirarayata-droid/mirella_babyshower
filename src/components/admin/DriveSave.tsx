@@ -20,7 +20,7 @@ import {
 
 interface Props {
   target: DriveTarget
-  /** Folder name in Drive, e.g. "Mir & Ella — Guest Photos". */
+  /** Folder name in Drive, e.g. "Baby Santos — Guest Photos". */
   folderName: string
   /** What to save — loaded when the admin clicks Start. */
   loadItems: () => Promise<DriveItem[]>
