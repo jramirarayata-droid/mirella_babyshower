@@ -13,7 +13,7 @@ export function SetupNotice() {
         </p>
         <p className="mt-6 rounded-lg border border-dashed border-line bg-paper px-4 py-3 text-left text-sm text-muted">
           <strong className="text-ink-soft">For the site owner:</strong> set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>{' '}
-          (in <code>.env.local</code> for local development, or as GitHub Actions secrets for deployment) and rebuild.
+          (in <code>.env.local</code> for local development, or in Cloudflare under Settings → Build → Variables and secrets for the live site) and rebuild.
         </p>
       </div>
     </main>
