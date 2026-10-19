@@ -21,12 +21,15 @@ export default function Registry() {
   const [view, setView] = useState<RegistryView | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
-  const [asking, setAsking] = useState<string | null>(null)
+  const [asking, setAsking] = useState<{ id: string; qty: number } | null>(null)
 
   const load = useCallback(async (token?: string | null) => {
     try {
-      setView(await getRegistry(token))
+      const v = await getRegistry(token)
+      setView(v)
       setError(null)
+      // The guest pass ended (e.g. expired): ask again. Only for the pass this list was loaded with.
+      if (token && !v.me) setGuest(null)
     } catch (e) {
       setError(toFriendlyMessage(e))
     }
@@ -37,14 +40,9 @@ export default function Registry() {
     void load(guest?.token)
   }, [load, guest])
 
-  // The session ended (e.g. expired): ask again.
-  useEffect(() => {
-    if (view && guest && !view.me) setGuest(null)
-  }, [view, guest])
-
   const claim = async (item: RegistryItem, qty: number) => {
     if (!guest) {
-      setAsking(item.id)
+      setAsking({ id: item.id, qty })
       return
     }
     setBusy(item.id)
@@ -100,9 +98,10 @@ export default function Registry() {
                 why="So we know who’s bringing what — only the parents-to-be see your name."
                 onReady={(g) => {
                   setGuest(g)
-                  const item = view.items.find((i) => i.id === asking)
+                  const item = view.items.find((i) => i.id === asking.id)
+                  const qty = asking.qty
                   setAsking(null)
-                  if (item) window.setTimeout(() => void claimAfter(g, item), 50)
+                  if (item) window.setTimeout(() => void claimAfter(g, item, qty), 50)
                 }}
               />
             </div>
@@ -124,12 +123,12 @@ export default function Registry() {
   )
 
   // After signing in from an item's button, finish what the guest started.
-  async function claimAfter(g: ShowerGuest, item: RegistryItem) {
+  async function claimAfter(g: ShowerGuest, item: RegistryItem, qty: number) {
     setBusy(item.id)
     try {
-      const r = await claimRegistryItem(g.token, item.id, 1)
+      const r = await claimRegistryItem(g.token, item.id, qty)
       if (r.ok) toast.success(`Thank you! “${item.title}” is marked for you.`)
-      else if (r.reason === 'taken') toast.error('Someone just picked the last one. Thank you all the same!')
+      else if (r.reason === 'taken') toast.error(r.left ? `Only ${r.left} still needed — someone just picked one.` : 'Someone just picked the last one. Thank you all the same!')
       await load(g.token)
     } catch (e) {
       toast.error(toFriendlyMessage(e))

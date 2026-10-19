@@ -67,7 +67,7 @@ async function handle(route) {
   }
   const accept = req.headers()['accept'] ?? ''
   if (p.startsWith('/rest/v1/wedding_settings')) {
-    const row = { id: 'ws1', couple_names: 'Mir & Ella', wedding_date: '2026-12-19', entourage: [], sections: [], motif_colors: [], seating_config: { finder: { from: null, mode: 'visible', preassign: false } } }
+    const row = { id: 'ws1', couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos', wedding_date: '2027-03-13', entourage: [], sections: [], motif_colors: [], seating_config: { finder: { from: null, mode: 'visible', preassign: false } } }
     return accept.includes('vnd.pgrst.object') ? json(row) : json([row])
   }
   if (p.startsWith('/rest/v1/')) return accept.includes('vnd.pgrst.object') ? json({ message: 'none' }, 406) : json([])

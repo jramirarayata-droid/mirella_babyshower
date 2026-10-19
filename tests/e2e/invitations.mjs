@@ -29,7 +29,7 @@ let seats = [
 let links = [{ member_id: 'p3', invitation_id: 'inv-a', guest_id: null, created_at: T }]
 const opens = [{ invitation_id: 'inv-a', first_opened_at: T, last_opened_at: T, open_count: 3 }]
 const entourage = [{ id: 'e1', title: 'Father of the Bride', layout: 'list', members: [{ id: 'p3', name: 'Arielito Pugay', role: '' }] }]
-const settings = { id: 'ws1', couple_names: 'Mir & Ella', wedding_date: '2026-12-19', rsvp_open: true, entourage, sections: [], additional_info: [], motif_colors: [] }
+const settings = { id: 'ws1', couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos', wedding_date: '2027-03-13', rsvp_open: true, entourage, sections: [], additional_info: [], motif_colors: [] }
 const tables = [{ id: 't1', name: 'Family', shape: 'round', capacity: 12, seat_sides: 'all', x: 0, y: 0, width: 170, height: 170, rotation: 0, placed: true, sort_order: 1, created_at: T, updated_at: T }]
 const calls = []
 let failNext = null
@@ -127,7 +127,7 @@ try {
   const text = await what.innerText()
   ok('explains the move', text.includes('Arielito Pugay joins Violeta Pugay’s invitation as an included guest'), text)
   ok('keeps the chair', text.includes('Keeps their chair at Family'))
-  ok('keeps the entourage place', text.includes('Stays in the entourage as Father of the Bride'))
+  ok('no entourage wording', !/entourage/i.test(text), text)
   ok('old link still works', text.includes('it now opens Violeta Pugay’s invitation (opened 3 times so far)'))
   ok('how to undo later', text.includes('“Own invitation” next to Arielito Pugay'))
   shots.push(['invitations-include-dialog', await dlg.screenshot()])

@@ -16,8 +16,8 @@ const ok = (name, pass, detail = '') => {
 
 const T = '2026-09-01T00:00:00Z'
 const settings = {
-  id: 'ws1', couple_names: 'Mir & Ella', hero_title: 'Mir & Ella', wedding_date: '2026-12-19', story_text: 'Together with our families, we invite you to celebrate our wedding.',
-  church_name: 'San Agustin Church', ceremony_time: '2:00 PM', reception_name: 'The Glass Garden', reception_time: '5:00 PM', rsvp_open: true,
+  id: 'ws1', couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos', hero_title: 'Baby Santos', wedding_date: '2027-03-13', story_text: 'A little one is on the way! Join us for an afternoon of games and treats.',
+  church_name: 'Sample Garden Venue', ceremony_time: '2:00 PM', reception_name: 'The Glass Garden', reception_time: '5:00 PM', rsvp_open: true,
   additional_info: [{ id: 'g1', title: 'Dress code', body: 'Formal attire, please.', icon: 'info', visible: true }], entourage: [], motif_colors: [], gallery_visible: false, video_visible: false, outfit_section_visible: false,
   seating_config: { finder: { from: null, mode: 'visible', preassign: false } }, updated_at: T,
   program_visible: false, program_title: null, program_subtitle: null, verse_visible: false, verse_text: null, verse_reference: null,
@@ -120,10 +120,10 @@ try {
   await programCard.getByRole('button', { name: 'Start with a typical program' }).click()
   const moments = programCard.getByRole('list', { name: 'Program moments' }).locator(':scope > li')
   ok('a typical program fills in', (await moments.count()) === 9)
-  ok('the ceremony takes the ceremony time', (await moments.first().getByLabel('Time', { exact: true }).inputValue()) === '2:00 PM')
-  await programCard.getByRole('button', { name: 'Remove Party' }).click()
-  await moments.nth(1).getByLabel('Note (optional)', { exact: true }).fill('At the church garden')
-  await programCard.getByRole('button', { name: 'Move First Dance up' }).click()
+  ok('the first moment takes the start time', (await moments.first().getByLabel('Time', { exact: true }).inputValue()) === '2:00 PM')
+  await programCard.getByRole('button', { name: 'Remove Opening of Gifts & Thank You' }).click()
+  await moments.nth(1).getByLabel('Note (optional)', { exact: true }).fill('In the garden')
+  await programCard.getByRole('button', { name: 'Move Gender Reveal up' }).click()
   // A moment with a time but no name is caught before saving.
   await programCard.getByRole('button', { name: 'Add a moment' }).click()
   await moments.last().getByLabel('Time', { exact: true }).fill('9:00 PM')
@@ -135,8 +135,8 @@ try {
   await programCard.getByRole('button', { name: 'Save program' }).click()
   await page.waitForTimeout(1000)
   const up = programUpserts.at(-1) ?? []
-  ok('program saved in its own table, in order', up.length === 9 && up.map((r) => r.sort_order).join(',') === '1,2,3,4,5,6,7,8,9' && up[0].title === 'Wedding Ceremony' && up[1].description === 'At the church garden', JSON.stringify(up.map((r) => r.title)))
-  ok('moved moment keeps its new place', up[4]?.title === 'First Dance' && up[5]?.title === 'Dinner', up.map((r) => r.title).join(' | '))
+  ok('program saved in its own table, in order', up.length === 9 && up.map((r) => r.sort_order).join(',') === '1,2,3,4,5,6,7,8,9' && up[0].title === 'Welcome & Snacks' && up[1].description === 'In the garden', JSON.stringify(up.map((r) => r.title)))
+  ok('moved moment keeps its new place', up[4]?.title === 'Gender Reveal' && up[5]?.title === 'Lunch / Merienda', up.map((r) => r.title).join(' | '))
   ok('removed moments are cleaned up after saving', programDeletes.length === 1 && programDeletes[0].startsWith('not.in.('))
   ok('program switched on', settingsPatches.at(-1)?.program_visible === true && (await programCard.getByText('Showing', { exact: true }).count()) === 1)
   shots.push(['program-admin-program', await programCard.screenshot()])
@@ -163,7 +163,7 @@ try {
   const programSection = g.locator('section[aria-labelledby="program-heading"]')
   await programSection.scrollIntoViewIfNeeded()
   await g.waitForTimeout(1200)
-  ok('program shows on the website', (await programSection.getByRole('heading', { name: 'Program', exact: true }).count()) === 1 && (await programSection.getByText('Wedding Ceremony').count()) === 1 && (await programSection.getByText('At the church garden').count()) === 1)
+  ok('program shows on the website', (await programSection.getByRole('heading', { name: 'Program', exact: true }).count()) === 1 && (await programSection.getByText('Welcome & Snacks').count()) === 1 && (await programSection.getByText('In the garden').count()) === 1)
   const ys = await g.evaluate(() => {
     const y = (sel) => document.querySelector(sel)?.getBoundingClientRect().top ?? -1
     return { intro: y('#details'), verse: y('section[aria-label^="Bible verse"]'), venues: y('section[aria-labelledby="venues-heading"]'), program: y('section[aria-labelledby="program-heading"]'), info: y('section[aria-labelledby="info-heading"]') }
@@ -221,7 +221,7 @@ try {
   await pp.getByRole('button', { name: 'Program', exact: true }).click()
   await pp.waitForTimeout(1500)
   const preview = pp.getByRole('region', { name: 'Print preview' })
-  ok('program leaflet prints the program from Website Settings', (await preview.getByText('Wedding Ceremony').count()) >= 1 && (await preview.getByText('At the church garden').count()) >= 1)
+  ok('program leaflet prints the program from Website Settings', (await preview.getByText('Welcome & Snacks').count()) >= 1 && (await preview.getByText('In the garden').count()) >= 1)
   ok('the block says where it comes from', (await pp.getByText(/8 moments from Website Settings/).count()) === 1)
   shots.push(['program-leaflet-front', await preview.screenshot()])
   await pp.getByLabel('What to print').selectOption('back')

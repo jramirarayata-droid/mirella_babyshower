@@ -58,7 +58,7 @@ for (const [tid, lens] of Object.entries(LENS)) {
     seats.push({ id: `s-${tid}-${i}`, table_id: tid, seat_index: i, invitation_id: id, guest_id: null, created_at: '2026-09-01T00:00:00Z' })
   })
 }
-const settings = { id: 'ws1', couple_names: 'Mir & Ella', wedding_date: '2026-12-19', seating_config: { room: { x: 100, y: 100, width: 1400, height: 900 }, canvas: { width: 1600, height: 1100 }, finder: { from: null, mode: 'visible', preassign: false } }, entourage: [], sections: [], motif_colors: [] }
+const settings = { id: 'ws1', couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos', wedding_date: '2027-03-13', seating_config: { room: { x: 100, y: 100, width: 1400, height: 900 }, canvas: { width: 1600, height: 1100 }, finder: { from: null, mode: 'visible', preassign: false } }, entourage: [], sections: [], motif_colors: [] }
 const responses = invitations.map((inv) => ({ id: `r-${inv.id}`, invitation_id: inv.id, attendance_status: 'attending', submitted_at: '2026-09-02T00:00:00Z', updated_at: '2026-09-02T00:00:00Z' }))
 
 async function handle(route) {

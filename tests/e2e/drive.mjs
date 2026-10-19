@@ -14,7 +14,7 @@ const ok = (name, pass, detail = '') => {
 }
 
 const T = '2026-12-19T10:42:00Z'
-const settings = { id: 'ws1', couple_names: 'Mir & Ella', wedding_date: '2026-12-19', sections: [], additional_info: [], motif_colors: [], entourage: [], seating_config: { finder: { from: null, mode: 'visible', preassign: false } } }
+const settings = { id: 'ws1', couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos', wedding_date: '2027-03-13', sections: [], additional_info: [], motif_colors: [], entourage: [], seating_config: { finder: { from: null, mode: 'visible', preassign: false } } }
 const gp = (i, status = 'visible', name = `Guest ${i}`) => ({ id: `gp${String(i).padStart(4, '0')}-aaaa`, uploader_name: name, path: `p/${i}.jpg`, thumb_path: `t/${i}.jpg`, bytes: 500000, status, created_at: T, uploaded: true })
 let guestPhotos = [gp(1, 'visible', 'Tita Baby'), gp(2, 'visible', 'Juan dela Cruz'), gp(3, 'hidden'), gp(4, 'pending'), gp(5, 'visible', 'Maria / Jose')]
 const gallery = [
@@ -188,7 +188,7 @@ try {
   const gis = await page.evaluate(() => window.__gis ?? [])
   ok('Google sign-in asks only for the drive.file permission', gis.length >= 1 && gis.every((g) => g.scope === 'https://www.googleapis.com/auth/drive.file' && g.client_id === CLIENT_ID), JSON.stringify(gis))
   const folder = drive.files.filter((f) => f.mimeType === 'application/vnd.google-apps.folder')
-  ok('a Drive folder “Mir & Ella — Guest Photos” is made', folder.length === 1 && folder[0].name === 'Mir & Ella — Guest Photos', JSON.stringify(folder.map((f) => f.name)))
+  ok('a Drive folder “Baby Santos — Guest Photos” is made', folder.length === 1 && folder[0].name === 'Baby Santos — Guest Photos', JSON.stringify(folder.map((f) => f.name)))
   const inFolder = () => drive.files.filter((f) => f.parents?.includes(folder[0]?.id))
   ok('only shown guest photos are saved (3 of 5)', inFolder().length === 3, `${inFolder().length}`)
   const names = inFolder().map((f) => f.name)
@@ -257,9 +257,9 @@ try {
   await b2.click()
   await dialog.getByRole('button', { name: 'Start' }).click()
   await dialog.locator('[data-drive-done]').waitFor({ timeout: 30000 })
-  const ours = drive.files.find((f) => f.name === 'Mir & Ella — Our Photos')
+  const ours = drive.files.find((f) => f.name === 'Baby Santos — Our Photos')
   const oursFiles = drive.files.filter((f) => f.parents?.includes(ours?.id))
-  ok('a separate folder “Mir & Ella — Our Photos” is made', Boolean(ours))
+  ok('a separate folder “Baby Santos — Our Photos” is made', Boolean(ours))
   ok('your photos are saved, sample photos are not (3 of 4)', oursFiles.length === 3, oursFiles.map((f) => f.name).join(' | '))
   ok('names follow the gallery and its sections', oursFiles.some((f) => f.name === 'Our Photos — 001 — At the beach.jpg') && oursFiles.some((f) => f.name === 'Our Photos — 002.png') && oursFiles.some((f) => f.name === 'Prenup Shoot — 001 — Prenup.jpg'), oursFiles.map((f) => f.name).join(' | '))
   ok('a big photo (over 4 MB) goes up in full', drive.resumable === 1 && (oursFiles.find((f) => f.name.startsWith('Prenup Shoot'))?.size ?? 0) > 5_000_000)

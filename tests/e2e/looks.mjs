@@ -1,5 +1,5 @@
-// Website-only design looks (Admin → Look & Feel): each look renders on the guest pages, keeps every
-// button and form working, never reaches the admin or Printables, and the four original styles are unchanged.
+// Website-only baby shower looks (Admin → Look & Feel): each look renders on the guest pages, keeps every
+// button and form working, never reaches the admin or Printables, and the four print styles still apply.
 // Saves phone and desktop screenshots of every look for review. Mocked backend — nothing live is touched.
 import { chromium } from 'playwright'
 import { writeFileSync } from 'node:fs'
@@ -15,39 +15,33 @@ const ok = (name, pass, detail = '') => {
 
 // The website-only looks to check, with the templates (colour presets) each one has.
 const LOOKS = [
-  { id: 'leaf', name: 'Eucalyptus & Gold', templates: ['leaf-ivory', 'leaf-sage', 'leaf-blush', 'leaf-forest'] },
-  { id: 'garden', name: 'Watercolour Garden', templates: ['garden-blush', 'garden-ivory', 'garden-peach', 'garden-sage'] },
-  { id: 'savedate', name: 'Save the Date', templates: ['savedate-champagne', 'savedate-rose', 'savedate-sage', 'savedate-dusk'] },
-  { id: 'arch', name: 'Sunlit Arch', templates: ['arch-terracotta', 'arch-apricot', 'arch-sand', 'arch-clay'] },
-  { id: 'story', name: 'Love Story', templates: ['story-rose', 'story-gold', 'story-mauve', 'story-lavender'] },
-  { id: 'damask', name: 'Damask', templates: ['damask-ivory', 'damask-champagne', 'damask-sage', 'damask-burgundy'] },
+  { id: 'clouds', name: 'Over the Moon', templates: ['clouds-blue', 'clouds-pink', 'clouds-lilac', 'clouds-neutral'] },
+  { id: 'balloons', name: 'Oh Baby! Balloons', templates: ['balloons-pastel', 'balloons-blue', 'balloons-pink', 'balloons-sage'] },
+  { id: 'arch', name: 'Boho Rainbow', templates: ['arch-terracotta', 'arch-blush', 'arch-sage', 'arch-blue'] },
+  { id: 'leaf', name: 'Sweet Greenery', templates: ['leaf-ivory', 'leaf-sage', 'leaf-blue', 'leaf-blush'] },
+  { id: 'garden', name: 'Little Blossom', templates: ['garden-blush', 'garden-peach', 'garden-lilac', 'garden-ivory'] },
 ]
 
 const T = '2026-09-01T00:00:00Z'
-const PHOTO = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2400&q=80'
-const m = (name, role = '') => ({ id: Math.random().toString(36).slice(2), name, role })
+const PHOTO = null
 const settings = {
   id: 'ws1',
-  couple_names: 'Mir & Ella',
-  hero_title: 'Mir & Ella',
+  couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos',
+  hero_title: 'Baby Santos',
   hero_image_url: PHOTO,
-  wedding_date: '2026-12-19',
-  story_text: 'Two hearts, one story — and we would love for you to be part of the next chapter.',
-  church_name: 'San Agustin Church',
+  wedding_date: '2027-03-13',
+  story_text: 'A little one is on the way! Join us for an afternoon of games, sweet treats and lots of love.',
+  church_name: 'Sample Garden Venue',
   ceremony_time: '2:00 PM',
   reception_name: 'The Glass Garden',
   reception_time: '5:00 PM',
   rsvp_open: true,
-  entourage: [
-    { id: 'e1', title: 'Parents of the Groom', layout: 'pairs', members: [m('Rogelio Ramirez'), m('Carmela Ramirez')] },
-    { id: 'e2', title: 'Principal Sponsors', layout: 'pairs', members: [m('Antonio Reyes'), m('Lourdes Reyes'), m('Manuel Santos'), m('Teresita Santos')] },
-  ],
-  entourage_title: 'The Entourage',
+  entourage: [],
   outfit_section_visible: false,
   sections: [],
   additional_info: [
-    { id: 'g1', title: 'Dress code', body: 'Formal attire, please.', icon: 'info', visible: true },
-    { id: 'g2', title: 'Gifts', body: 'Your presence is the greatest gift.', icon: 'gift', visible: true },
+    { id: 'g1', title: 'What to Wear', body: 'Soft pastels — wear pink or blue for your team!', icon: 'shirt', visible: true },
+    { id: 'g2', title: 'Gifts', body: 'Your presence is the best gift.', icon: 'gift', visible: true },
   ],
   motif_colors: [],
   seating_config: { finder: { from: null, mode: 'visible', preassign: false } },
@@ -109,8 +103,8 @@ try {
     return page.screenshot()
   }
 
-  // ---------------------------------------------------------------- the original four styles are unchanged
-  for (const [template, style] of [['classic', 'classic'], ['maison-noir', 'maison'], ['deco-gatsby', 'deco'], ['heritage-capiz', 'heritage']]) {
+  // ---------------------------------------------------------------- the four print styles still apply
+  for (const [template, style] of [['classic', 'classic'], ['maison-noir', 'maison'], ['deco-sunshine', 'deco'], ['heritage-capiz', 'heritage']]) {
     await open('/', { template })
     ok(`${template}: page still uses the “${style}” style`, (await styleAttr()) === style, await styleAttr())
   }
@@ -121,9 +115,9 @@ try {
       await page.setViewportSize({ width: 1440, height: 900 })
       await open('/', { template })
       ok(`${template}: home page uses the ${look.name} look`, (await styleAttr()) === look.id, await styleAttr())
-      ok(`${template}: couple’s names show`, (await page.locator('.hero-names').first().innerText()).includes('Mir'))
+      ok(`${template}: the baby’s name shows`, (await page.locator('.hero-names').first().innerText()).includes('Baby Santos'))
       shots.push([`looks-${template}-desktop-hero`, await page.screenshot()])
-      if (look.id === 'savedate' && i === 0) ok(`${template}: the round countdown shows on the photo`, await page.getByRole('timer').first().isVisible())
+      if (i === 0) ok(`${template}: the countdown to the shower is on the page`, (await page.getByRole('timer').count()) >= 1)
       if (i === 0) {
         shots.push([`looks-${template}-desktop-details`, await shotOf('#details')])
         shots.push([`looks-${template}-desktop-venues`, await shotOf('.lux-venue')])
@@ -158,7 +152,7 @@ try {
       }
     }
 
-    // The admin always stays Classic, and Printables keep their own (Classic) design for this look.
+    // The admin always stays in the base style, and Printables use Soft & Sweet (classic) for this look.
     await page.setViewportSize({ width: 1440, height: 900 })
     await open('/admin/printables', { template: look.templates[0] })
     ok(`${look.name}: admin pages stay in the classic style`, (await styleAttr()) === 'classic', await styleAttr())

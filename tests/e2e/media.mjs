@@ -138,7 +138,7 @@ async function handle(route) {
   }
   if (p.startsWith('/auth/v1/user')) return json({ id: 'u1', aud: 'authenticated', role: 'authenticated', email: 'admin@test' })
   if (p.startsWith('/rest/v1/wedding_settings')) {
-    const row = { id: 'ws1', couple_names: 'Mir & Ella', wedding_date: '2026-12-19', rsvp_open: true, rsvp_button_label: 'RSVP', seating_config: { finder: { from: null, mode: 'visible', preassign: false } }, entourage: [], sections: [], motif_colors: [], gallery_visible: true, gallery_title: 'Our Story', video_visible: true, video_title: 'Our Prenup Film', video_url: 'samples/video/prenup-sample.mp4', media_order: store.mediaOrder, rsvp_config: { builtins: {}, teaser: { enabled: true, title: 'Confirm your attendance for a chance to win', highlight: 'up to ₱25,000', note: 'in our wedding raffle, drawn at the reception — be there to win!' } } }
+    const row = { id: 'ws1', couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos', wedding_date: '2027-03-13', rsvp_open: true, rsvp_button_label: 'RSVP', seating_config: { finder: { from: null, mode: 'visible', preassign: false } }, entourage: [], sections: [], motif_colors: [], gallery_visible: true, gallery_title: 'Our Story', video_visible: true, video_title: 'Our Prenup Film', video_url: 'samples/video/prenup-sample.mp4', media_order: store.mediaOrder, rsvp_config: { builtins: {}, teaser: { enabled: true, title: 'Confirm your attendance for a chance to win', highlight: 'up to ₱25,000', note: 'in our wedding raffle, drawn at the reception — be there to win!' } } }
     const accept = req.headers()['accept'] ?? ''
     if (req.method() === 'PATCH') {
       const body = JSON.parse(req.postData() || '{}')
@@ -215,7 +215,7 @@ try {
   await menu.waitFor({ timeout: 5000 })
   await page.waitForTimeout(500)
   const items = await menu.locator('li').allInnerTexts()
-  ok('menu lists pages by name', items.some((t) => /Wedding details/.test(t)) && items.some((t) => /Photos/.test(t)), items.map((t) => t.split('\n')[0]).join(', '))
+  ok('menu lists pages by name', items.some((t) => /Shower details/.test(t)) && items.some((t) => /Photos/.test(t)), items.map((t) => t.split('\n')[0]).join(', '))
   ok('menu greets the remembered guest', await menu.getByText(/Hi\s*Rina/).isVisible())
   shots.push(['menu', await page.screenshot({ fullPage: false })])
   await page.keyboard.press('Escape')
@@ -502,7 +502,7 @@ try {
   ok('no page errors (presentation)', terr.length === 0, terr.join(' | '))
   await tctx.close()
 
-  // ---------------------------------------------------------------- home: menu + wedding-day buttons
+  // ---------------------------------------------------------------- home: menu, and no wedding-day layout
   const hctx = await browser.newContext({ viewport: { width: 375, height: 760 } })
   await hctx.route(`${API}/**`, handle)
   const hp = await hctx.newPage()
@@ -515,7 +515,7 @@ try {
   const navBox = await hp.locator('nav[aria-label="Primary"]').boundingBox()
   ok('home top bar fits a small phone', navBox && navBox.width <= 375, JSON.stringify(navBox))
   const dayOf = await hp.getByText('Today’s the day!').count()
-  ok('wedding-day buttons show on the day', dayOf === 1)
+  ok('no wedding-day layout (removed for the shower)', dayOf === 0)
   shots.push(['home-dayof', await hp.screenshot({ fullPage: false })])
   ok('no page errors (home)', herr.length === 0, herr.join(' | '))
   await hctx.close()
@@ -539,7 +539,7 @@ try {
   await wctx.route(`${API}/**`, handle)
   const wp = await wctx.newPage()
   await wp.goto(`${BASE}#/`)
-  const enter = wp.getByRole('button', { name: /Enter the wedding website/ })
+  const enter = wp.getByRole('button', { name: /Enter the baby shower website/ })
   await enter.waitFor({ timeout: 15000 })
   ok('welcome screen shows (autoplay blocked without a tap)', true)
   shots.push(['welcome', await wp.screenshot()])

@@ -1,5 +1,5 @@
 // Printables: "addressed as" per invitation (suggestions only, saved one by one),
-// the entourage card (separate card, on the back, and its own tab), and the
+// the attire, thank-you, name and table cards, leaflets, and the
 // online invitation showing the "addressed as". Mocked backend — nothing live is touched.
 import { chromium } from 'playwright'
 import { writeFileSync } from 'node:fs'
@@ -19,43 +19,32 @@ const invitations = [
   inv('inv-1', 'Juan dela Cruz', 'JUAN1'),
   inv('inv-2', 'Elvira Arayata', 'ELVI2'),
   inv('inv-3', 'Ramon Garcia Jr.', 'RAMO3'),
-  inv('inv-4', 'Joey Montes', 'JOEY4', { addressed_as: 'Mr. Joey Montes & Mrs. Vivian Montes', position_mode: 'custom', position_label: 'Principal Sponsor' }),
+  inv('inv-4', 'Joey Montes', 'JOEY4', { addressed_as: 'Tito Joey Montes & Tita Vivian Montes', position_mode: 'custom', position_label: 'Ninong' }),
 ]
 const guest = (id, invitationId, name) => ({ id, invitation_id: invitationId, rsvp_response_id: null, guest_name: name, status: 'approved', added_by: 'admin', created_at: T, updated_at: T })
 const guests = [guest('g1', 'inv-1', 'Maria dela Cruz'), guest('g2', 'inv-3', 'Tess Garcia'), guest('g3', 'inv-3', 'Paolo Garcia'), guest('g4', 'inv-3', 'Bea Garcia')]
-const m = (name, role = '') => ({ id: Math.random().toString(36).slice(2), name, role })
-const entourage = [
-  { id: 'e1', title: 'Parents of the Groom', layout: 'pairs', members: [m('Rogelio Ramirez'), m('Carmela Ramirez')] },
-  { id: 'e2', title: 'Father of the Bride', layout: 'list', members: [m('Ernesto Villanueva')] },
-  { id: 'e3', title: 'Principal Sponsors', layout: 'pairs', members: [m('Hon. Antonio Reyes'), m('Dra. Lourdes Reyes'), m('Engr. Manuel Santos'), m('Teresita Santos'), m('Ricardo Bautista'), m('Rosalinda Bautista'), m('Atty. Jose Mendoza'), m('Maria Clara Mendoza'), m('Fernando Castillo'), m('Gloria Castillo')] },
-  { id: 'e4', title: 'Best Man', layout: 'list', members: [m('Mark Anthony Soriano')] },
-  { id: 'e5', title: 'Maid of Honor', layout: 'list', members: [m('Kristine Joy Navarro')] },
-  { id: 'e6', title: 'Candle', layout: 'pairs', members: [m('Paolo Aquino'), m('Bea Aquino')] },
-  { id: 'e7', title: 'Veil', layout: 'pairs', members: [m('Carlo Ramos'), m('Princess Mae Ramos')] },
-  { id: 'e8', title: 'Cord', layout: 'pairs', members: [m('Miguel Fernandez'), m('Ana Fernandez')] },
-  { id: 'e9', title: 'Bearers', layout: 'list', members: [m('Joaquin Reyes', 'Ring'), m('Elijah Santos', 'Coin'), m('Santi Cruz', 'Bible')] },
-  { id: 'e10', title: 'Flower Grandma', layout: 'list', members: [m('Lola Nena Villanueva')] },
-]
-const settings = { id: 'ws1', couple_names: 'Mir & Ella', wedding_date: '2026-12-19', church_name: 'San Agustin Church', ceremony_time: '2:00 PM', reception_name: 'The Glass Garden', reception_time: '5:00 PM', rsvp_open: true, entourage, entourage_title: 'The Entourage', outfit_layout: 'pairs', outfit_section_visible: true, outfit_title: 'Attire Inspiration', sections: [], additional_info: [{ id: 'g1', title: 'Dress code', body: 'Formal attire, please.', icon: 'info', visible: true }], motif_colors: [], seating_config: { finder: { from: null, mode: 'visible', preassign: false } } }
+const settings = { id: 'ws1', couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos', wedding_date: '2027-03-13', church_name: 'Sample Garden Venue', ceremony_time: '2:00 PM', rsvp_open: true, outfit_layout: 'pairs', outfit_section_visible: true, outfit_title: 'What to Wear', sections: [], additional_info: [{ id: 'g1', title: 'Dress code', body: 'Comfy pastels, please.', icon: 'info', visible: true }], motif_colors: [], seating_config: { finder: { from: null, mode: 'visible', preassign: false } } }
 const outfit = (id, gender, file, caption, label, sort_order) => ({ id, gender, image_url: `attire/${file}.jpg`, caption, label, sort_order, is_visible: true, created_at: T, updated_at: T })
 const outfits = [
-  outfit('o1', 'male', 'sponsors-him', 'Embroidered barong & taupe trousers', 'Principal Sponsors', 1),
-  outfit('o2', 'male', 'family-him', 'Ivory barong & brown trousers', 'Parents & Relatives', 2),
+  outfit('o1', 'male', 'sponsors-him', 'Light blue polo & khaki trousers', 'Parents-to-be', 1),
+  outfit('o2', 'male', 'family-him', 'White linen shirt & chinos', 'Family', 2),
   outfit('o3', 'male', 'guests-him', 'Polo shirt & beige trousers', 'Guests', 3),
-  outfit('o4', 'female', 'sponsors-her', 'One-shoulder gown in taupe', 'Principal Sponsors', 1),
-  outfit('o5', 'female', 'family-her', 'Modern Filipiniana in mocha', 'Parents & Relatives', 2),
+  outfit('o4', 'female', 'sponsors-her', 'Pastel pink sundress', 'Parents-to-be', 1),
+  outfit('o5', 'female', 'family-her', 'Floral midi dress', 'Family', 2),
   outfit('o6', 'female', 'guests-her', 'Puff-sleeve midi dress in cream', 'Guests', 3),
   outfit('o7', 'male', 'look4-him', 'Cream turtleneck with long sleeves', null, 4),
   outfit('o8', 'female', 'look4-her', 'Beige dress with regular sleeves', null, 4),
 ]
 const table = (id, name, sort_order) => ({ id, name, shape: 'round', capacity: 10, seat_sides: 'all', x: 0, y: 0, width: 170, height: 170, rotation: 0, placed: true, sort_order, created_at: T, updated_at: T })
-const seatingTables = [table('t1', 'Sponsors', 1), table('t2', 'Family', 2), table('t3', 'Table 5', 3)]
+const seatingTables = [table('t1', 'Godparents', 1), table('t2', 'Family', 2), table('t3', 'Table 5', 3)]
 const seats = [{ id: 's1', table_id: 't1', seat_index: 0, invitation_id: 'inv-1', guest_id: null, created_at: T }]
 // The program flow from Website Settings (the Program leaflet prints it).
 const programItems = [
-  { id: 'p1', time_label: '2:00 PM', title: 'Ceremony', description: null, sort_order: 1, created_at: T, updated_at: T },
-  { id: 'p2', time_label: '8:00 PM', title: 'First dance', description: null, sort_order: 2, created_at: T, updated_at: T },
+  { id: 'p1', time_label: '2:00 PM', title: 'Welcome & Snacks', description: null, sort_order: 1, created_at: T, updated_at: T },
+  { id: 'p2', time_label: '8:00 PM', title: 'Gender Reveal', description: null, sort_order: 2, created_at: T, updated_at: T },
 ]
+// The outfit photos are test stand-ins (the copied wedding photos were removed): plain 3:4 pastel pictures.
+const photo = (route) => route.fulfill({ status: 200, contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="#DCEAF7"/><circle cx="450" cy="420" r="160" fill="#F6D3DC"/><rect x="300" y="620" width="300" height="420" rx="60" fill="#FBE9C9"/></svg>' })
 const patches = []
 const prefWrites = []
 
@@ -108,6 +97,7 @@ let current = null
 try {
   const ctx = await browser.newContext({ viewport: { width: 1500, height: 1000 } })
   await ctx.route(`${API}/**`, handle)
+  await ctx.route('**/attire/**', photo)
   await ctx.addInitScript(() => {
     const exp = Math.floor(Date.now() / 1000) + 86400
     const payload = btoa(JSON.stringify({ sub: 'u1', role: 'authenticated', exp })).replace(/=+$/, '')
@@ -140,16 +130,16 @@ try {
   const box = editor.getByLabel('Addressed as')
   ok('editor opens empty', (await box.inputValue()) === '')
   const chips = await editor.locator('button.rounded-full').allInnerTexts()
-  ok('suggestions for a couple', chips.includes('Mr. & Mrs. Juan dela Cruz') && chips.includes('Juan & Maria dela Cruz'), chips.join(' · '))
-  await editor.getByRole('button', { name: 'Mr. & Mrs. Juan dela Cruz' }).click()
-  ok('a suggestion only fills the box', (await box.inputValue()) === 'Mr. & Mrs. Juan dela Cruz' && patches.length === 0)
-  await editor.getByRole('button', { name: 'Dr. & Mrs.' }).click()
-  ok('a title replaces the one in front', (await box.inputValue()) === 'Dr. & Mrs. Juan dela Cruz', await box.inputValue())
-  await editor.getByRole('button', { name: 'Mr. & Mrs.', exact: true }).click()
+  ok('suggestions for a couple', chips.includes('Juan & Maria dela Cruz') && chips.includes('Tito Juan & Tita Maria') && !chips.some((c) => /Mr\. & Mrs\./.test(c)), chips.join(' · '))
+  await editor.getByRole('button', { name: 'Tito Juan & Tita Maria' }).click()
+  ok('a suggestion only fills the box', (await box.inputValue()) === 'Tito Juan & Tita Maria' && patches.length === 0)
+  await editor.getByRole('button', { name: 'Ninong', exact: true }).click()
+  ok('a title replaces the one in front', (await box.inputValue()) === 'Ninong Juan & Tita Maria', await box.inputValue())
+  await editor.getByRole('button', { name: 'Juan & Maria dela Cruz' }).click()
   shots.push(['printables-addressed-editor', await editor.screenshot()])
   await editor.getByRole('button', { name: 'Save' }).click()
   await page.waitForTimeout(800)
-  ok('saved to that invitation only', patches.length === 1 && patches[0].id === 'inv-1' && patches[0].body.addressed_as === 'Mr. & Mrs. Juan dela Cruz', JSON.stringify(patches))
+  ok('saved to that invitation only', patches.length === 1 && patches[0].id === 'inv-1' && patches[0].body.addressed_as === 'Juan & Maria dela Cruz', JSON.stringify(patches))
 
   await page.getByRole('button', { name: 'Edit card: Ramon Garcia Jr.' }).click()
   const family = page.getByRole('button', { name: /Change how Ramon Garcia Jr\.’s invitation is addressed/ })
@@ -165,65 +155,37 @@ try {
   await page.locator('li', { hasText: 'Juan dela Cruz' }).getByRole('checkbox').check()
   await page.waitForTimeout(1500)
   const preview = page.getByRole('region', { name: 'Print preview' })
-  ok('card says Dear Mr. & Mrs. Juan dela Cruz', (await preview.getByText('Mr. & Mrs. Juan dela Cruz', { exact: true }).count()) >= 1)
+  ok('card says Juan & Maria dela Cruz', (await preview.getByText('Juan & Maria dela Cruz', { exact: true }).count()) >= 1)
   ok('no “together with” line when addressed', (await preview.getByText(/together with Maria/).count()) === 0)
 
   // Two people with their own titles: one line each, "&" on its own line between them.
   const joey = page.locator('li', { hasText: 'Joey Montes' }).getByRole('checkbox')
   await joey.check()
   await page.waitForTimeout(1500)
-  const split = (await preview.getByText('Mr. Joey Montes', { exact: true }).count()) >= 1 && (await preview.getByText('Mrs. Vivian Montes', { exact: true }).count()) >= 1 && (await preview.getByText('&', { exact: true }).count()) >= 1
-  ok('Mr. … & Mrs. … print on separate lines', split)
-  ok('Mr. & Mrs. Juan stays on one line', (await preview.getByText('Mr. & Mrs. Juan dela Cruz', { exact: true }).count()) >= 1)
+  const split = (await preview.getByText('Tito Joey Montes', { exact: true }).count()) >= 1 && (await preview.getByText('Tita Vivian Montes', { exact: true }).count()) >= 1 && (await preview.getByText('&', { exact: true }).count()) >= 1
+  ok('Tito … & Tita … print on separate lines', split)
+  ok('Juan & Maria stays on one line', (await preview.getByText('Juan & Maria dela Cruz', { exact: true }).count()) >= 1)
   shots.push(['printables-names-split', await preview.screenshot()])
   await joey.uncheck()
   await page.waitForTimeout(800)
   shots.push(['printables-card-addressed', await preview.screenshot()])
 
-  // ---------------------------------------------------------------- entourage: separate card
-  const printBtn = page.getByRole('button', { name: /^Print / })
-  await pane('Print')
-  const before = await printBtn.innerText()
-  await pane('Content')
-  await page.getByRole('radiogroup', { name: 'Entourage' }).getByRole('radio', { name: 'Separate card' }).click()
-  await page.waitForTimeout(1500)
-  await pane('Print')
-  const after = await printBtn.innerText()
-  ok('separate card adds an entourage sheet', /\(2 pages\)/.test(after), `${before} → ${after}`)
-  ok('entourage card shows the groups', (await preview.getByText('PRINCIPAL SPONSORS').count()) >= 1 && (await preview.getByText('Hon. Antonio Reyes').count()) >= 1)
-  ok('roles print under the name', (await preview.getByText('RING', { exact: true }).count()) >= 1)
-  ok('entourage card fits', (await page.getByText(/entourage card is very full/).count()) === 0)
-  shots.push(['printables-entourage-insert', await preview.screenshot({ fullPage: false })])
-
-  // ---------------------------------------------------------------- entourage: on the back
-  await pane('Content')
-  await page.getByRole('radiogroup', { name: 'Entourage' }).getByRole('radio', { name: 'On the back' }).click()
-  await pane('Print')
-  await page.getByRole('radio', { name: 'Both sides' }).click()
-  await page.waitForTimeout(1500)
-  ok('RSVP QR moves to the front', (await preview.getByText('SCAN TO RSVP').count()) >= 1 && (await page.getByText(/RSVP QR is printed on the front/).count()) === 1)
-  ok('back carries the entourage', (await preview.getByText('PRINCIPAL SPONSORS').count()) >= 1)
-  ok('back fits', (await page.getByText(/doesn’t fit/).count()) === 0)
-  shots.push(['printables-entourage-back', await preview.screenshot({ fullPage: false })])
-
-  // ---------------------------------------------------------------- entourage tab
-  await page.getByRole('tab', { name: 'Entourage' }).click()
-  await page.getByText(/25 names in 10 groups/).waitFor({ timeout: 10000 })
-  ok('entourage tab counts everyone', true)
-  shots.push(['printables-entourage-tab', await page.getByRole('region', { name: 'Print preview' }).screenshot()])
-
   // ---------------------------------------------------------------- attire card shows the labels
-  await page.getByRole('tab', { name: 'Attire guide' }).click()
+  await page.getByRole('tab', { name: 'What to wear' }).click()
   await page.waitForTimeout(2500)
   const attire = page.getByRole('region', { name: 'Print preview' })
-  ok('attire card shows the labels', (await attire.getByText('PRINCIPAL SPONSORS').count()) >= 1 && (await attire.getByText('Embroidered barong & taupe trousers').count()) >= 1)
+  ok('attire card shows the labels', (await attire.getByText('PARENTS-TO-BE').count()) >= 1 && (await attire.getByText('Light blue polo & khaki trousers').count()) >= 1)
   ok('attire photos are sharp enough', (await page.getByText(/may print a little soft/).count()) === 0)
   ok('attire guide is one card', await page.getByText(/^1 card per set/).isVisible())
-  ok('each label printed once', (await attire.getByText('PRINCIPAL SPONSORS').count()) === 1 && (await attire.getByText('GUESTS', { exact: true }).count()) === 1)
+  ok('each label printed once', (await attire.getByText('PARENTS-TO-BE').count()) === 1 && (await attire.getByText('GUESTS', { exact: true }).count()) === 1)
   shots.push(['printables-attire-labels', await attire.screenshot()])
   // "Please refrain from wearing …": a highlighted note at the bottom, fitted inside the card.
   const avoidBox = attire.locator('[data-attire-avoid]')
-  ok('attire: the don’t-wear note is at the bottom', (await avoidBox.count()) === 1 && /PLEASE REFRAIN FROM WEARING/.test(await avoidBox.innerText()) && /Slippers.*Sando.*Shorts.*Above-the-knee skirts/s.test(await avoidBox.innerText()), await avoidBox.innerText().catch(() => ''))
+  ok('attire: the gentle-request note is off at first', (await avoidBox.count()) === 0)
+  await pane('Content')
+  await page.getByRole('region', { name: 'Please don’t wear' }).getByRole('checkbox').check()
+  await page.waitForTimeout(1200)
+  ok('attire: the note is at the bottom', (await avoidBox.count()) === 1 && /A GENTLE REQUEST/i.test(await avoidBox.innerText()) && /Strong perfume.*Smoking near the mom-to-be/s.test(await avoidBox.innerText()), await avoidBox.innerText().catch(() => ''))
   const fits = async () => avoidBox.first().evaluate((el) => {
     const b = el.getBoundingClientRect()
     const p = el.parentElement.getBoundingClientRect()
@@ -254,7 +216,7 @@ try {
   await page.getByRole('tab', { name: 'Thank-you card' }).click()
   await page.waitForTimeout(2000)
   const thanks = page.getByRole('region', { name: 'Print preview' })
-  ok('thank-you card shows the message', (await thanks.getByText('Thank you', { exact: true }).count()) >= 1 && (await thanks.getByText(/Thank you for celebrating our wedding day with us/).count()) >= 1)
+  ok('thank-you card shows the message', (await thanks.getByText('Thank you', { exact: true }).count()) >= 1 && (await thanks.getByText(/Thank you for showering our little one/).count()) >= 1)
   await pane('Print')
   ok('ten copies by default', await page.getByRole('button', { name: 'Print 5 sheets' }).isVisible())
   ok('message fits', (await page.getByText(/message is a little long/).count()) === 0)
@@ -267,9 +229,9 @@ try {
   await pane('Content')
   await page.getByRole('radio', { name: 'With each guest’s name' }).click()
   await page.getByLabel('Show everyone').check()
-  await page.locator('li', { hasText: 'Mr. Joey Montes & Mrs. Vivian Montes' }).getByRole('checkbox').check()
+  await page.locator('li', { hasText: 'Tito Joey Montes & Tita Vivian Montes' }).getByRole('checkbox').check()
   await page.waitForTimeout(1500)
-  ok('personal thank-you uses the addressed-as', (await thanks.getByText('Mrs. Vivian Montes', { exact: true }).count()) >= 1 && (await thanks.getByText('DEAR').count()) >= 1)
+  ok('personal thank-you uses the addressed-as', (await thanks.getByText('Tita Vivian Montes', { exact: true }).count()) >= 1 && (await thanks.getByText('DEAR').count()) >= 1)
   shots.push(['printables-thanks-personal', await thanks.screenshot()])
 
   // ---------------------------------------------------------------- the toolbar stays on screen; search; our details; Good to know for print only
@@ -292,7 +254,6 @@ try {
   shots.push(['printables-ribbon', await page.screenshot()])
 
   await pane('Content')
-  await page.getByRole('radiogroup', { name: 'Entourage' }).getByRole('radio', { name: 'None' }).click()
   const search = page.getByLabel('Search invitations')
   await search.fill('elv')
   await page.waitForTimeout(300)
@@ -316,18 +277,18 @@ try {
   const dlg = page.getByRole('dialog')
   await dlg.getByLabel('Title').fill('What to wear')
   const gtkBox = dlg.getByLabel('Text', { exact: true })
-  await gtkBox.fill('Filipiniana or barong for the ceremony.')
-  await gtkBox.evaluate((el) => { el.focus(); el.setSelectionRange(0, 11) })
+  await gtkBox.fill('Pastels or your team colour, pink or blue.')
+  await gtkBox.evaluate((el) => { el.focus(); el.setSelectionRange(0, 7) })
   await dlg.getByRole('button', { name: 'Gold', exact: true }).click()
-  ok('Good to know: gold marks the selected word', (await gtkBox.inputValue()) === '==Filipiniana== or barong for the ceremony.', await gtkBox.inputValue())
+  ok('Good to know: gold marks the selected word', (await gtkBox.inputValue()) === '==Pastels== or your team colour, pink or blue.', await gtkBox.inputValue())
   await dlg.getByRole('button', { name: 'Save for print' }).click()
   await page.waitForTimeout(1500)
-  ok('Good to know prints the gold word', (await inv.locator('.print-sheet').nth(1).locator('span', { hasText: /^Filipiniana$/ }).count()) >= 1 && !(await inv.locator('.print-sheet').nth(1).innerText()).includes('=='))
+  ok('Good to know prints the gold word', (await inv.locator('.print-sheet').nth(1).locator('span', { hasText: /^Pastels$/ }).count()) >= 1 && !(await inv.locator('.print-sheet').nth(1).innerText()).includes('=='))
   ok('Good to know edited for print', (await inv.getByText('What to wear', { exact: true }).count()) >= 1 && (await inv.getByText('Dress code', { exact: true }).count()) === 0)
   ok('the website keeps its own text', settings.additional_info[0].title === 'Dress code')
   await page.getByRole('button', { name: 'Add your own' }).click()
   await dlg.getByLabel('Title').fill('Parking')
-  await dlg.getByLabel('Text', { exact: true }).fill('Free parking at the church.')
+  await dlg.getByLabel('Text', { exact: true }).fill('Free parking at the venue.')
   await dlg.getByRole('button', { name: 'Save for print' }).click()
   await page.waitForTimeout(1500)
   ok('your own Good to know is printed', (await inv.getByText('Parking', { exact: true }).count()) >= 1)
@@ -338,50 +299,50 @@ try {
 
   await pane('Our details')
   const details = page.getByRole('group', { name: 'Our details' }).first()
-  await page.locator('fieldset', { hasText: 'Our details' }).getByLabel('Wedding date').uncheck()
+  await page.locator('fieldset', { hasText: 'Our details' }).getByLabel('Shower date').uncheck()
   await page.locator('fieldset', { hasText: 'Our details' }).getByLabel('Monogram').uncheck()
   await page.waitForTimeout(1200)
   const backText = await inv.locator('.print-sheet').nth(1).innerText()
-  ok('our details: date and monogram off on the back', !/DECEMBER 19, 2026/i.test(backText) && (await inv.locator('.print-sheet').nth(1).locator('svg[viewBox="0 0 40 40"]').count()) === 0, backText.slice(0, 120))
-  ok('the front keeps names and date', /DECEMBER 19, 2026/i.test(await inv.locator('.print-sheet').first().innerText()))
-  await page.locator('fieldset', { hasText: 'Our details' }).getByLabel('Wedding date').check()
+  ok('our details: date and monogram off on the back', !/MARCH 13, 2027/i.test(backText) && (await inv.locator('.print-sheet').nth(1).locator('svg[viewBox="0 0 40 40"]').count()) === 0, backText.slice(0, 120))
+  ok('the front keeps names and date', /MARCH 13, 2027/i.test(await inv.locator('.print-sheet').first().innerText()))
+  await page.locator('fieldset', { hasText: 'Our details' }).getByLabel('Shower date').check()
   await page.locator('fieldset', { hasText: 'Our details' }).getByLabel('Monogram').check()
   void details
 
   await pane('Content')
-  await page.getByRole('region', { name: 'Front of the card' }).getByRole('checkbox', { name: 'Ceremony' }).uncheck()
+  await page.getByRole('region', { name: 'Front of the card' }).getByRole('checkbox', { name: 'Venue' }).uncheck()
   await page.waitForTimeout(1000)
-  ok('ceremony can be left off the front', (await inv.locator('.print-sheet').first().getByText('CEREMONY').count()) === 0 && (await inv.locator('.print-sheet').first().getByText('RECEPTION').count()) >= 1)
-  await page.getByRole('region', { name: 'Front of the card' }).getByRole('checkbox', { name: 'Ceremony' }).check()
+  ok('the venue can be left off the front', !/Sample Garden Venue/i.test(await inv.locator('.print-sheet').first().innerText()) && /Baby Santos/i.test(await inv.locator('.print-sheet').first().innerText()))
+  await page.getByRole('region', { name: 'Front of the card' }).getByRole('checkbox', { name: 'Venue' }).check()
 
   // The ceremony line worded for print, with the place name in bold (the website keeps its own).
-  await page.getByRole('button', { name: 'Edit for print: Ceremony' }).click()
-  const fd = page.getByRole('dialog', { name: 'Ceremony — wording for print' })
-  const cBox = fd.getByLabel('Ceremony line', { exact: true })
-  ok('ceremony editor starts from the website’s text', (await cBox.inputValue()) === 'San Agustin Church · 2:00 PM', await cBox.inputValue())
-  await cBox.evaluate((el) => { el.focus(); el.setSelectionRange(0, 18) })
+  await page.getByRole('button', { name: 'Edit for print: Venue' }).click()
+  const fd = page.getByRole('dialog', { name: 'Venue — wording for print' })
+  const cBox = fd.getByLabel('Venue line', { exact: true })
+  ok('venue editor starts from the website’s text', (await cBox.inputValue()) === 'Sample Garden Venue · 2:00 PM', await cBox.inputValue())
+  await cBox.evaluate((el) => { el.focus(); el.setSelectionRange(0, 19) })
   await fd.getByRole('button', { name: 'Bold', exact: true }).click()
-  ok('Bold marks the selected place name', (await cBox.inputValue()) === '**San Agustin Church** · 2:00 PM', await cBox.inputValue())
-  ok('preview shows it in bold', (await fd.locator('[data-print-preview] b').innerText()) === 'San Agustin Church')
-  await cBox.evaluate((el) => { el.focus(); el.setSelectionRange(25, 32) })
+  ok('Bold marks the selected place name', (await cBox.inputValue()) === '**Sample Garden Venue** · 2:00 PM', await cBox.inputValue())
+  ok('preview shows it in bold', (await fd.locator('[data-print-preview] b').innerText()) === 'Sample Garden Venue')
+  await cBox.evaluate((el) => { el.focus(); el.setSelectionRange(26, 33) })
   await cBox.press('Control+i')
-  ok('Ctrl+I makes the time italic', (await cBox.inputValue()) === '**San Agustin Church** · __2:00 PM__', await cBox.inputValue())
-  await cBox.evaluate((el) => { el.focus(); el.setSelectionRange(2, 20) })
+  ok('Ctrl+I makes the time italic', (await cBox.inputValue()) === '**Sample Garden Venue** · __2:00 PM__', await cBox.inputValue())
+  await cBox.evaluate((el) => { el.focus(); el.setSelectionRange(2, 21) })
   await fd.getByRole('button', { name: 'Bold', exact: true }).click()
-  ok('Bold again takes it off', (await cBox.inputValue()) === 'San Agustin Church · __2:00 PM__', await cBox.inputValue())
-  await cBox.evaluate((el) => { el.focus(); el.setSelectionRange(0, 18) })
+  ok('Bold again takes it off', (await cBox.inputValue()) === 'Sample Garden Venue · __2:00 PM__', await cBox.inputValue())
+  await cBox.evaluate((el) => { el.focus(); el.setSelectionRange(0, 19) })
   await cBox.press('Control+b')
   shots.push(['printables-ceremony-editor', await fd.screenshot()])
   await fd.getByRole('button', { name: 'Save for print' }).click()
   await page.waitForTimeout(1500)
   const frontSheet = inv.locator('.print-sheet').first()
-  ok('the card prints the place name in bold', (await frontSheet.locator('b', { hasText: 'San Agustin Church' }).count()) >= 1 && (await frontSheet.locator('i', { hasText: '2:00 PM' }).count()) >= 1)
+  ok('the card prints the place name in bold', (await frontSheet.locator('b', { hasText: 'Sample Garden Venue' }).count()) >= 1 && (await frontSheet.locator('i', { hasText: '2:00 PM' }).count()) >= 1)
   ok('no marks are printed', !/\*\*|__|==/.test(await frontSheet.innerText()))
-  ok('the website keeps its ceremony text', settings.church_name === 'San Agustin Church' && !patches.some((x) => x.table === 'wedding_settings'))
-  ok('ceremony shows “Edited”', (await page.getByRole('region', { name: 'Front of the card' }).getByText('Edited').count()) === 1)
+  ok('the website keeps its venue text', settings.church_name === 'Sample Garden Venue' && !patches.some((x) => x.table === 'wedding_settings'))
+  ok('venue shows “Edited”', (await page.getByRole('region', { name: 'Front of the card' }).getByText('Edited').count()) === 1)
   await page.waitForTimeout(800)
   const ft = prefWrites.flatMap((w) => (Array.isArray(w) ? w : [w])).filter((w) => w?.key === 'printables').at(-1)?.value?.frontText
-  ok('saved for print only', ft?.ceremony === '**San Agustin Church** · __2:00 PM__' && ft?.reception === undefined, JSON.stringify(ft))
+  ok('saved for print only', ft?.ceremony === '**Sample Garden Venue** · __2:00 PM__' && ft?.reception === undefined, JSON.stringify(ft))
   shots.push(['printables-ceremony-bold', await frontSheet.screenshot()])
 
   // My paper measures 21.0 × 29.8 cm: everything is centred on it; the back can be moved; the line-up test.
@@ -482,21 +443,21 @@ try {
   await pane('Page setup')
 
   // Money envelope: date, ceremony, reception and seal can be left off; names stay.
-  await page.getByRole('tab', { name: 'Money envelope' }).click()
+  await page.getByRole('tab', { name: 'Gift envelope' }).click()
   await page.waitForTimeout(1000)
   await pane('Content')
-  await page.getByRole('region', { name: 'Front of the envelope' }).getByLabel('Ceremony').uncheck()
+  await page.getByRole('region', { name: 'Front of the envelope' }).getByLabel('Venue').uncheck()
   await pane('Our details')
-  await page.getByLabel('Wedding date').uncheck()
+  await page.getByLabel('Shower date').uncheck()
   await page.getByLabel(/Monogram seal/).uncheck()
   await page.waitForTimeout(1000)
   const envTxt = await page.getByRole('region', { name: 'Print preview' }).locator('.print-sheet').first().innerText()
-  ok('envelope: date and ceremony off, names stay', !/CEREMONY/.test(envTxt) && /RECEPTION/.test(envTxt) && !/DECEMBER 19, 2026/i.test(envTxt) && /Mir/.test(envTxt), envTxt.replace(/\s+/g, ' ').slice(0, 160))
+  ok('envelope: date and venue off, names stay', !/Sample Garden Venue/i.test(envTxt) && !/MARCH 13, 2027/i.test(envTxt) && /Baby Santos/i.test(envTxt), envTxt.replace(/\s+/g, ' ').slice(0, 160))
   shots.push(['printables-envelope-details', await page.getByRole('region', { name: 'Print preview' }).screenshot()])
-  await page.getByLabel('Wedding date').check()
+  await page.getByLabel('Shower date').check()
   await page.getByLabel(/Monogram seal/).check()
   await pane('Content')
-  await page.getByRole('region', { name: 'Front of the envelope' }).getByLabel('Ceremony').check()
+  await page.getByRole('region', { name: 'Front of the envelope' }).getByLabel('Venue').check()
   await pane('Page setup')
   await page.getByRole('tab', { name: 'Paper invitations' }).click()
   await page.waitForTimeout(600)
@@ -568,13 +529,13 @@ try {
   await pane('Page setup')
   await page.getByRole('combobox', { name: 'Design', exact: true }).selectOption('heritage')
   await pick.getByRole('radio', { name: 'Champagne', exact: true }).click()
-  await page.getByRole('tab', { name: 'Money envelope' }).click()
+  await page.getByRole('tab', { name: 'Gift envelope' }).click()
   await page.waitForTimeout(1500)
   const env = page.getByRole('region', { name: 'Print preview' })
   const envInfo = await env.locator('.print-sheet').first().evaluate((el) => [el.querySelectorAll('path[fill="transparent"]').length, el.querySelectorAll('pattern rect').length, el.querySelectorAll('pattern path').length])
   ok('envelope: no paper fill, light woven band', envInfo[0] >= 1 && envInfo[1] === 0 && envInfo[2] >= 1, envInfo.join(' · '))
   shots.push(['printables-coloured-envelope', await env.screenshot()])
-  await page.getByRole('tab', { name: 'Attire guide' }).click()
+  await page.getByRole('tab', { name: 'What to wear' }).click()
   await page.waitForTimeout(2500)
   const att = page.getByRole('region', { name: 'Print preview' })
   const frames = await att.locator('.print-sheet').first().evaluate((el) => [...el.querySelectorAll('img')].map((img) => getComputedStyle(img.parentElement.parentElement).boxShadow))
@@ -609,7 +570,7 @@ try {
   ok('Letter: landscape 11 × 8.5 in sheet, 2 cards that fit', letterCards.width === '279.4mm' && letterCards.n === 2 && letterCards.fits, JSON.stringify(letterCards))
   ok('Letter: the print dialog gets the Letter page size', (await page.evaluate(() => [...document.querySelectorAll('style')].some((st) => /size:\s*279\.4mm 215\.9mm/.test(st.textContent ?? '')))))
   shots.push(['printables-letter', await page.getByRole('region', { name: 'Print preview' }).screenshot()])
-  await page.getByRole('tab', { name: 'Money envelope' }).click()
+  await page.getByRole('tab', { name: 'Gift envelope' }).click()
   await page.waitForTimeout(1200)
   const letterEnv = await inside(':scope > div > svg')
   ok('Letter: the envelope fits the sheet', letterEnv.n === 1 && letterEnv.fits, JSON.stringify(letterEnv))
@@ -622,7 +583,7 @@ try {
 
   // ---------------------------------------------------------------- money envelope: flaps fold inside, the back is clear
   const region = () => page.getByRole('region', { name: 'Print preview' })
-  await page.getByRole('tab', { name: 'Money envelope' }).click()
+  await page.getByRole('tab', { name: 'Gift envelope' }).click()
   await page.waitForTimeout(1200)
   ok('envelope: GLUE marks on the two inside flaps', (await region().getByText('GLUE · FOLDS INSIDE').count()) === 2)
   ok('envelope: no GLUE on the back', (await region().getByText('GLUE', { exact: true }).count()) === 0)
@@ -641,7 +602,7 @@ try {
   ok('name cards: 9 stands on 5 sheets', (await ncSheets.count()) === 5, String(await ncSheets.count()))
   ok('name cards: the name reads on both faces', (await region().locator('text', { hasText: 'Juan dela Cruz' }).count()) === 2)
   ok('name cards: one face upside down', (await ncSheets.first().locator('g[transform*="rotate(180)"]').count()) === 2)
-  ok('name cards: shows the table from Seating', (await region().locator('text', { hasText: 'Table · Sponsors' }).count()) >= 2)
+  ok('name cards: shows the table from Seating', (await region().locator('text', { hasText: 'Table · Godparents' }).count()) >= 2)
   ok('name cards: extra names with their table', (await region().locator('text', { hasText: 'Lola Nena' }).count()) === 2 && (await region().locator('text', { hasText: 'Table · Family' }).count()) === 2)
   ok('name cards: included guests too', (await region().locator('text', { hasText: 'Maria dela Cruz' }).count()) === 2)
   shots.push(['printables-name-cards', await ncSheets.first().screenshot()])
@@ -658,10 +619,10 @@ try {
   await page.waitForTimeout(1000)
   const tSheets = region().locator('.print-sheet')
   ok('table names: 4 names → 2 fronts + 2 backs', (await tSheets.count()) === 4, String(await tSheets.count()))
-  const lefts = async (i) => tSheets.nth(i).evaluate((el) => [...el.querySelectorAll(':scope > div[style*="position:absolute"][style*="overflow:hidden"]')].map((d) => [d.style.left, d.querySelector('text')?.parentElement?.textContent?.includes('Sponsors') ?? false]))
+  const lefts = async (i) => tSheets.nth(i).evaluate((el) => [...el.querySelectorAll(':scope > div[style*="position:absolute"][style*="overflow:hidden"]')].map((d) => [d.style.left, d.querySelector('text')?.parentElement?.textContent?.includes('Godparents') ?? false]))
   const f0 = await lefts(0)
   const b0 = await lefts(1)
-  ok('table names: front left card is Sponsors', f0[0]?.[0] === '12mm' && f0[0]?.[1] === true, JSON.stringify(f0))
+  ok('table names: front left card is Godparents', f0[0]?.[0] === '12mm' && f0[0]?.[1] === true, JSON.stringify(f0))
   ok('table names: its back is on the mirrored side', b0[0]?.[0] === '154.5mm' && b0[0]?.[1] === true, JSON.stringify(b0))
   await pane('Print')
   await page.getByLabel('Move back → (mm)').fill('1.5')
@@ -689,23 +650,23 @@ try {
   await page.getByRole('button', { name: 'Guest info card' }).click()
   await page.waitForTimeout(2500)
   const lSheets = region().locator('.print-sheet')
-  ok('leaflets: info card, 4 per sheet', (await lSheets.count()) === 1 && (await region().getByText('#HappilyEverMIRella').count()) === 4)
+  ok('leaflets: info card, 4 per sheet', (await lSheets.count()) === 1 && (await region().getByText('Our website', { exact: true }).count()) === 4, String(await region().getByText('Our website', { exact: true }).count()))
   ok('leaflets: three QR codes each', (await lSheets.first().locator('svg path').count()) >= 12)
   ok('leaflets: fits', (await page.getByText(/too full for this size/).count()) === 0)
   shots.push(['printables-leaflet-info', await lSheets.first().screenshot()])
   await page.getByLabel('Add a block').selectOption('heading')
   await page.waitForTimeout(500)
   const heads = page.getByRole('list', { name: 'Front blocks' }).getByLabel('Heading')
-  await heads.last().fill('See you at the dance floor!')
+  await heads.last().fill('See you at the shower!')
   await page.waitForTimeout(1500)
-  ok('leaflets: a new block shows on the card', (await region().getByText('See you at the dance floor!').count()) === 4)
+  ok('leaflets: a new block shows on the card', (await region().getByText('See you at the shower!').count()) === 4)
   await page.getByRole('button', { name: 'Program' }).click()
   await page.waitForTimeout(2000)
   await pane('Print')
   await page.getByRole('group', { name: 'Print', exact: true }).getByRole('combobox', { name: 'What to print' }).selectOption('both')
   await page.waitForTimeout(1200)
   ok('leaflets: program prints both sides', (await lSheets.count()) === 4 && (await region().getByText('Thank you', { exact: true }).count()) >= 2, String(await lSheets.count()))
-  ok('leaflets: program lines', (await region().getByText('FIRST DANCE').count()) + (await region().getByText('First dance').count()) >= 2)
+  ok('leaflets: program lines', (await region().getByText('GENDER REVEAL').count()) + (await region().getByText('Gender Reveal').count()) >= 2)
   shots.push(['printables-leaflet-program', await lSheets.first().screenshot()])
   shots.push(['printables-leaflet-program-back', await lSheets.nth(1).screenshot()])
   await page.waitForTimeout(900)
@@ -717,23 +678,24 @@ try {
   await page.goto(`${BASE}#/admin/outfits`)
   await page.locator('#pair-label-0').waitFor({ timeout: 15000 })
   ok('admin shows the layout choice', (await page.getByRole('radio', { name: 'His & hers side by side' }).getAttribute('aria-checked')) === 'true')
-  ok('pairs show one label each', (await page.locator('#pair-label-0').inputValue()) === 'Principal Sponsors' && (await page.locator('#pair-label-3').inputValue()) === '')
+  ok('pairs show one label each', (await page.locator('#pair-label-0').inputValue()) === 'Parents-to-be' && (await page.locator('#pair-label-3').inputValue()) === '')
   ok('no per-photo label boxes when side by side', (await page.locator('#label-o1').count()) === 0)
   const patchesBefore = patches.length
-  await page.locator('[data-pair-row="3"]').getByRole('button', { name: 'Entourage' }).click()
+  await page.locator('[data-pair-row="3"]').getByRole('button', { name: 'Team Pink' }).click()
   await page.waitForTimeout(900)
   const saved = patches.slice(patchesBefore)
-  ok('a pair label is saved to both photos', saved.length === 2 && saved.every((x) => x.body.label === 'Entourage') && saved.map((x) => x.id).sort().join() === 'o3,o6', JSON.stringify(saved))
+  ok('a pair label is saved to both photos', saved.length === 2 && saved.every((x) => x.body.label === 'Team Pink') && saved.map((x) => x.id).sort().join() === 'o3,o6', JSON.stringify(saved))
   shots.push(['admin-outfit-pairs', await page.locator('section', { has: page.locator('#pairs-heading') }).screenshot()])
   await page.getByRole('radio', { name: 'For Him / For Her tabs' }).click()
   await page.locator('#label-o1').waitFor({ timeout: 5000 })
-  ok('tabs layout brings back per-photo labels', (await page.locator('#label-o1').inputValue()) === 'Principal Sponsors')
+  ok('tabs layout brings back per-photo labels', (await page.locator('#label-o1').inputValue()) === 'Parents-to-be')
   ok('no page errors (printables)', errors.length === 0, errors.join(' | '))
   await ctx.close()
 
   // ---------------------------------------------------------------- website: his & hers side by side
   const hctx = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   await hctx.route(`${API}/**`, handle)
+  await hctx.route('**/attire/**', photo)
   const h = await hctx.newPage()
   const herr = []
   h.on('pageerror', (e) => herr.push(String(e)))
@@ -744,7 +706,7 @@ try {
   await h.waitForTimeout(2000)
   const section = h.locator('section', { has: heading })
   ok('website shows four pairs', (await section.locator('[data-outfit-pair]').count()) === 4)
-  ok('one label per pair', (await section.getByText('Principal Sponsors', { exact: true }).count()) === 1 && (await section.getByText('Parents & Relatives', { exact: true }).count()) === 1)
+  ok('one label per pair', (await section.getByText('Parents-to-be', { exact: true }).count()) === 1 && (await section.getByText('Family', { exact: true }).count()) === 1)
   ok('no For Him / For Her tabs', (await section.getByRole('tab').count()) === 0)
   const imgs = await section.locator('img').evaluateAll((els) => els.map((e) => [e.getAttribute('src'), e.naturalWidth, e.naturalHeight]))
   ok('all photos load in 3:4', imgs.length === 8 && imgs.every(([, w, hh]) => w === 900 && hh === 1200), JSON.stringify(imgs.map((x) => x[0])))
@@ -757,7 +719,7 @@ try {
   const dialog = h.getByRole('dialog')
   await dialog.waitFor({ timeout: 5000 })
   await h.waitForTimeout(700)
-  ok('enlarged view shows the pair', (await dialog.locator('img').count()) === 2 && (await dialog.getByText('Principal Sponsors').count()) === 1)
+  ok('enlarged view shows the pair', (await dialog.locator('img').count()) === 2 && (await dialog.getByText('Parents-to-be').count()) === 1)
   shots.push(['website-attire-lightbox', await h.screenshot()])
   await h.keyboard.press('Escape')
 
@@ -765,6 +727,7 @@ try {
   settings.outfit_layout = 'tabs'
   const tctx2 = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   await tctx2.route(`${API}/**`, handle)
+  await tctx2.route('**/attire/**', photo)
   const t2 = await tctx2.newPage()
   t2.on('pageerror', (e) => herr.push(String(e)))
   await t2.goto(`${BASE}#/`)
@@ -781,13 +744,14 @@ try {
   // ---------------------------------------------------------------- online invitation shows it too
   const gctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 })
   await gctx.route(`${API}/**`, handle)
+  await gctx.route('**/attire/**', photo)
   const g = await gctx.newPage()
   const gerr = []
   g.on('pageerror', (e) => gerr.push(String(e)))
   await g.goto(`${BASE}#/i/JUAN1`)
   await g.getByRole('button', { name: /Open your invitation/ }).waitFor({ timeout: 20000 })
   await g.waitForTimeout(1500)
-  ok('online envelope is addressed', (await g.getByRole('button', { name: 'Open your invitation, Mr. & Mrs. Juan dela Cruz' }).count()) === 1)
+  ok('online envelope is addressed', (await g.getByRole('button', { name: 'Open your invitation, Juan & Maria dela Cruz' }).count()) === 1)
   shots.push(['online-envelope-addressed', await g.screenshot()])
   await g.goto(`${BASE}#/i/ELVI2`)
   await g.getByRole('button', { name: /Open your invitation/ }).waitFor({ timeout: 20000 })

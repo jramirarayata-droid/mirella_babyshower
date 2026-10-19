@@ -14,7 +14,7 @@ const ok = (name, pass, detail = '') => {
 
 const T = '2026-09-01T00:00:00Z'
 const settings = {
-  id: 'ws1', couple_names: 'Mir & Ella', wedding_date: '2026-12-19', church_name: 'San Agustin Church', ceremony_time: '2:00 PM',
+  id: 'ws1', couple_names: 'Juan & Maria Santos', baby_name: 'Baby Santos', wedding_date: '2027-03-13', church_name: 'Sample Garden Venue', ceremony_time: '2:00 PM',
   church_map_url: 'https://maps.google.com/?q=church', reception_name: 'The Glass Garden', reception_time: '5:00 PM', rsvp_open: true,
   sections: [], additional_info: [], motif_colors: [], entourage: [], seating_config: { finder: { from: null, mode: 'visible', preassign: false } },
 }
@@ -77,7 +77,7 @@ try {
     await fallback.waitFor({ timeout: 8000 })
     const text = await fallback.innerText()
     ok('a broken guest page shows the friendly page, not a blank screen', /Something went wrong on this page/.test(text))
-    ok('…with your names, the ceremony and the reception', /Mir & Ella/.test(text) && /San Agustin Church/.test(text) && /The Glass Garden/.test(text), text.slice(0, 160))
+    ok('…with the baby’s name and the venue', /Baby Santos/.test(text) && /Sample Garden Venue/.test(text), text.slice(0, 160))
     shots.push(['resilience-guest-error', await page.screenshot()])
     await page.evaluate(() => (window.__crashArmed = false))
     await page.getByRole('button', { name: 'Try again' }).click()
