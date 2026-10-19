@@ -1,1 +1,2 @@
-https://multi-tenant-mirella-babyshower.mirandella.workers.dev/site-config.json
+https://multi-tenant-mirella-babyshower.mirandella.workers.dev/i/?c=sample-01
+https://mirella-babyshower.mirandella.workers.dev/i/?c=sample-01

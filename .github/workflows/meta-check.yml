@@ -18,14 +18,9 @@ jobs:
             grep -oE '<title>[^<]*</title>|<meta (property|name)="(og:[a-z:]+|twitter:[a-z]+|description)" content="[^"]*"' /tmp/p.html | head -20
             grep -o 'location.replace([^)]*)' /tmp/p.html | head -2
           done
-          echo "=================== config + direct calls"
-          C=$(curl -s https://multi-tenant-mirella-babyshower.mirandella.workers.dev/site-config.json)
-          echo "config keys: $(echo "$C" | jq -r 'keys|join(",")' 2>&1) url: $(echo "$C" | jq -r .supabaseUrl 2>&1)"
-          U=$(echo "$C" | jq -r .supabaseUrl); K=$(echo "$C" | jq -r .anonKey)
-          if [ -n "$U" ] && [ "$U" != null ]; then
-            echo "space_here:"; curl -s -X POST "$U/rest/v1/rpc/space_here" -H "apikey: $K" -H "Authorization: Bearer $K" -H "Content-Type: application/json" -H "x-space: mirella" -d '{}' | head -c 600; echo
-            echo "settings:"; curl -s "$U/rest/v1/wedding_settings?select=baby_name,wedding_date&limit=1" -H "apikey: $K" -H "Authorization: Bearer $K" -H "x-space: mirella" | head -c 300; echo
-          fi
+          echo "=== js bundle mentions supabase.co?"
+          JS=$(curl -s https://multi-tenant-mirella-babyshower.mirandella.workers.dev/ | grep -oE '/assets/index-[^"]+\.js' | head -1)
+          echo "js: $JS"; curl -s "https://multi-tenant-mirella-babyshower.mirandella.workers.dev$JS" | grep -oE 'https://[a-z0-9]+\.supabase\.co|project-not-configured' | sort -u
       - name: Save the result to the meta-check-results branch
         if: always()
         run: |
