@@ -1,0 +1,1 @@
+import{r as e}from"./react-CgUzYIil.js";import{ap as u}from"./index-Bj8J53Hs.js";function a(){const[s,o]=e.useState([]);return e.useEffect(()=>{let t=!0;return u().then(r=>t&&o(r)).catch(()=>{}),()=>{t=!1}},[]),s}export{a as u};

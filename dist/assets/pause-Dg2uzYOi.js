@@ -1,0 +1,1 @@
+import{c as e}from"./index-Bj8J53Hs.js";const t=[["rect",{x:"14",y:"4",width:"4",height:"16",rx:"1",key:"zuxfzm"}],["rect",{x:"6",y:"4",width:"4",height:"16",rx:"1",key:"1okwgv"}]],o=e("pause",t);export{o as P};

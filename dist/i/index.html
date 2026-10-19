@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>You’re invited to a baby shower</title>
+    <meta name="description" content="Tap to open your personal baby shower invitation." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="You’re invited to a baby shower" />
+    <meta property="og:description" content="Tap to open your personal baby shower invitation." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="You’re invited to a baby shower" />
+    <meta name="twitter:description" content="Tap to open your personal baby shower invitation." />
+    <script>location.replace((function (c) { return c ? '../#/i/' + encodeURIComponent(c) : '../' })(new URLSearchParams(location.search).get('c') || ''))</script>
+  </head>
+  <body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;background:#f2f7fc;color:#25344d">
+    <p>Opening your invitation… <a id="go" href="../" style="color:#8a6e45">Continue</a></p>
+    <script>document.getElementById('go').href = (function (c) { return c ? '../#/i/' + encodeURIComponent(c) : '../' })(new URLSearchParams(location.search).get('c') || '')</script>
+  </body>
+</html>
