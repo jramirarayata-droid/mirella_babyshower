@@ -9,7 +9,7 @@ import { getGiftSettings } from '../../services/giftService'
 import { listProgram } from '../../services/programService'
 import type { ProgramItem } from '../../types/wedding'
 import type { StyleId } from '../../theme/themes'
-import { formatWeddingDate, monogram } from '../../utils/formatting'
+import { formatWeddingDate, babyMonogram } from '../../utils/formatting'
 import { measureCardFit, type CardFit } from '../../utils/cardFit'
 import { siteLinks } from '../../utils/share'
 import { SHEETS, type Paper } from '../../utils/printables'
@@ -90,12 +90,12 @@ export function LeafletsTab({ paper, design, prefs, update }: Props) {
 
   const data: LeafletData = useMemo(
     () => ({
-      coupleNames: settings?.coupleNames ?? '',
+      coupleNames: settings?.babyName ?? '',
       dateText: settings ? formatWeddingDate(settings.weddingDate) : '',
-      monogram: settings ? monogram(settings.coupleNames, '&') : '',
+      monogram: settings ? babyMonogram(settings.babyName) : '',
       monogramArt: mono ? { src: mono.src, aspect: mono.aspect } : null,
       ceremony: [settings?.churchName, settings?.ceremonyTime].filter(Boolean).join(' · '),
-      reception: [settings?.receptionName, settings?.receptionTime].filter(Boolean).join(' · '),
+      reception: '',
       qr,
       giftQrUrl: gift,
       program: program ?? [],
@@ -419,7 +419,7 @@ function BlockFields({
     case 'names':
       return <p className="mt-1 text-xs text-muted">From Website Settings.</p>
     case 'details':
-      return <p className="mt-1 text-xs text-muted">Ceremony and reception places and times, from Website Settings.</p>
+      return <p className="mt-1 text-xs text-muted">The venue and start time, from Website Settings.</p>
     case 'monogram':
       return <p className="mt-1 text-xs text-muted">Your monogram (Look & Feel).</p>
     default:

@@ -17,7 +17,7 @@ type Target = 'home' | 'rsvp' | 'seat'
 const CARD_TITLE: Record<Target, string> = { rsvp: 'KINDLY RSVP', home: 'OUR WEDDING', seat: 'FIND YOUR SEAT' }
 const CARD_TEXT: Record<Target, string> = {
   rsvp: 'Scan to open your invitation & RSVP',
-  home: 'Scan to visit our wedding website',
+  home: 'Scan to visit our baby shower website',
   seat: 'Scan to find your table',
 }
 const INK = '#2B2A28'
@@ -42,11 +42,11 @@ export default function AdminShare() {
   const [busy, setBusy] = useState(false)
 
   const url = links[target]
-  const couple = settings?.coupleNames ?? 'Our wedding'
-  const shareText = `${couple} are getting married! Kindly RSVP here:`
+  const couple = settings?.babyName ?? 'Our baby shower'
+  const shareText = `You’re invited to ${couple}’s baby shower! Kindly RSVP here:`
 
   useEffect(() => {
-    document.title = 'Share & QR · Wedding admin'
+    document.title = 'Share & QR · Baby shower admin'
   }, [])
 
   useEffect(() => {
@@ -65,13 +65,13 @@ export default function AdminShare() {
 
   const downloadPng = async () => {
     const data = await QRCode.toDataURL(url, { width: 1200, margin: 2, errorCorrectionLevel: 'M', color: { dark: INK, light: '#FFFFFF' } })
-    download(data, `wedding-${target}-qr.png`)
+    download(data, `baby-shower-${target}-qr.png`)
   }
 
   const downloadSvg = () => {
     const blob = new Blob([qrSvg], { type: 'image/svg+xml' })
     const href = URL.createObjectURL(blob)
-    download(href, `wedding-${target}-qr.svg`)
+    download(href, `baby-shower-${target}-qr.svg`)
     setTimeout(() => URL.revokeObjectURL(href), 1000)
   }
 
@@ -137,7 +137,7 @@ export default function AdminShare() {
   const downloadCard = async () => {
     setBusy(true)
     try {
-      download(await renderCard(target), `wedding-${target}-card.png`)
+      download(await renderCard(target), `baby-shower-${target}-card.png`)
     } catch {
       toast.error('The printable card could not be created. Please try the plain QR download.')
     } finally {
@@ -161,7 +161,7 @@ export default function AdminShare() {
           <div className="mt-5 space-y-4">
             {(
               [
-                { key: 'home', label: 'Wedding website', href: links.home },
+                { key: 'home', label: 'Baby shower website', href: links.home },
                 { key: 'rsvp', label: 'RSVP page', href: links.rsvp },
                 { key: 'seat', label: 'Find My Seat (for the venue entrance)', href: links.seat },
               ] as const
@@ -268,7 +268,7 @@ export default function AdminShare() {
 }
 
 const POSTER_QRS = [
-  { key: 'home', title: 'Our Wedding Website', caption: 'Details, entourage, photos & more' },
+  { key: 'home', title: 'Our Baby Shower Website', caption: 'Details, gift wishlist, photos & more' },
   { key: 'rsvp', title: 'RSVP', caption: 'Confirm your attendance' },
   { key: 'seat', title: 'Find My Seat', caption: 'See your table in the venue' },
 ] as const
@@ -293,7 +293,7 @@ function readPosterTheme(): PrintTheme {
 function PosterCard({ links }: { links: Record<'home' | 'rsvp' | 'seat', string> }) {
   const { settings } = useWeddingSettings()
   const [pick, setPick] = useState<Record<string, boolean>>({ home: true, rsvp: true, seat: true })
-  const [headline, setHeadline] = useState('Welcome to the wedding of')
+  const [headline, setHeadline] = useState('Welcome to the baby shower of')
   const [venue, setVenue] = useState<string | null>(null)
   const [size, setSize] = useState<PosterSize>('a2')
   const [svgs, setSvgs] = useState<Record<string, string>>({})
@@ -321,9 +321,9 @@ function PosterCard({ links }: { links: Record<'home' | 'rsvp' | 'seat', string>
 
   const qrs = POSTER_QRS.filter((q) => pick[q.key]).map((q) => ({ title: q.title, caption: q.caption, svg: svgs[q.key] ?? '' }))
   const html = posterHtml({
-    coupleNames: settings?.coupleNames ?? '',
+    coupleNames: settings?.babyName ?? '',
     dateText: settings ? formatWeddingDate(settings.weddingDate, 'full') : '',
-    venue: venue ?? settings?.receptionName ?? '',
+    venue: venue ?? settings?.churchName ?? '',
     headline,
     qrs,
     theme,
@@ -364,7 +364,7 @@ function PosterCard({ links }: { links: Record<'home' | 'rsvp' | 'seat', string>
             </label>
             <label className="block text-sm text-ink-soft">
               Venue line (optional)
-              <input className="input-base mt-1.5" value={venue ?? settings?.receptionName ?? ''} maxLength={120} onChange={(e) => setVenue(e.target.value)} />
+              <input className="input-base mt-1.5" value={venue ?? settings?.churchName ?? ''} maxLength={120} onChange={(e) => setVenue(e.target.value)} />
             </label>
             <label className="block text-sm text-ink-soft">
               Size (portrait)

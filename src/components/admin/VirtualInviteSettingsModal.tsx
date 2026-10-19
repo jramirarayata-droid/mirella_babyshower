@@ -62,7 +62,7 @@ export function VirtualInviteSettingsModal(p: Props) {
 
   // Private on the card but still public on the website → recommend hiding there too.
   const stillPublic: { key: keyof WebsitePrivacy; label: string }[] = []
-  if (s.hideVenues && !p.website.hideVenues) stillPublic.push({ key: 'hideVenues', label: 'ceremony and reception' })
+  if (s.hideVenues && !p.website.hideVenues) stillPublic.push({ key: 'hideVenues', label: 'the venue' })
   if (s.hideInfo && !p.website.hideInfo) stillPublic.push({ key: 'hideInfo', label: '“Good to know”' })
 
   return (
@@ -189,7 +189,7 @@ export function VirtualInviteSettingsModal(p: Props) {
             <div className="mt-3 space-y-2">
               {(
                 [
-                  ['hideVenues', 'Ceremony and reception', 'On the front of the card, a short note says details are shared once they confirm.'],
+                  ['hideVenues', 'The venue', 'On the front of the card, a short note says details are shared once they confirm.'],
                   ['hideInfo', '“Good to know”', 'The back of the card shows just your monogram, names and date.'],
                   ['hideLinks', 'Maps and Add to calendar', 'The links under the card.'],
                 ] as const
@@ -210,7 +210,7 @@ export function VirtualInviteSettingsModal(p: Props) {
                   <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-gold" />
                   <span>
                     <span className="font-medium text-ink">Recommended:</span> your {stillPublic.map((x) => x.label).join(' and ')} {stillPublic.length > 1 ? 'are' : 'is'} still public on
-                    your wedding website.
+                    your baby shower website.
                   </span>
                 </p>
                 <Button
@@ -228,7 +228,7 @@ export function VirtualInviteSettingsModal(p: Props) {
             )}
             {(s.hideVenues || s.hideInfo) && stillPublic.length === 0 && (
               <p className="mt-3 flex items-center gap-1.5 text-sm text-sage">
-                <Check aria-hidden="true" className="size-4" /> Also private on your wedding website.
+                <Check aria-hidden="true" className="size-4" /> Also private on your baby shower website.
               </p>
             )}
           </section>

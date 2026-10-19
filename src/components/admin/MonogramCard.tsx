@@ -3,7 +3,7 @@ import { ImageUp, Trash2 } from 'lucide-react'
 import { useToast } from '../../hooks/useToast'
 import { useWeddingSettings } from '../../hooks/useWeddingSettings'
 import { DEFAULT_MONOGRAM, MONOGRAM_MAX_MB, getMonogramSettings, removeMonogramFile, saveMonogramSettings, uploadMonogram, type MonogramSettings } from '../../services/monogramService'
-import { monogram } from '../../utils/formatting'
+import { babyMonogram } from '../../utils/formatting'
 import { toFriendlyMessage } from '../../utils/errors'
 import { MonogramImage } from '../wedding/Monogram'
 import { Button } from '../ui/Button'
@@ -64,7 +64,7 @@ export function MonogramCard() {
     if (old) void removeMonogramFile(old)
   }
 
-  const initials = settings ? monogram(settings.coupleNames) : 'M & E'
+  const initials = settings ? babyMonogram(settings.babyName) : 'B'
 
   return (
     <section aria-labelledby="monogram-heading" className="rounded-xl border border-line bg-paper p-5 shadow-soft sm:p-6">

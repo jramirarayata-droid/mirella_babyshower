@@ -91,7 +91,7 @@ export default function AdminQuestions() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    document.title = 'RSVP Questions · Wedding admin'
+    document.title = 'RSVP Questions · Baby shower admin'
     listAllQuestions()
       .then(setQuestions)
       .catch((e) => setError(toFriendlyMessage(e)))
@@ -172,7 +172,7 @@ export default function AdminQuestions() {
                 Your questions
               </h2>
               <p className="mt-1 text-sm text-muted">
-                Shown after the standard questions and before the message to the couple. Up to {QUESTION_LIMIT}.
+                Shown after the standard questions and before the wish for the baby. Up to {QUESTION_LIMIT}.
               </p>
             </div>
             {questions && (

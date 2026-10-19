@@ -131,7 +131,7 @@ export function RSVPForm({ invitation, form, onChange, onRequestConfirm, submitt
                 <li key={name}>{name}</li>
               ))}
             </ul>
-            <p className="mt-3 text-xs text-muted">Already confirmed by the couple — no need to add them below.</p>
+            <p className="mt-3 text-xs text-muted">Already confirmed by the hosts — no need to add them below.</p>
           </div>
         )}
         <Ornament className="mt-7" />
@@ -180,7 +180,7 @@ export function RSVPForm({ invitation, form, onChange, onRequestConfirm, submitt
             onChange={(v) => update({ mobileNumber: v })}
             maxLength={20}
             placeholder="0917 123 4567"
-            hint="Used only for wedding updates. Never shared."
+            hint="Used only for baby shower updates. Never shared."
             error={errors.mobileNumber}
             required={attending}
           />
@@ -463,7 +463,7 @@ export function RSVPForm({ invitation, form, onChange, onRequestConfirm, submitt
               maxLength={LIMITS.messageToCouple}
               showCounter
               rows={4}
-              placeholder="Share your wishes, a favourite memory, or a word of advice…"
+              placeholder="A wish for the baby, a lullaby, or a word of advice for the parents-to-be…"
               error={errors.messageToCouple}
             />
           </Question>

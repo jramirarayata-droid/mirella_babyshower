@@ -32,7 +32,7 @@ const MIX_SECONDS = 3
 const EXIT_MS = 750
 
 /** Bingo for the reception: a lotto drum, a drumroll, and a 75-number board. */
-export function BingoGame({ tabs, host }: { tabs: ReactNode; /** Run from the wedding website (host link), not the admin. */ host?: boolean }) {
+export function BingoGame({ tabs, host }: { tabs: ReactNode; /** Run from the shower website (host link), not the admin. */ host?: boolean }) {
   const { settings } = useWeddingSettings()
   const reduce = Boolean(useReducedMotion())
   const [game, setGame] = useState<BingoGameState>(loadBingo)
@@ -59,7 +59,7 @@ export function BingoGame({ tabs, host }: { tabs: ReactNode; /** Run from the we
   const done = remaining.length === 0
 
   useEffect(() => {
-    if (!host) document.title = 'Bingo · Wedding admin'
+    if (!host) document.title = 'Shower Bingo · Admin'
   }, [host])
   useEffect(() => saveBingo(game), [game])
   useEffect(() => {
@@ -284,7 +284,7 @@ export function BingoGame({ tabs, host }: { tabs: ReactNode; /** Run from the we
               </Button>
             </div>
             <p className="text-xs text-muted">The game is kept on this device, so refreshing the page won’t lose the numbers called. Use the same device for the whole game.</p>
-            {!host && <p className="text-xs text-muted">To run Bingo from the wedding website instead, set up host access in the Website &amp; host tab.</p>}
+            {!host && <p className="text-xs text-muted">To run Bingo from the shower website instead, set up host access in the Website &amp; host tab.</p>}
           </section>
 
           <section className="space-y-3 rounded-xl border border-line bg-paper p-5 shadow-soft">

@@ -6,7 +6,7 @@ import type { PrintablePrefs } from '../../hooks/usePrintablePrefs'
 import { listSeats, listTables } from '../../services/seatingService'
 import type { SeatAssignment, SeatingTable } from '../../types/seating'
 import type { StyleId } from '../../theme/themes'
-import { formatWeddingDate, monogram } from '../../utils/formatting'
+import { formatWeddingDate, babyMonogram } from '../../utils/formatting'
 import { useMonogram } from '../../hooks/useMonogram'
 import { forPaper } from '../../utils/paperColour'
 import { readTheme } from '../../utils/printTheme'
@@ -58,8 +58,8 @@ const lines = (text: string) =>
 function useOurs(d: OurDetails) {
   const { settings } = useWeddingSettings()
   const mono = useMonogram()
-  const footer = [d.names ? settings?.coupleNames : '', d.date && settings ? formatWeddingDate(settings.weddingDate) : ''].filter(Boolean).join(' · ')
-  const seal = d.monogram && settings ? { text: monogram(settings.coupleNames, '&'), art: mono ? { src: mono.src, aspect: mono.aspect } : null } : undefined
+  const footer = [d.names ? settings?.babyName : '', d.date && settings ? formatWeddingDate(settings.weddingDate) : ''].filter(Boolean).join(' · ')
+  const seal = d.monogram && settings ? { text: babyMonogram(settings.babyName), art: mono ? { src: mono.src, aspect: mono.aspect } : null } : undefined
   return { footer: footer || undefined, seal }
 }
 

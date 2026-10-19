@@ -29,7 +29,7 @@ export default function AdminMusic() {
   const fileInput = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    document.title = 'Music · Wedding admin'
+    document.title = 'Music · Baby shower admin'
     getMusicSettings()
       .then((c) => {
         latest.current = c

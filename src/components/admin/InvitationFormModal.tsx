@@ -29,15 +29,13 @@ interface Props {
   tables: SeatingTable[]
   invitations: InvitationWithRSVP[]
   onTableCreated: (table: SeatingTable) => void
-  /** Position taken from the entourage for this invitee, if linked. */
-  autoPosition?: string
   /** Give a saved included guest their own invitation again. */
   onSeparate?: (guest: AdditionalGuest) => void
 }
 
 const EMPTY: InvitationInput = { inviteeName: '', tableId: null, positionMode: 'auto', positionLabel: '', side: null, maxAdditionalGuests: 0, isActive: true }
 
-export function InvitationFormModal({ open, invitation, saving, onClose, onSave, onCopyLink, tables, invitations, onTableCreated, autoPosition = '', onSeparate }: Props) {
+export function InvitationFormModal({ open, invitation, saving, onClose, onSave, onCopyLink, tables, invitations, onTableCreated, onSeparate }: Props) {
   const priceEach = guestPriceEach(useWeddingSettings().settings?.rsvpConfig)
   const [values, setValues] = useState<InvitationInput>(EMPTY)
   const [errors, setErrors] = useState<InvitationErrors>({})
@@ -132,8 +130,8 @@ export function InvitationFormModal({ open, invitation, saving, onClose, onSave,
           <div className="grid grid-cols-2 gap-1 rounded-lg bg-cream p-1" role="radiogroup" aria-label="Guest of">
             {(
               [
-                { v: 'groom', l: 'Groom’s side' },
-                { v: 'bride', l: 'Bride’s side' },
+                { v: 'groom', l: 'Dad’s side' },
+                { v: 'bride', l: 'Mom’s side' },
               ] as const
             ).map((o) => (
               <button
@@ -169,36 +167,27 @@ export function InvitationFormModal({ open, invitation, saving, onClose, onSave,
         />
         <fieldset>
           <legend className="mb-2 text-[0.95rem] font-medium text-ink-soft">Position on the printed invitation (optional)</legend>
-          <div className="grid grid-cols-3 gap-1 rounded-lg bg-cream p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-lg bg-cream p-1">
             {(
               [
-                { v: 'auto', l: 'From entourage' },
                 { v: 'custom', l: 'Type it' },
                 { v: 'none', l: 'Don’t show' },
               ] as const
-            ).map((o) => (
-              <button
-                key={o.v}
-                type="button"
-                aria-pressed={values.positionMode === o.v}
-                onClick={() => setValues((s) => ({ ...s, positionMode: o.v }))}
-                className={cn('rounded-md px-2 py-1.5 text-sm transition', values.positionMode === o.v ? 'bg-paper text-ink shadow-soft' : 'text-muted hover:text-ink')}
-              >
-                {o.l}
-              </button>
-            ))}
+            ).map((o) => {
+              const on = o.v === 'custom' ? values.positionMode === 'custom' : values.positionMode !== 'custom'
+              return (
+                <button
+                  key={o.v}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setValues((s) => ({ ...s, positionMode: o.v }))}
+                  className={cn('rounded-md px-2 py-1.5 text-sm transition', on ? 'bg-paper text-ink shadow-soft' : 'text-muted hover:text-ink')}
+                >
+                  {o.l}
+                </button>
+              )
+            })}
           </div>
-          {values.positionMode === 'auto' && (
-            <p className="mt-1.5 text-sm text-muted">
-              {autoPosition ? (
-                <>
-                  Will show: <strong className="font-medium text-ink">{autoPosition}</strong>
-                </>
-              ) : (
-                'Not linked in the entourage yet — nothing will show. Link them in Entourage → “Pick from guest list”.'
-              )}
-            </p>
-          )}
           {values.positionMode === 'custom' && (
             <TextField
               className="mt-2"
@@ -207,7 +196,7 @@ export function InvitationFormModal({ open, invitation, saving, onClose, onSave,
               value={values.positionLabel}
               onChange={(v) => setValues((s) => ({ ...s, positionLabel: v }))}
               maxLength={80}
-              placeholder="e.g. Maid of Honor, Principal Sponsor, Ninang"
+              placeholder="e.g. Ninang, Ninong, Lola"
             />
           )}
         </fieldset>
@@ -337,7 +326,7 @@ export function InvitationFormModal({ open, invitation, saving, onClose, onSave,
               onChange={setContact}
               maxLength={20}
               placeholder="0917 123 4567"
-              hint="E.g. a son or daughter you can reach about the wedding."
+              hint="E.g. a son or daughter you can reach about the shower."
               error={contactError ?? undefined}
             />
           )}
@@ -379,7 +368,7 @@ export function InvitationFormModal({ open, invitation, saving, onClose, onSave,
               <span className="block">
                 This saves an <strong>attending</strong> RSVP on their behalf
                 {included.filter((n) => n.trim()).length > 0 && <> together with their {included.filter((n) => n.trim()).length} included {included.filter((n) => n.trim()).length === 1 ? 'guest' : 'guests'}</>}.
-                They’ll count in your headcount, can be seated, and are tagged <strong>“Confirmed by couple”</strong>. Food, transport and other answers stay
+                They’ll count in your headcount, can be seated, and are tagged <strong>“Confirmed by hosts”</strong>. Food, transport and other answers stay
                 blank.
               </span>
             ) : (

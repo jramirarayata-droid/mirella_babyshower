@@ -14,8 +14,8 @@ alter table public.wedding_settings
     default 'Our RSVP list is now closed. For any changes, please reach out to us directly — we would love to hear from you.',
   add column if not exists entourage jsonb not null default '[]'::jsonb,
   add column if not exists entourage_visible boolean not null default true,
-  add column if not exists entourage_title text default 'The Entourage',
-  add column if not exists entourage_subtitle text default 'With gratitude to the people who will stand beside us.',
+  add column if not exists entourage_title text default 'Special Thanks',
+  add column if not exists entourage_subtitle text default 'With gratitude to the people helping us welcome our little one.',
   add column if not exists motif_title text default 'Our Motif',
   add column if not exists motif_colors jsonb not null default '[]'::jsonb;
 
@@ -103,8 +103,8 @@ create table if not exists public.gift_settings (
   singleton    boolean primary key default true check (singleton),
   is_visible   boolean not null default false,
   placement    text not null default 'private',
-  title        text default 'Wedding Gift',
-  message      text default 'Your presence is the greatest gift of all. Should you wish to bless us further, you may scan the code below.',
+  title        text default 'Gifts for Baby',
+  message      text default 'Your love and presence are the best gifts for our little one. Should you wish to bless the baby further, you may scan the code below.',
   qr_image_url text,
   updated_at   timestamptz not null default now(),
   constraint gift_settings_placement_valid check (placement in ('private', 'public')),

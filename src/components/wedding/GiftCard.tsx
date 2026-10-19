@@ -10,7 +10,7 @@ export function GiftCard({ gift, className }: { gift: PublicGift; className?: st
       <h2 className="mt-4 text-[2rem] leading-tight text-ink">{gift.title}</h2>
       {gift.message && <p className="mx-auto mt-3 max-w-sm whitespace-pre-line text-[0.95rem] leading-relaxed text-ink-soft">{gift.message}</p>}
       <div className="relative z-10 mx-auto mt-7 w-fit rounded-xl bg-white p-3 shadow-soft ring-1 ring-line">
-        <img src={gift.qrImageUrl} alt="QR code for sending a wedding gift" className="block size-56 object-contain sm:size-60" loading="lazy" />
+        <img src={gift.qrImageUrl} alt="QR code for sending a gift for the baby" className="block size-56 object-contain sm:size-60" loading="lazy" />
       </div>
       <p className="mt-4 text-xs uppercase tracking-[0.2em] text-muted">Scan with GCash, Maya or your banking app</p>
       <a

@@ -1,6 +1,6 @@
 /**
  * Leaflets: small printed cards the couple builds from blocks (heading, text,
- * hashtag, QR codes, ceremony & reception, the program flow and Bible verse
+ * hashtag, QR codes, the venue, the program flow and Bible verse
  * from Website Settings, a free list, …), on one or both sides.
  */
 import type { StyleId } from '../theme/themes'
@@ -37,13 +37,13 @@ export interface Leaflet {
 }
 
 export const BLOCK_LABELS: Record<BlockKind, string> = {
-  names: 'Your names & date',
+  names: 'Baby’s name & date',
   monogram: 'Monogram',
   heading: 'Heading',
   text: 'Text',
   hashtag: 'Hashtag',
   qr: 'QR code',
-  details: 'Ceremony & reception',
+  details: 'Venue',
   program: 'Program flow',
   verse: 'Bible verse',
   list: 'Your own list',
@@ -51,7 +51,7 @@ export const BLOCK_LABELS: Record<BlockKind, string> = {
 }
 
 export const QR_SOURCES: Record<QrSource, string> = {
-  website: 'Wedding website',
+  website: 'Baby shower website',
   rsvp: 'RSVP page',
   seat: 'Find My Seat',
   photos: 'Share your photos',
@@ -70,11 +70,11 @@ export function newBlock(kind: BlockKind): LeafletBlock {
     case 'text':
       return { id, kind, text: 'Write something for your guests.' }
     case 'hashtag':
-      return { id, kind, text: '#HappilyEverMIRella' }
+      return { id, kind, text: '#YourHashtag' }
     case 'qr':
-      return { id, kind, source: 'website', caption: 'Our wedding website' }
+      return { id, kind, source: 'website', caption: 'Our baby shower website' }
     case 'list':
-      return { id, kind, title: 'Program', text: '3:00 PM — Ceremony\n5:00 PM — Cocktails\n6:00 PM — Dinner & toasts\n8:00 PM — First dance' }
+      return { id, kind, title: 'Program', text: '2:00 PM — Welcome & snacks\n2:30 PM — Shower games\n3:30 PM — Gender reveal\n4:00 PM — Opening of gifts' }
     case 'program':
       return { id, kind, title: 'Program' }
     default:
@@ -92,9 +92,8 @@ export const LEAFLET_TEMPLATES: { key: string; name: string; make: () => Omit<Le
       perSheet: 4,
       front: [
         { id: newId(), kind: 'heading', text: 'Share your photos' },
-        { id: newId(), kind: 'text', text: 'Snap, scan and upload — your photos appear on the big screen tonight.' },
+        { id: newId(), kind: 'text', text: 'Snap, scan and upload — your photos appear on the big screen during the shower.' },
         { id: newId(), kind: 'qr', source: 'photos', caption: 'Scan to upload' },
-        { id: newId(), kind: 'hashtag', text: '#HappilyEverMIRella' },
       ],
       back: [],
     }),
@@ -111,7 +110,6 @@ export const LEAFLET_TEMPLATES: { key: string; name: string; make: () => Omit<Le
         { id: newId(), kind: 'qr', source: 'website', caption: 'Our website' },
         { id: newId(), kind: 'qr', source: 'seat', caption: 'Find your seat' },
         { id: newId(), kind: 'qr', source: 'photos', caption: 'Share your photos' },
-        { id: newId(), kind: 'hashtag', text: '#HappilyEverMIRella' },
       ],
       back: [],
     }),
@@ -133,9 +131,8 @@ export const LEAFLET_TEMPLATES: { key: string; name: string; make: () => Omit<Le
         { id: newId(), kind: 'verse' },
         { id: newId(), kind: 'divider' },
         { id: newId(), kind: 'heading', text: 'Thank you' },
-        { id: newId(), kind: 'text', text: 'Thank you for celebrating with us today. Your presence means the world to us.' },
+        { id: newId(), kind: 'text', text: 'Thank you for celebrating our little one with us today. Your love means the world to us.' },
         { id: newId(), kind: 'qr', source: 'photos', caption: 'Share your photos' },
-        { id: newId(), kind: 'hashtag', text: '#HappilyEverMIRella' },
       ],
     }),
   },
@@ -147,11 +144,13 @@ export interface LeafletData {
   dateText: string
   monogram: string
   monogramArt?: MonogramArt | null
+  /** The venue line. */
   ceremony: string
+  /** Not used by the baby shower (one venue). */
   reception: string
   /** QR code SVGs by block id (made ahead, since making them is asynchronous). */
   qr: Record<string, string>
-  /** The couple's uploaded gift QR image. */
+  /** The uploaded gift QR image. */
   giftQrUrl: string | null
   /** Program flow and Bible verse from Website Settings. */
   program?: { time: string; title: string; description: string }[]
@@ -235,7 +234,7 @@ export function leafletHtml(blocks: LeafletBlock[], w: number, h: number, t0: Pr
             const [place, time] = value.split(/\s+·\s+/)
             return `<div style="margin-top:${z(1.6)}mm"><div style="font-size:${z(2.2, 1.9)}mm;letter-spacing:${z(0.5)}mm;color:${t.accent}">${label}${time ? ` · ${esc(time)}` : ''}</div><div style="font-family:${t.serif};font-size:${z(3.8, 2.8)}mm;color:${t.ink}">${esc(place)}</div></div>`
           }
-          parts.push(row('CEREMONY', data.ceremony) + row('RECEPTION', data.reception))
+          parts.push(row('VENUE', data.ceremony))
           break
         }
         case 'list': {

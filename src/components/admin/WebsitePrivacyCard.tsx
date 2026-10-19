@@ -43,7 +43,7 @@ export function WebsitePrivacyCard() {
   }
 
   const recommend: string[] = []
-  if (invite?.hideVenues && !value.hideVenues) recommend.push('ceremony and reception')
+  if (invite?.hideVenues && !value.hideVenues) recommend.push('the venue')
   if (invite?.hideInfo && !value.hideInfo) recommend.push('“Good to know”')
 
   return (
@@ -59,7 +59,7 @@ export function WebsitePrivacyCard() {
       <div className="space-y-2">
         {(
           [
-            ['hideVenues', 'Keep ceremony and reception private', 'Hides the Ceremony and Reception section (names, times and maps).'],
+            ['hideVenues', 'Keep the venue private', 'Hides the venue section (name, time and map).'],
             ['hideInfo', 'Keep “Good to know” private', 'Hides the information sections below.'],
           ] as const
         ).map(([key, label, hint]) => (

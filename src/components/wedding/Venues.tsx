@@ -1,4 +1,4 @@
-import { Church, ExternalLink, Wine, type LucideIcon } from 'lucide-react'
+import { ExternalLink, PartyPopper, type LucideIcon } from 'lucide-react'
 import type { WeddingSettings } from '../../types/wedding'
 import { Reveal } from './Reveal'
 
@@ -12,8 +12,7 @@ interface Venue {
 
 export function Venues({ settings }: { settings: WeddingSettings }) {
   const venues: Venue[] = [
-    { label: 'Ceremony', name: settings.churchName, time: settings.ceremonyTime, mapUrl: settings.churchMapUrl, icon: Church },
-    { label: 'Reception', name: settings.receptionName, time: settings.receptionTime, mapUrl: settings.receptionMapUrl, icon: Wine },
+    { label: 'Venue', name: settings.churchName, time: settings.ceremonyTime, mapUrl: settings.churchMapUrl, icon: PartyPopper },
   ].filter((v) => v.name)
 
   if (!venues.length) return null
@@ -24,10 +23,10 @@ export function Venues({ settings }: { settings: WeddingSettings }) {
         <Reveal className="section-title text-center">
           <p className="eyebrow">Where</p>
           <h2 id="venues-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
-            Ceremony &amp; Reception
+            The Shower
           </h2>
         </Reveal>
-        <div className="mt-14 grid gap-6 md:grid-cols-2 md:gap-8">
+        <div className="mx-auto mt-14 grid max-w-xl gap-6 md:gap-8">
           {venues.map((v, i) => (
             <Reveal key={v.label} delay={i * 0.12}>
               <article className="lux-venue fine-frame flex h-full flex-col items-center rounded-sm bg-paper px-7 py-12 text-center shadow-card sm:px-10 sm:py-14">

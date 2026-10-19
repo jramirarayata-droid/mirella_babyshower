@@ -6,7 +6,7 @@ import { FriendlyError, logError } from '../utils/errors'
 type GiftRow = { title: string | null; message: string | null; qr_image_url: string | null }
 
 const toPublic = (r: GiftRow | undefined): PublicGift | null =>
-  r && r.qr_image_url ? { title: r.title ?? 'Wedding Gift', message: r.message ?? '', qrImageUrl: r.qr_image_url } : null
+  r && r.qr_image_url ? { title: r.title ?? 'Gifts for Baby', message: r.message ?? '', qrImageUrl: r.qr_image_url } : null
 
 /** Home page: only returns the gift when the couple chose "public". */
 export async function getPublicGift(): Promise<PublicGift | null> {

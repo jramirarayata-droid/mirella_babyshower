@@ -16,18 +16,18 @@ import { Skeleton } from '../ui/Skeleton'
 
 const item = (time: string, title: string, description = ''): ProgramItem => ({ id: newProgramItemId(), time, title, description })
 
-/** A typical Filipino wedding day to start from (every line can be changed). */
-function starterProgram(ceremonyTime: string, receptionTime: string): ProgramItem[] {
+/** A typical baby shower afternoon to start from (every line can be changed). */
+function starterProgram(startTime: string): ProgramItem[] {
   return [
-    item(ceremonyTime || '2:00 PM', 'Wedding Ceremony'),
-    item('', 'Photos with the Couple', 'Family, sponsors and friends'),
-    item(receptionTime || '5:00 PM', 'Cocktails & Welcome'),
-    item('', 'Entrance of the Newlyweds'),
-    item('', 'Dinner'),
-    item('', 'First Dance'),
-    item('', 'Cake Cutting & Toast'),
-    item('', 'Messages for the Couple'),
-    item('', 'Party'),
+    item(startTime || '2:00 PM', 'Welcome & Snacks', 'Sign the guest book and grab a treat'),
+    item('', 'Opening Prayer'),
+    item('', 'Shower Games', 'Baby bingo, guess the bump and more'),
+    item('', 'Baby Predictions', 'Due date, weight and boy or girl'),
+    item('', 'Lunch / Merienda'),
+    item('', 'Gender Reveal'),
+    item('', 'Diaper Raffle'),
+    item('', 'Wishes for the Baby'),
+    item('', 'Opening of Gifts & Thank You'),
   ]
 }
 
@@ -35,7 +35,7 @@ function starterProgram(ceremonyTime: string, receptionTime: string): ProgramIte
 export function ProgramCard() {
   const toast = useToast()
   const [id, setId] = useState<string | null>(null)
-  const [times, setTimes] = useState({ ceremony: '', reception: '' })
+  const [startTime, setStartTime] = useState('')
   const [saved, setSaved] = useState<{ settings: ProgramSettings; items: ProgramItem[] } | null>(null)
   const [settings, setSettings] = useState<ProgramSettings>({ programVisible: false, programTitle: '', programSubtitle: '' })
   const [items, setItems] = useState<ProgramItem[]>([])
@@ -50,7 +50,7 @@ export function ProgramCard() {
         if (!active) return
         const ps: ProgramSettings = { programVisible: s.programVisible, programTitle: s.programTitle, programSubtitle: s.programSubtitle }
         setId(s.id)
-        setTimes({ ceremony: s.ceremonyTime, reception: s.receptionTime })
+        setStartTime(s.ceremonyTime)
         setSaved({ settings: ps, items: list })
         setSettings(ps)
         setItems(list)
@@ -157,13 +157,13 @@ export function ProgramCard() {
             <p className="text-[0.95rem] font-medium text-ink-soft">
               Moments <span className="font-normal text-muted">({ready.length} of up to {PROGRAM_LIMIT})</span>
             </p>
-            <p className="text-xs text-muted">Time is optional, e.g. “2:00 PM” or “After the ceremony”.</p>
+            <p className="text-xs text-muted">Time is optional, e.g. “2:00 PM” or “After lunch”.</p>
           </div>
           {items.length === 0 ? (
             <div className="rounded-lg border border-dashed border-line px-4 py-8 text-center">
               <p className="text-sm text-muted">No moments yet.</p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => setItems(starterProgram(times.ceremony, times.reception))} icon={<Wand2 aria-hidden="true" className="size-4" />}>
+                <Button variant="outline" size="sm" onClick={() => setItems(starterProgram(startTime))} icon={<Wand2 aria-hidden="true" className="size-4" />}>
                   Start with a typical program
                 </Button>
                 <Button variant="outline" size="sm" onClick={add} icon={<Plus aria-hidden="true" className="size-4" />}>
@@ -184,7 +184,7 @@ export function ProgramCard() {
                         value={it.title}
                         onChange={(v) => update(it.id, { title: v })}
                         maxLength={120}
-                        placeholder="e.g. Wedding Ceremony"
+                        placeholder="e.g. Shower Games"
                         error={showErrors && missingTitle(it) ? 'Please name this moment.' : undefined}
                       />
                       <div className="flex items-center gap-1 sm:pt-8">
@@ -204,7 +204,7 @@ export function ProgramCard() {
                         value={it.description}
                         onChange={(v) => update(it.id, { description: v })}
                         maxLength={300}
-                        placeholder="e.g. At the garden, right after the ceremony"
+                        placeholder="e.g. Baby bingo, guess the bump and more"
                       />
                     </div>
                   </li>

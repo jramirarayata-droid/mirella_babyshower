@@ -6,7 +6,7 @@ import { getHostBoard, getHostWheel, hostLanded, hostNewRound, hostSetMode, ordi
 import { usePresentScreen } from '../../hooks/usePresentScreen'
 import { OutStack, PresentTopBar, WinnersStack, boardEntries } from './PresentSides'
 import { toFriendlyMessage } from '../../utils/errors'
-import { monogram } from '../../utils/formatting'
+import { babyMonogram } from '../../utils/formatting'
 import { Button } from '../ui/Button'
 import { cn } from '../ui/cn'
 import { ConfirmDialog } from '../ui/ConfirmDialog'
@@ -36,7 +36,7 @@ export function HostWheel({ token, initial, tabs }: { token: string | null; init
   const keys = useMemo(() => state.names.map((x) => x.k), [state.names])
   const roundDone = lastMode && state.knockedOut > 0 && state.names.length <= 1
   const spinMs = lastMode && state.names.length > state.finalsAt ? QUICK_SPIN_MS : SLOW_SPIN_MS
-  const centre = settings ? monogram(settings.coupleNames, '&') : ''
+  const centre = settings ? babyMonogram(settings.babyName) : ''
 
   useEffect(() => {
     autoRef.current = autoPlay
@@ -159,7 +159,7 @@ export function HostWheel({ token, initial, tabs }: { token: string | null; init
             <p className="mt-2 text-xs text-muted">
               Prizes:{' '}
               {Array.from({ length: state.consolations + 1 }, (_, i) => `${i === 0 ? 'Winner' : ordinal(i + 1)} — ${(state.prizes[i] ?? '').trim() || 'no prize set'}`).join(' · ')}
-              . The couple sets these in the admin.
+              . These are set in the admin.
             </p>
           )}
         </fieldset>
@@ -241,7 +241,7 @@ export function HostWheel({ token, initial, tabs }: { token: string | null; init
           {present && <SoundControls className="mt-2" />}
         </div>
       </section>
-      <p className="mt-4 text-center text-xs text-muted">Every result is saved for the couple. Guests on their phones only see the wheel — they can’t spin it.</p>
+      <p className="mt-4 text-center text-xs text-muted">Every result is saved in the admin. Guests on their phones only see the wheel — they can’t spin it.</p>
 
       <ConfirmDialog
         destructive

@@ -5,14 +5,14 @@ import { getDisplayPrefs, type DisplayPrefs } from '../services/displayPrefsServ
 import { invitationBackHtml, invitationCardHtml, type PrintTheme } from '../utils/printables'
 import { readTheme } from '../utils/printTheme'
 import { measureCardFit } from '../utils/cardFit'
-import { formatWeddingDate, monogram } from '../utils/formatting'
+import { arrivalText, formatWeddingDate, babyMonogram } from '../utils/formatting'
 import { useMonogram } from './useMonogram'
 
 /** Who the on-screen card is for. */
 export interface CardGuest {
   inviteeName: string
   includedGuests: string[]
-  /** e.g. "Groom's Mother" ('' for none). */
+  /** e.g. "Ninang" ('' for none). */
   position: string
   /** Shown on the front while they still need to reply. */
   respondBy: string | null
@@ -22,7 +22,7 @@ export interface CardGuest {
   addressedAs?: string
 }
 
-export const PRIVATE_DETAILS_NOTE = 'Ceremony and reception details will be shared once you confirm your attendance.'
+export const PRIVATE_DETAILS_NOTE = 'The venue details will be shared once you confirm your attendance.'
 
 
 /**
@@ -77,9 +77,11 @@ export function useInvitationCard(guest: CardGuest | null) {
           position: guest.position,
           withNames: guest.addressedAs?.trim() ? [] : guest.includedGuests,
           coupleNames: settings.coupleNames,
+          babyName: settings.babyName,
+          arriving: arrivalText(settings),
           dateText: formatWeddingDate(settings.weddingDate, 'full'),
           ceremony: hideVenues ? '' : [settings.churchName, settings.ceremonyTime].filter(Boolean).join(' · '),
-          reception: hideVenues ? '' : [settings.receptionName, settings.receptionTime].filter(Boolean).join(' · '),
+          reception: '',
           detailsNote: hideVenues ? PRIVATE_DETAILS_NOTE : undefined,
           respondBy: guest.respondBy,
           qrSvg: '',
@@ -93,9 +95,9 @@ export function useInvitationCard(guest: CardGuest | null) {
   const makeBack = (fit: number) =>
     settings && theme
       ? invitationBackHtml({
-          coupleNames: settings.coupleNames,
+          coupleNames: settings.babyName,
           dateText: formatWeddingDate(settings.weddingDate),
-          monogram: monogram(settings.coupleNames, '&'),
+          monogram: babyMonogram(settings.babyName),
           monogramArt: art,
           theme,
           size: '5x7',
@@ -104,7 +106,7 @@ export function useInvitationCard(guest: CardGuest | null) {
         })
       : ''
 
-  const key = JSON.stringify([art?.src.slice(0, 64), guest, theme, sections, hideVenues, settings?.coupleNames, settings?.weddingDate, settings?.churchName, settings?.ceremonyTime, settings?.receptionName, settings?.receptionTime])
+  const key = JSON.stringify([art?.src.slice(0, 64), guest, theme, sections, hideVenues, settings?.coupleNames, settings?.babyName, settings?.dueDate, settings?.dueText, settings?.dueVisible, settings?.weddingDate, settings?.churchName, settings?.ceremonyTime])
 
   useEffect(() => {
     if (!makeFront(1)) return
@@ -135,8 +137,8 @@ export function useInvitationCard(guest: CardGuest | null) {
     theme,
     frontHtml: ready ? makeFront(fits.front) : '',
     backHtml: ready ? makeBack(fits.back) : '',
-    monogramText: settings ? monogram(settings.coupleNames, '&') : '',
-    /** The couple's uploaded monogram (null = use the initials). */
+    monogramText: settings ? babyMonogram(settings.babyName) : '',
+    /** The uploaded monogram (null = use the initials). */
     monogramArt: art,
     /** Hide the map and calendar links under the card. */
     hideLinks: Boolean(prefs?.hideLinks) && !confirmed,

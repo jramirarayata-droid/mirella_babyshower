@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import QRCode from 'qrcode'
-import { Armchair, Bold, CheckCircle2, FileText, Heart, Mail, PenLine, Plus, Printer, RotateCcw, Shirt, Tent, Trash2, TriangleAlert, Users, Wallet } from 'lucide-react'
+import { Armchair, Bold, CheckCircle2, FileText, Heart, Mail, PenLine, Plus, Printer, RotateCcw, Shirt, Tent, Trash2, TriangleAlert, Wallet } from 'lucide-react'
 import { useAdminData } from '../hooks/useAdminData'
 import { useKept } from '../hooks/useKept'
-import { useEntourageLinks } from '../hooks/useEntourageLinks'
-import { entouragePositions, invitationPosition } from '../utils/positions'
+import { invitationPosition } from '../utils/positions'
 import { useToast } from '../hooks/useToast'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
 import { useMonogram } from '../hooks/useMonogram'
@@ -18,7 +17,7 @@ import type { InvitationWithRSVP, PositionMode } from '../types/rsvp'
 import { bySide, type SideFilter } from '../utils/headcount'
 import { FilterTabs } from '../components/admin/FilterTabs'
 import { toFriendlyMessage } from '../utils/errors'
-import { formatDateTime, formatDeadlineDate, formatWeddingDate, monogram } from '../utils/formatting'
+import { arrivalText, formatDateTime, formatDeadlineDate, formatWeddingDate, babyMonogram } from '../utils/formatting'
 import {
   CARD_SIZES,
   ENV_FLAT,
@@ -31,10 +30,7 @@ import {
   attireOneCardHtml,
   avoidItems,
   attirePages,
-  entourageCardHtml,
   thankYouCardHtml,
-  MIN_ENTOURAGE_FIT,
-  type EntouragePrintGroup,
   invitationBackHtml,
   invitationCardHtml,
   placeBack,
@@ -52,7 +48,6 @@ import {
 } from '../utils/printables'
 import { siteLinks } from '../utils/share'
 import { measureCardFit, type CardFit } from '../utils/cardFit'
-import type { EntourageGroup } from '../types/wedding'
 import { Button } from '../components/ui/Button'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { Modal } from '../components/ui/Modal'
@@ -71,26 +66,19 @@ import { PAPER_PRESETS, forPaper, normalHex, type PaperFit, type PrintOn } from 
 import { listVisibleOutfits } from '../services/outfitService'
 import type { OutfitImage } from '../types/wedding'
 
-type Tab = 'invitations' | 'entourage' | 'envelope' | 'attire' | 'thanks' | 'names' | 'tables' | 'leaflets'
+type Tab = 'invitations' | 'envelope' | 'attire' | 'thanks' | 'names' | 'tables' | 'leaflets'
 
-/** Admin → Entourage, as printed (empty groups and blank names left out). */
-function printGroups(entourage: EntourageGroup[] | undefined): EntouragePrintGroup[] {
-  return (entourage ?? [])
-    .map((g) => ({ title: g.title.trim(), layout: g.layout, members: g.members.filter((m) => m.name.trim()).map((m) => ({ name: m.name.trim(), role: m.role ?? '' })) }))
-    .filter((g) => g.members.length > 0)
-}
 /** Same-size stand-in for a personal QR while measuring or before the real one is ready. */
 /** Shown in the 3D preview before any guest is ticked. */
-const SAMPLE_GUEST = { id: 'sample', inviteeName: 'Your Guest’s Name', positionMode: 'custom', positionLabel: 'Maid of Honor', guests: [] } as unknown as InvitationWithRSVP
+const SAMPLE_GUEST = { id: 'sample', inviteeName: 'Your Guest’s Name', positionMode: 'custom', positionLabel: 'Ninang', guests: [] } as unknown as InvitationWithRSVP
 const QR_PLACEHOLDER = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" width="100%" height="100%"><rect width="10" height="10" fill="none"/></svg>'
 
 const chunk = <T,>(list: T[], n: number) => Array.from({ length: Math.ceil(list.length / n) }, (_, i) => list.slice(i * n, i * n + n))
 
 const PRINTABLE_TYPES = [
   { v: 'invitations', l: 'Paper invitations', i: Mail },
-  { v: 'entourage', l: 'Entourage', i: Users },
-  { v: 'envelope', l: 'Money envelope', i: Wallet },
-  { v: 'attire', l: 'Attire guide', i: Shirt },
+  { v: 'envelope', l: 'Gift envelope', i: Wallet },
+  { v: 'attire', l: 'What to wear', i: Shirt },
   { v: 'thanks', l: 'Thank-you card', i: Heart },
   { v: 'names', l: 'Name cards', i: Tent },
   { v: 'tables', l: 'Table names', i: Armchair },
@@ -110,7 +98,7 @@ export default function AdminPrintables() {
   const paperFit = useMemo(() => forPaper({ ...readTheme(), style: design, frame: prefs.cardBorder !== false }, prefs.printOn, prefs.paperColour), [settings?.theme, design, prefs.printOn, prefs.paperColour, prefs.cardBorder])
 
   useEffect(() => {
-    document.title = 'Printables · Wedding admin'
+    document.title = 'Printables · Baby shower admin'
   }, [])
 
   // The browser's print dialog uses this exact page size, with no margins.
@@ -125,7 +113,7 @@ export default function AdminPrintables() {
   useEffect(() => {
     if (tab !== 'tables') setPortraitPage(false)
   }, [tab])
-  const usesCardSize = tab === 'invitations' || tab === 'attire' || tab === 'entourage' || tab === 'thanks'
+  const usesCardSize = tab === 'invitations' || tab === 'attire' || tab === 'thanks'
   const envFit = applyEnvelopeFit({ ...DEFAULT_PRINTABLE_PREFS.envFit, ...(prefs.envFit ?? {}) })
   const props = { paper, design, prefs, update }
   const tabView =
@@ -135,8 +123,6 @@ export default function AdminPrintables() {
         <InvitationsTab {...props} />
       ) : tab === 'attire' ? (
         <AttireTab {...props} />
-      ) : tab === 'entourage' ? (
-        <EntourageTab {...props} />
       ) : tab === 'names' ? (
         <NameCardsTab {...props} />
       ) : tab === 'tables' ? (
@@ -575,8 +561,8 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
   const rotateBacks = prefs.rotateBacks
   const setRotateBacks = (v: boolean) => update({ rotateBacks: v })
   const showPositions = prefs.showPositions
-  const { showCeremony, showReception, showRespondBy, showWithNames } = prefs
-  const sparse = !showCeremony || !showReception || !showRespondBy || !showWithNames
+  const { showCeremony, showRespondBy, showWithNames } = prefs
+  const sparse = !showCeremony || !showRespondBy || !showWithNames
   const setShowPositions = (v: boolean) => update({ showPositions: v })
   const qrPlace = prefs.qrPlace
   const ours = { ...ALL_DETAILS, ...(prefs.ours?.invitations ?? {}) }
@@ -606,11 +592,11 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
     update({ boldIds: [...n] })
   }
   const backSections = infoSections.filter((x) => backIds.has(x.id)).map((x) => ({ title: x.title, body: x.body, bold: boldIds.has(x.id), marked: x.edited || x.own }))
-  // Ceremony / reception lines on the front: the website's, or worded for print only (with bold / italic / gold).
+  // The venue line on the front: the website's, or worded for print only (with bold / italic / gold).
   const frontText = prefs.frontText ?? {}
   const siteFront = {
     ceremony: [settings?.churchName, settings?.ceremonyTime].filter(Boolean).join(' · '),
-    reception: [settings?.receptionName, settings?.receptionTime].filter(Boolean).join(' · '),
+    reception: '',
   }
   const frontLine = (k: 'ceremony' | 'reception') => frontText[k] ?? siteFront[k]
   const [frontEditing, setFrontEditing] = useState<{ key: 'ceremony' | 'reception'; text: string } | null>(null)
@@ -624,8 +610,8 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
   const measureHost = useRef<HTMLDivElement>(null)
   const [fits, setFits] = useState<Record<string, CardFit>>({})
   const [backFit, setBackFit] = useState<CardFit>({ fit: 1, overflow: false })
-  const { links: entLinks } = useEntourageLinks()
-  const autoPositions = useMemo(() => entouragePositions(settings?.entourage ?? [], entLinks), [settings, entLinks])
+  // Positions are typed per invitation (there is no entourage to take them from).
+  const autoPositions = useMemo(() => new Map<string, string>(), [])
   const effective = (inv: InvitationWithRSVP): InvitationWithRSVP => {
     const e = posEdits[inv.id]
     const a = addrEdits[inv.id]
@@ -671,12 +657,6 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
         const pos = showPositions ? autoPositions.get(`${inv.id}:${g.id}`) : undefined
         return pos ? `${g.guestName} (${pos})` : g.guestName
       })
-  // The entourage card: a separate card in each set, or on the back of every invitation.
-  const entGroups = useMemo(() => printGroups(settings?.entourage), [settings])
-  const hasEntourage = entGroups.length > 0
-  const entMode: PrintablePrefs['entourage'] = hasEntourage ? prefs.entourage : 'off'
-  const setEntMode = (v: PrintablePrefs['entourage']) => update({ entourage: v })
-  const [entFit, setEntFit] = useState<CardFit>({ fit: 1, overflow: false })
   const box = useWidth()
   const [marking, setMarking] = useState(false)
   const paperFit = useMemo(() => forPaper({ ...readTheme(), style: design, frame: prefs.cardBorder !== false }, prefs.printOn, prefs.paperColour), [settings?.theme, design, prefs.printOn, prefs.paperColour, prefs.cardBorder])
@@ -722,19 +702,19 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
   // Nobody ticked yet: preview a sample card (never printed) so the page shows what it makes.
   const sample = chosen.length === 0
   const groups = chunk(sample ? [SAMPLE_GUEST] : chosen, perSheet)
-  // With the entourage on the back, the RSVP QR goes on the front.
-  const qrOnBack = qrPlace === 'back' && entMode !== 'back'
+  const qrOnBack = qrPlace === 'back'
   const frontFor = (inv: InvitationWithRSVP, fit = 1, sz: CardSize = size, qrSvg = qr[inv.id] ?? '') =>
     invitationCardHtml({
       guestName: addressedOf(inv) || inv.inviteeName,
       position: positionOf(inv),
       withNames: showWithNames && !addressedOf(inv) ? withNamesOf(inv) : [],
       coupleNames: settings?.coupleNames ?? '',
+      babyName: settings?.babyName ?? 'Baby',
+      arriving: settings ? arrivalText(settings) : '',
       dateText: settings ? formatWeddingDate(settings.weddingDate, 'full') : '',
       ceremony: showCeremony ? frontLine('ceremony') : '',
-      reception: showReception ? frontLine('reception') : '',
+      reception: '',
       ceremonyMarked: frontText.ceremony !== undefined,
-      receptionMarked: frontText.reception !== undefined,
       respondBy: showRespondBy ? respondBy : null,
       sparse,
       qrSvg,
@@ -744,26 +724,11 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
       qrOnBack,
       fit,
     })
-  const entourageFor = (fit = 1, sz: CardSize = size, frameless = false) =>
-    entourageCardHtml({
-      title: settings?.entourageTitle?.trim() || 'The Entourage',
-      coupleNames: settings?.coupleNames ?? '',
-      groups: entGroups,
-      theme,
-      size: sz,
-      frameless,
-      showNames: ours.names,
-      fit,
-    })
-  const plainBack = (sz: CardSize = size) =>
-    invitationBackHtml({ coupleNames: settings?.coupleNames ?? '', dateText: settings ? formatWeddingDate(settings.weddingDate) : '', monogram: settings ? monogram(settings.coupleNames, '&') : '', monogramArt, theme, size: sz, show: ours })
   const backFor = (inv: InvitationWithRSVP | null, fit = 1, sz: CardSize = size, qrSvg = inv ? qr[inv.id] ?? '' : '') =>
-    entMode === 'back'
-      ? entourageFor(fit, sz, true)
-      : invitationBackHtml({
-      coupleNames: settings?.coupleNames ?? '',
+    invitationBackHtml({
+      coupleNames: settings?.babyName ?? '',
       dateText: settings ? formatWeddingDate(settings.weddingDate) : '',
-      monogram: settings ? monogram(settings.coupleNames, '&') : '',
+      monogram: settings ? babyMonogram(settings.babyName) : '',
       monogramArt,
       theme,
       size: sz,
@@ -775,7 +740,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
 
   // Measure every listed card with the real fonts: shrink text a little when a card is very
   // full, and flag the ones that still don't fit inside the frame.
-  const measureKey = JSON.stringify([list.map((i) => [i.id, positionOf(i), withNamesOf(i), addressedOf(i)]), design, qrPlace, backSections, ours, size, CARD_SIZES[size].w, settings?.theme, settings?.coupleNames, respondBy, showCeremony, showReception, showRespondBy, showWithNames, frontText, entGroups, entMode, settings?.entourageTitle])
+  const measureKey = JSON.stringify([list.map((i) => [i.id, positionOf(i), withNamesOf(i), addressedOf(i)]), design, qrPlace, backSections, ours, size, CARD_SIZES[size].w, settings?.theme, settings?.coupleNames, settings?.babyName, settings?.dueDate, settings?.dueText, settings?.dueVisible, respondBy, showCeremony, showRespondBy, showWithNames, frontText])
   useEffect(() => {
     const host = measureHost.current
     if (!host || !settings) return
@@ -785,8 +750,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
       const next: Record<string, CardFit> = {}
       for (const inv of list) next[inv.id] = measureCardFit((f) => frontFor(inv, f, '5x7', QR_PLACEHOLDER), host)
       setFits(next)
-      setBackFit(measureCardFit((f) => backFor(list[0] ?? null, f, '5x7', QR_PLACEHOLDER), host, entMode === 'back' ? MIN_ENTOURAGE_FIT : undefined))
-      if (entMode === 'insert') setEntFit(measureCardFit((f) => entourageFor(f, '5x7'), host, MIN_ENTOURAGE_FIT))
+      setBackFit(measureCardFit((f) => backFor(list[0] ?? null, f, '5x7', QR_PLACEHOLDER), host))
     }
     void document.fonts.ready.then(run)
     return () => {
@@ -824,32 +788,14 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
       orientationMarkHtml('back', gi + 1, groups.length, theme)
     return lineUp.back(inner)
   })
-  // Separate entourage cards: one per invitation, on their own sheets after the invitations
-  // (sheet N of cards matches sheet N of invitations). Their backs carry your monogram.
-  const insertFronts =
-    entMode === 'insert'
-      ? groups.map((_, gi) => {
-          const pos = layouts[gi]
-          return (
-            pos.map((p) => `<div style="position:absolute;left:${p.x}mm;top:${p.y}mm">${flag(entourageFor(entFit.fit), entFit.overflow)}</div>`).join('') +
-            cropMarksSvg(s.w, s.h, pos, theme.muted) +
-            orientationMarkHtml('front', gi + 1, groups.length, theme) +
-            calibrationHtml(theme)
-          )
-        })
-      : []
-  const insertBacks = insertFronts.map((_, gi) => {
-    const pos = layouts[gi]
-    const inner = pos.map((p) => `<div style="position:absolute;left:${p.x}mm;top:${p.y}mm">${plainBack()}</div>`).join('') + cropMarksSvg(s.w, s.h, pos, theme.muted) + orientationMarkHtml('back', gi + 1, groups.length, theme)
-    return lineUp.back(inner)
-  })
   const pick = <T,>(list: T[]) => (sheetNo > 0 ? list.slice(sheetNo - 1, sheetNo) : list)
   const sheets = lineUp.testing
     ? lineUp.test(printSide)
-    : [
-        ...(printSide === 'front' ? pick(fronts) : printSide === 'back' ? pick(backs) : pick(fronts.map((f, i) => [f, backs[i]])).flat()),
-        ...(printSide === 'front' ? pick(insertFronts) : printSide === 'both' ? pick(insertFronts.map((f, i) => [f, insertBacks[i]])).flat() : []),
-      ]
+    : printSide === 'front'
+      ? pick(fronts)
+      : printSide === 'back'
+        ? pick(backs)
+        : pick(fronts.map((f, i) => [f, backs[i]])).flat()
 
   const toggle = (id: string) =>
     setSelected((cur) => {
@@ -967,49 +913,9 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
               ))}
             </div>
             <p className="mt-1 text-xs text-muted">
-              {entMode === 'back' && qrPlace === 'back'
-                ? 'The entourage is on the back, so the RSVP QR is printed on the front.'
-                : qrOnBack
+              {qrOnBack
                   ? 'Recommended: the front stays clean and says “Please turn over to RSVP”. Remember to print the backs too.'
                   : 'Everything a guest needs is on the front, even if you only print fronts.'}
-            </p>
-          </div>
-        </RibbonGroup>
-        <RibbonGroup label="Entourage" className="w-72">
-          <div>
-            
-            <div role="radiogroup" aria-label="Entourage" className="grid grid-cols-3 gap-1 rounded-lg bg-cream p-1">
-              {(
-                [
-                  { v: 'off', l: 'None' },
-                  { v: 'insert', l: 'Separate card' },
-                  { v: 'back', l: 'On the back' },
-                ] as const
-              ).map((o) => (
-                <button
-                  key={o.v}
-                  type="button"
-                  role="radio"
-                  aria-checked={entMode === o.v}
-                  disabled={!hasEntourage && o.v !== 'off'}
-                  onClick={() => setEntMode(o.v)}
-                  className={cn(
-                    'rounded-md px-1.5 py-1.5 text-sm transition disabled:cursor-not-allowed disabled:opacity-40',
-                    entMode === o.v ? 'bg-paper text-ink shadow-soft' : 'text-muted hover:text-ink',
-                  )}
-                >
-                  {o.l}
-                </button>
-              ))}
-            </div>
-            <p className="mt-1 text-xs text-muted">
-              {!hasEntourage
-                ? 'Add your entourage in Admin → Entourage to print it.'
-                : entMode === 'insert'
-                  ? `One entourage card per invitation, printed on its own sheets after the invitations — same size and design${entFit.fit < 1 && !entFit.overflow ? ', with slightly smaller text so everyone fits' : ''}.`
-                  : entMode === 'back'
-                    ? 'Printed on the back of every invitation (print both sides). The “Good to know” sections and the RSVP QR move off the back.'
-                    : `From Admin → Entourage (${entGroups.reduce((n, g) => n + g.members.length, 0)} names). Print it as its own card or on the back of each invitation.`}
             </p>
           </div>
         </RibbonGroup>
@@ -1021,13 +927,12 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
             </legend>
             {(
               [
-                ['showCeremony', 'Ceremony'],
-                ['showReception', 'Reception'],
+                ['showCeremony', 'Venue'],
                 ['showRespondBy', '“Please respond by” date'],
-                ['showWithNames', '“Together with” (included guests)'],
+                ['showWithNames', 'Included guests (“and …”)'],
               ] as const
             ).map(([key, label]) => {
-              const line = key === 'showCeremony' ? 'ceremony' : key === 'showReception' ? 'reception' : null
+              const line = key === 'showCeremony' ? 'ceremony' : null
               return (
                 <div key={key} className="flex items-center gap-1.5">
                   <label className="flex min-w-0 flex-1 items-center justify-between gap-3">
@@ -1056,7 +961,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
           <label className="flex items-start justify-between gap-3 text-sm text-ink-soft">
             <span>
               Show positions under names
-              <span className="block text-xs text-muted">E.g. “Maid of Honor”. Set per invitation, or taken from the Entourage.</span>
+              <span className="block text-xs text-muted">E.g. “Ninang” or “Lola”. Set per invitation.</span>
             </span>
             <span className="flex shrink-0 items-start gap-1.5">
               <input type="checkbox" checked={showPositions} onChange={(e) => setShowPositions(e.target.checked)} className="mt-0.5 size-5 shrink-0 accent-ink" />
@@ -1064,7 +969,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
             </span>
           </label>
         </RibbonGroup>
-        {entMode !== 'back' && (
+        {(
           <RibbonGroup label="Good to know (back)" className="w-80">
             <fieldset>
               <legend className="sr-only">“Good to know” on the back</legend>
@@ -1142,7 +1047,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
 
       <RibbonPane pane="details">
         <RibbonGroup label="Back of the card" className="w-72">
-          <OurDetailsSwitches value={ours} onChange={(v) => update({ ours: { ...prefs.ours, invitations: v } })} note="The front of the invitation always shows your names and date." />
+          <OurDetailsSwitches value={ours} onChange={(v) => update({ ours: { ...prefs.ours, invitations: v } })} note="The front of the invitation always shows the baby’s name and the date." />
         </RibbonGroup>
       </RibbonPane>
 
@@ -1152,7 +1057,6 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
             
             <p className="mt-1 text-xs text-muted">
               {printSide === 'both' ? 'For printers that print both sides automatically (duplex).' : 'Print the fronts, put the pages back in the printer, then print the backs.'}
-              {entMode === 'insert' && printSide !== 'back' ? ' The entourage cards come out after the invitations.' : ''}
             </p>
           </div>
           {groups.length > 1 && (
@@ -1183,11 +1087,6 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
 
       <RibbonPane pane="side">
       <aside className="space-y-4 print:hidden">
-        {entMode === 'insert' && entFit.overflow && (
-          <p role="alert" className="rounded-xl border border-rose/40 bg-rose/5 p-3 text-sm text-rose">
-            The entourage card is very full even with small text. Try the 5 × 7 size, or shorten some roles in Admin → Entourage.
-          </p>
-        )}
         {(overflowing.length > 0 || backFit.overflow) && (
           <div role="alert" className="rounded-xl border border-rose/40 bg-rose/5 p-4 text-sm text-ink-soft">
             <p className="flex items-center gap-2 font-medium text-rose">
@@ -1200,16 +1099,14 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
               <>
                 <p className="mt-1">{overflowing.map((i) => i.inviteeName).join(', ')}</p>
                 <p className="mt-1 text-xs text-muted">
-                  Even with smaller text the words reach the border. Shorten the position, the “addressed as” or the “together with” names, use shorter venue names in Website
+                  Even with smaller text the words reach the border. Shorten the position, the “addressed as” or the included guests’ names, use a shorter venue name in Website
                   Settings{qrOnBack ? '' : ', or move the RSVP QR to the back'}.
                 </p>
               </>
             )}
             {backFit.overflow && (
               <p className="mt-1 text-xs text-muted">
-                {entMode === 'back'
-                  ? 'The back: the entourage is very long for the back of this card size. Try 5 × 7, or print it as a separate card.'
-                  : 'The back: untick a “Good to know” section below, or shorten its text in Website Settings.'}
+                The back: untick a “Good to know” section below, or shorten its text in Website Settings.
               </p>
             )}
           </div>
@@ -1247,8 +1144,8 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
               onChange={setSide}
               options={[
                 { value: 'all', label: 'All', count: active.length },
-                { value: 'groom', label: 'Groom', count: bySide(active, 'groom').length },
-                { value: 'bride', label: 'Bride', count: bySide(active, 'bride').length },
+                { value: 'groom', label: 'Dad', count: bySide(active, 'groom').length },
+                { value: 'bride', label: 'Mom', count: bySide(active, 'bride').length },
               ]}
             />
           </div>
@@ -1281,7 +1178,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-ink">{i.inviteeName}</span>
                           <span className="block truncate text-xs text-muted">
-                            {[i.side === 'bride' ? 'Bride’s side' : 'Groom’s side', i.tableNumber, withNames.length ? `+ ${withNames.join(', ')}` : ''].filter(Boolean).join(' · ')}
+                            {[i.side === 'bride' ? 'Mom’s side' : 'Dad’s side', i.tableNumber, withNames.length ? `+ ${withNames.join(', ')}` : ''].filter(Boolean).join(' · ')}
                           </span>
                           {addressedOf(i) && <span className="block truncate font-serif text-[0.95rem] italic text-gold">“{addressedOf(i)}”</span>}
                         </span>
@@ -1308,7 +1205,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
                     </div>
                     {open && (
                       <div className="mb-2 ml-8 mt-1 space-y-1 rounded-lg bg-cream/60 p-2">
-                        <PositionPicker invitation={effective(i)} auto={autoPositions.get(`${i.id}:`) ?? ''} onSave={(mode, label) => void savePosition(i, mode, label)} />
+                        <PositionPicker invitation={effective(i)} onSave={(mode, label) => void savePosition(i, mode, label)} />
                         <AddressedAsEditor invitation={i} value={addressedOf(i)} included={withNames} onSave={(text) => void saveAddressed(i, text)} />
                       </div>
                     )}
@@ -1428,7 +1325,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
       <Modal
         open={Boolean(frontEditing)}
         onClose={() => setFrontEditing(null)}
-        title={frontEditing?.key === 'reception' ? 'Reception — wording for print' : 'Ceremony — wording for print'}
+        title="Venue — wording for print"
         description="Only the printed invitations change. Website Settings keeps its own wording."
         footer={
           frontEditing && (
@@ -1455,7 +1352,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
         {frontEditing && (
           <div className="space-y-3">
             <MarkedTextEditor
-              label={frontEditing.key === 'reception' ? 'Reception line' : 'Ceremony line'}
+              label="Venue line"
               value={frontEditing.text}
               rows={3}
               maxLength={200}
@@ -1498,13 +1395,13 @@ function EnvelopeTab({ paper, design, prefs, update }: { paper: Paper; design: S
 
   const s = SHEETS[paper]
   const envOptions = {
-    coupleNames: settings?.coupleNames ?? '',
+    coupleNames: settings?.babyName ?? '',
     dateText: settings ? formatWeddingDate(settings.weddingDate, 'full') : '',
-    monogram: settings ? monogram(settings.coupleNames, '&') : '',
+    monogram: settings ? babyMonogram(settings.babyName) : '',
     monogramArt,
     theme,
     ceremony: prefs.envCeremony === false ? '' : [settings?.churchName, settings?.ceremonyTime].filter(Boolean).join(' · '),
-    reception: prefs.envReception === false ? '' : [settings?.receptionName, settings?.receptionTime].filter(Boolean).join(' · '),
+    reception: '',
     giftQrUrl: withQr ? giftQr : null,
     showDate: prefs.envDate !== false,
     showSeal: prefs.envSeal !== false,
@@ -1516,7 +1413,7 @@ function EnvelopeTab({ paper, design, prefs, update }: { paper: Paper; design: S
 
   return (
     <div className="min-w-0">
-      <PrintBar summary={printSummary([`${copies} ${copies === 1 ? 'money envelope' : 'money envelopes'}`, `${copies} ${copies === 1 ? 'sheet' : 'sheets'}`, SHEETS[paper].name])} note="One envelope per sheet. In the print window choose Actual size (100%).">
+      <PrintBar summary={printSummary([`${copies} ${copies === 1 ? 'gift envelope' : 'gift envelopes'}`, `${copies} ${copies === 1 ? 'sheet' : 'sheets'}`, SHEETS[paper].name])} note="One envelope per sheet. In the print window choose Actual size (100%).">
         <Button className="sm:min-w-40" onClick={() => window.print()} icon={<Printer aria-hidden="true" className="size-4" />}>
           Print {copies} {copies === 1 ? 'envelope' : 'envelopes'}
         </Button>
@@ -1547,24 +1444,18 @@ function EnvelopeTab({ paper, design, prefs, update }: { paper: Paper; design: S
         <RibbonGroup label="Front of the envelope" className="w-64">
             <label className="flex items-center justify-between gap-3 text-sm text-ink-soft">
               <span>
-                Ceremony
+                Venue
               </span>
               <input type="checkbox" checked={prefs.envCeremony !== false} onChange={(e) => update({ envCeremony: e.target.checked })} className="size-5 shrink-0 accent-ink" />
-            </label>
-            <label className="flex items-center justify-between gap-3 text-sm text-ink-soft">
-              <span>
-                Reception
-              </span>
-              <input type="checkbox" checked={prefs.envReception !== false} onChange={(e) => update({ envReception: e.target.checked })} className="size-5 shrink-0 accent-ink" />
             </label>
         </RibbonGroup>
       </RibbonPane>
       <RibbonPane pane="details">
         <RibbonGroup label="Our details" className="w-72">
-            <p className="text-xs text-muted">Your names always show on the front.</p>
+            <p className="text-xs text-muted">The baby’s name always shows on the front.</p>
             <label className="flex items-center justify-between gap-3 text-sm text-ink-soft">
               <span>
-                Wedding date
+                Shower date
               </span>
               <input type="checkbox" checked={prefs.envDate !== false} onChange={(e) => update({ envDate: e.target.checked })} className="size-5 shrink-0 accent-ink" />
             </label>
@@ -1619,7 +1510,7 @@ function AttireTab({ paper, design, prefs, update }: { paper: Paper; design: Sty
   const [outfits, setOutfits] = useState<OutfitImage[] | null>(null)
   const [sets, setSets] = useState(1)
   const [withMotif, setWithMotif] = useState(true)
-  const [note, setNote] = useState('Kindly reserve white for the bride.')
+  const [note, setNote] = useState('Soft pastels welcome — wear pink or blue for your team!')
   const [side, setSide] = useState<'front' | 'back' | 'both'>('front')
   const [lowRes, setLowRes] = useState<string[]>([])
   const paperFit = useMemo(() => forPaper({ ...readTheme(), style: design, frame: prefs.cardBorder !== false }, prefs.printOn, prefs.paperColour), [settings?.theme, design, prefs.printOn, prefs.paperColour, prefs.cardBorder])
@@ -1701,7 +1592,7 @@ function AttireTab({ paper, design, prefs, update }: { paper: Paper; design: Sty
   const groups = chunk(all, perSheet)
   // The back: your monogram crest (as in the website's header), names and date — the same on every card.
   const backHtml = settings
-    ? invitationBackHtml({ coupleNames: settings.coupleNames, dateText: formatWeddingDate(settings.weddingDate), monogram: monogram(settings.coupleNames, '&'), monogramArt, theme, size, show: ours })
+    ? invitationBackHtml({ coupleNames: settings.babyName, dateText: formatWeddingDate(settings.weddingDate), monogram: babyMonogram(settings.babyName), monogramArt, theme, size, show: ours })
     : ''
   const fronts = groups.map((group, gi) => {
     const pos = layoutRow(s.w, s.h, group.length === perSheet ? perSheet : group.length, card.w, card.h)
@@ -1871,129 +1762,6 @@ function AttireTab({ paper, design, prefs, update }: { paper: Paper; design: Sty
   )
 }
 
-// ---------------------------------------------------------------- entourage cards on their own
-
-/** Extra entourage cards (the same card as in the invitation set), any number of copies. */
-function EntourageTab({ paper, design, prefs, update }: { paper: Paper; design: StyleId } & PrefsProps) {
-  const { settings } = useWeddingSettings()
-  const mono = useMonogram()
-  const monogramArt = mono ? { src: mono.src, aspect: mono.aspect } : null
-  const [copies, setCopies] = useState(2)
-  const [side, setSide] = useState<'front' | 'back' | 'both'>('front')
-  const [fit, setFit] = useState<CardFit>({ fit: 1, overflow: false })
-  const measureHost = useRef<HTMLDivElement>(null)
-  const paperFit = useMemo(() => forPaper({ ...readTheme(), style: design, frame: prefs.cardBorder !== false }, prefs.printOn, prefs.paperColour), [settings?.theme, design, prefs.printOn, prefs.paperColour, prefs.cardBorder])
-  const theme = paperFit.theme
-  const groupsData = useMemo(() => printGroups(settings?.entourage), [settings])
-  const size = prefs.size
-  const ours = { ...ALL_DETAILS, ...(prefs.ours?.entourage ?? {}) }
-  const card = CARD_SIZES[size]
-  const perSheet = card.perSheet[paper]
-  const s = SHEETS[paper]
-  const names = groupsData.reduce((n, g) => n + g.members.length, 0)
-  const make = (f: number, sz: CardSize = size) =>
-    entourageCardHtml({ title: settings?.entourageTitle?.trim() || 'The Entourage', coupleNames: settings?.coupleNames ?? '', groups: groupsData, theme, size: sz, fit: f, showNames: ours.names })
-
-  useEffect(() => {
-    const host = measureHost.current
-    if (!host || !settings || !groupsData.length) return
-    let cancelled = false
-    void document.fonts.ready.then(() => !cancelled && setFit(measureCardFit((f) => make(f, '5x7'), host, MIN_ENTOURAGE_FIT)))
-    return () => {
-      cancelled = true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify([groupsData, design, settings?.theme, settings?.coupleNames, settings?.entourageTitle, ours.names, size])])
-
-  const html = make(fit.fit)
-  const backHtml = settings
-    ? invitationBackHtml({ coupleNames: settings.coupleNames, dateText: formatWeddingDate(settings.weddingDate), monogram: monogram(settings.coupleNames, '&'), monogramArt, theme, size, show: ours })
-    : ''
-  const groups = groupsData.length ? chunk(Array.from({ length: copies }, () => html), perSheet) : []
-  const fronts = groups.map((group, gi) => {
-    const pos = layoutRow(s.w, s.h, group.length === perSheet ? perSheet : group.length, card.w, card.h)
-    return group.map((h, k) => `<div style="position:absolute;left:${pos[k].x}mm;top:${pos[k].y}mm">${h}</div>`).join('') + cropMarksSvg(s.w, s.h, pos, theme.muted) + orientationMarkHtml('front', gi + 1, groups.length, theme) + calibrationHtml(theme)
-  })
-  const lineUp = useLineUp(paper, theme, prefs)
-  const backs = groups.map((group, gi) => {
-    const pos = layoutRow(s.w, s.h, group.length === perSheet ? perSheet : group.length, card.w, card.h)
-    return lineUp.back(pos.map((p) => `<div style="position:absolute;left:${p.x}mm;top:${p.y}mm">${backHtml}</div>`).join('') + cropMarksSvg(s.w, s.h, pos, theme.muted) + orientationMarkHtml('back', gi + 1, groups.length, theme))
-  })
-  const sheets = lineUp.testing ? lineUp.test(side) : side === 'front' ? fronts : side === 'back' ? backs : fronts.flatMap((f, i) => [f, backs[i]])
-
-  return (
-    <div className="min-w-0">
-      <PrintBar summary={lineUp.testing ? printSummary(['Line-up test', `${sheets.length} ${sheets.length === 1 ? 'page' : 'pages'}`, SHEETS[paper].name]) : printSummary(['Entourage cards', `${sheets.length} ${sheets.length === 1 ? 'sheet' : 'sheets'}`, SHEETS[paper].name, CARD_SIZES[size].label])}>
-        <label className="flex items-center gap-2 text-sm text-ink-soft">
-          <span className="sr-only">Print</span>
-          <select className="input-base min-h-10 w-auto py-1.5" aria-label="What to print" value={side} onChange={(e) => setSide(e.target.value as typeof side)}>
-            <option value="front">Fronts</option>
-            <option value="back">Backs</option>
-            <option value="both">Both sides</option>
-          </select>
-        </label>
-        <Button className="sm:min-w-40" disabled={!groupsData.length} onClick={() => window.print()} icon={<Printer aria-hidden="true" className="size-4" />}>
-          Print {sheets.length} {sheets.length === 1 ? 'sheet' : 'sheets'}
-        </Button>
-      </PrintBar>
-      <div ref={measureHost} aria-hidden="true" style={{ position: 'fixed', left: -10000, top: 0, visibility: 'hidden', pointerEvents: 'none' }} />
-      <RibbonPane pane="content">
-        <RibbonGroup label="Copies" className="w-80">
-          <label className="flex items-center justify-between gap-2 text-sm text-ink-soft">
-            <span>
-              Copies
-              <span className="block text-xs text-muted">For sponsors, family or spares. The invitation set adds its own (Paper invitations → Entourage).</span>
-            </span>
-            <input
-              type="number"
-              min={1}
-              max={300}
-              value={copies}
-              onChange={(e) => setCopies(Math.max(1, Math.min(300, Math.trunc(Number(e.target.value) || 1))))}
-              className="input-base min-h-10 w-24 py-1.5"
-            />
-          </label>
-        </RibbonGroup>
-      </RibbonPane>
-      <RibbonPane pane="details">
-        <RibbonGroup label="Our details" className="w-72">
-          <OurDetailsSwitches value={ours} onChange={(v) => update({ ours: { ...prefs.ours, entourage: v } })} note="Names: above the title on the front. Monogram and date: on the back." />
-        </RibbonGroup>
-      </RibbonPane>
-      <RibbonPane pane="print">
-        <DuplexPanel prefs={prefs} update={update} testing={lineUp.testing} onTest={lineUp.setTesting} showMirror={false} />
-      </RibbonPane>
-      <RibbonPane pane="side">
-      <aside className="space-y-4 print:hidden">
-        {fit.overflow && (
-          <p role="alert" className="rounded-lg border border-rose/40 bg-rose/5 p-3 text-sm text-rose">
-            The entourage is very full even with small text. Try the 5 × 7 size, or shorten some roles in Admin → Entourage.
-          </p>
-        )}
-        <TipsFold title="The entourage card">
-          <ul className="mt-1 list-disc space-y-1 pl-5">
-            <li>Read from Admin → Entourage, so it always matches your website. Edit names there and the card updates.</li>
-            <li>Groups set to “pairs” print in two columns (e.g. Ninong and Ninang side by side), the others centred.</li>
-            <li>Same design, size and crop marks as your invitations. Print at <strong>Actual size / 100%</strong>.</li>
-          </ul>
-        </TipsFold>
-      </aside>
-      </RibbonPane>
-      <section aria-label="Print preview" className="min-w-0">
-        <p className="mb-3 text-sm text-muted print:hidden">
-          {names} {names === 1 ? 'name' : 'names'} in {groupsData.length} {groupsData.length === 1 ? 'group' : 'groups'} · {CARD_SIZES[size].label}
-          {fit.fit < 1 && !fit.overflow ? ' · slightly smaller text so everyone fits' : ''}
-        </p>
-        {groupsData.length === 0 ? (
-          <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-line text-sm text-muted print:hidden">Add your entourage in Admin → Entourage first.</div>
-        ) : (
-          <Sheets paper={paper} tint={paperFit.tint} sheets={sheets} />
-        )}
-      </section>
-    </div>
-  )
-}
-
 // ---------------------------------------------------------------- thank-you cards
 
 /** Thank-you cards: your message on the front, your monogram on the back. The same card for everyone, or one per guest. */
@@ -2063,7 +1831,7 @@ function ThankYouTab({ paper, design, prefs, update }: { paper: Paper; design: S
 
   const fronts_ = mode === 'personal' ? chosen.map((g) => make(nameOf(g), fitOf(nameOf(g)).fit)) : Array.from({ length: copies }, () => make(undefined, fitOf('').fit))
   const backHtml = settings
-    ? invitationBackHtml({ coupleNames: settings.coupleNames, dateText: formatWeddingDate(settings.weddingDate), monogram: monogram(settings.coupleNames, '&'), monogramArt, theme, size, show: ours })
+    ? invitationBackHtml({ coupleNames: settings.babyName, dateText: formatWeddingDate(settings.weddingDate), monogram: babyMonogram(settings.babyName), monogramArt, theme, size, show: ours })
     : ''
   const groups = chunk(fronts_, perSheet)
   const fronts = groups.map((group, gi) => {
@@ -2241,8 +2009,8 @@ function ThankYouTab({ paper, design, prefs, update }: { paper: Paper; design: S
 
 // ---------------------------------------------------------------- position per invitation
 
-/** Same three choices as in Add/Edit Invitation; saves to the invitation. */
-function PositionPicker({ invitation, auto, onSave }: { invitation: InvitationWithRSVP; auto: string; onSave: (mode: PositionMode, label: string) => void }) {
+/** Same choices as in Add/Edit Invitation; saves to the invitation. */
+function PositionPicker({ invitation, onSave }: { invitation: InvitationWithRSVP; onSave: (mode: PositionMode, label: string) => void }) {
   const [draft, setDraft] = useState(invitation.positionLabel)
   useEffect(() => setDraft(invitation.positionLabel), [invitation.positionLabel])
   const id = `pos-${invitation.id}`
@@ -2257,10 +2025,9 @@ function PositionPicker({ invitation, auto, onSave }: { invitation: InvitationWi
       <select
         id={id}
         className="input-base min-h-8 w-auto py-0.5 pl-2 pr-7 text-xs"
-        value={invitation.positionMode}
+        value={invitation.positionMode === 'custom' ? 'custom' : 'none'}
         onChange={(e) => onSave(e.target.value as PositionMode, e.target.value === 'custom' ? draft : invitation.positionLabel)}
       >
-        <option value="auto">From entourage{auto ? ` (${auto})` : ' (not linked)'}</option>
         <option value="custom">Type it</option>
         <option value="none">Don’t show</option>
       </select>
@@ -2289,7 +2056,7 @@ function PositionPicker({ invitation, auto, onSave }: { invitation: InvitationWi
 
 /**
  * How one invitation is addressed ("Mr. & Mrs. Juan dela Cruz"). Suggestions
- * only fill the box — nothing is saved until the couple presses Save, one
+ * only fill the box — nothing is saved until Save is pressed, one
  * invitation at a time. Saved to the invitation: used on the printed card and
  * the guest's online invitation, in place of the name and "together with".
  */

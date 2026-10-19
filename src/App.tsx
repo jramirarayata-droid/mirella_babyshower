@@ -58,7 +58,6 @@ const AdminResponses = page(() => import('./pages/AdminResponses'))
 const AdminGuests = page(() => import('./pages/AdminGuests'))
 const AdminSettings = page(() => import('./pages/AdminSettings'))
 const AdminOutfits = page(() => import('./pages/AdminOutfits'))
-const AdminEntourage = page(() => import('./pages/AdminEntourage'))
 const AdminMedia = page(() => import('./pages/AdminMedia'))
 const AdminLookFeel = page(() => import('./pages/AdminLookFeel'))
 const AdminShare = page(() => import('./pages/AdminShare'))
@@ -118,7 +117,6 @@ export default function App() {
                 <Route path="responses" element={<AdminResponses />} />
                 <Route path="guests" element={<AdminGuests />} />
                 <Route path="outfits" element={<AdminOutfits />} />
-                <Route path="entourage" element={<AdminEntourage />} />
                 <Route path="media" element={<AdminMedia />} />
                 <Route path="look" element={<AdminLookFeel />} />
                 <Route path="share" element={<AdminShare />} />

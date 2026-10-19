@@ -54,7 +54,7 @@ export const DEFAULT_RSVP_TEASER: RsvpTeaser = {
   enabled: false,
   title: 'Confirm your attendance for a chance to win',
   highlight: 'up to ₱25,000',
-  note: 'in our wedding raffle, drawn at the reception — be there to win!',
+  note: 'in our baby shower raffle, drawn at the shower — be there to win!',
 }
 
 export interface RsvpConfig {
@@ -65,16 +65,16 @@ export interface RsvpConfig {
 export const BUILTIN_QUESTIONS: { key: BuiltinKey; defaultLabel: string; description: string; canRequire?: boolean; alwaysOn?: boolean }[] = [
   { key: 'transportation', defaultLabel: 'Do you have your own transportation vehicle?', description: 'Includes the follow-ups: vehicle type, or whether they need a ride.' },
   { key: 'comingFrom', defaultLabel: 'Where will you be coming from?', description: 'Short text, 120 characters.', canRequire: true },
-  { key: 'food', defaultLabel: 'Which dishes would you like to see at our wedding? 🍽️', description: 'Up to 4 of: vegetable, pasta, fish, pork, beef, chicken.' },
+  { key: 'food', defaultLabel: 'Which dishes would you like to see at the shower? 🍽️', description: 'Up to 4 of: vegetable, pasta, fish, pork, beef, chicken.' },
   { key: 'dietary', defaultLabel: 'Do you have any food allergies or dietary restrictions?', description: 'Yes / No, with details when Yes.' },
   { key: 'accessibility', defaultLabel: 'Do you have any special accessibility or mobility needs we should be aware of?', description: 'Optional, 255 characters.' },
   {
     key: 'additionalGuest',
-    defaultLabel: 'Would you like to bring an additional guest for ₱799?',
+    defaultLabel: 'Would you like to bring an additional guest?',
     description: 'Only shown to attending guests whose invitation allows additional guests (set per invitation). Always asked. Type {price} in your wording to insert the price.',
     alwaysOn: true,
   },
-  { key: 'message', defaultLabel: 'Leave a message for the couple 💌', description: 'Optional, 500 characters. Always the last question.' },
+  { key: 'message', defaultLabel: 'Leave a wish for the baby 💌', description: 'Wishes for the baby. Optional, 500 characters. Always the last question.' },
 ]
 
 export const QUESTION_TYPES: { value: QuestionType; label: string; description: string }[] = [

@@ -82,7 +82,7 @@ export function GiftSettingsCard() {
     <section id="gift-settings" aria-labelledby="gift-settings-heading" className="scroll-mt-24 rounded-xl border border-line bg-paper p-5 shadow-soft sm:p-6">
       <div className="mb-5">
         <h2 id="gift-settings-heading" className="text-2xl text-ink">
-          Wedding Gift QR
+          Gift QR for the Baby
         </h2>
         <p className="mt-1 text-sm text-muted">Your GCash / Maya / InstaPay QR for guests who wish to send a monetary gift.</p>
       </div>

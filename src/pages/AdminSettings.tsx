@@ -6,6 +6,7 @@ import { getWeddingSettings, newSectionId, SECTION_ICONS, updateWeddingSettings,
 import type { InfoSection, SectionIconName, WeddingSettings, WeddingSettingsInput } from '../types/wedding'
 import { toFriendlyMessage } from '../utils/errors'
 import { isValidHttpUrl } from '../utils/validation'
+import { arrivalText } from '../utils/formatting'
 import { Button } from '../components/ui/Button'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { TextAreaField, TextField } from '../components/ui/FormField'
@@ -22,12 +23,16 @@ import { ProgramCard } from '../components/admin/ProgramCard'
 import { useUnsavedChanges } from '../hooks/unsavedChanges'
 import { SaveStatus } from '../components/ui/SaveStatus'
 
-type FieldErrors = Partial<Record<'coupleNames' | 'weddingDate' | 'heroImageUrl' | 'churchMapUrl' | 'receptionMapUrl' | 'sections', string>>
+type FieldErrors = Partial<Record<'coupleNames' | 'babyName' | 'weddingDate' | 'dueDate' | 'heroImageUrl' | 'churchMapUrl' | 'sections', string>>
 
 function toInput(s: WeddingSettings): WeddingSettingsInput {
   return {
     coupleNames: s.coupleNames,
+    babyName: s.babyName,
     weddingDate: s.weddingDate,
+    dueDate: s.dueDate,
+    dueText: s.dueText,
+    dueVisible: s.dueVisible,
     heroTitle: s.heroTitle,
     heroSubtitle: s.heroSubtitle,
     heroImageUrl: s.heroImageUrl,
@@ -56,7 +61,7 @@ export default function AdminSettings() {
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    document.title = 'Website settings · Wedding admin'
+    document.title = 'Website settings · Baby shower admin'
     let active = true
     getWeddingSettings()
       .then((s) => {
@@ -120,11 +125,12 @@ export default function AdminSettings() {
 
   const validate = (v: WeddingSettingsInput): FieldErrors => {
     const e: FieldErrors = {}
-    if (!v.coupleNames.trim()) e.coupleNames = 'Couple names are required.'
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(v.weddingDate)) e.weddingDate = 'Please choose the wedding date.'
+    if (!v.coupleNames.trim()) e.coupleNames = 'The parents’ names are required.'
+    if (!v.babyName.trim()) e.babyName = 'Please give the baby’s name or a nickname, e.g. “Baby Santos”.'
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v.weddingDate)) e.weddingDate = 'Please choose the date of the shower.'
+    if (v.dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(v.dueDate)) e.dueDate = 'Please choose a date, or leave it empty.'
     if (!isValidHttpUrl(v.heroImageUrl)) e.heroImageUrl = 'Please enter a full image URL starting with https://'
     if (!isValidHttpUrl(v.churchMapUrl)) e.churchMapUrl = 'Please enter a full URL starting with https://'
-    if (!isValidHttpUrl(v.receptionMapUrl)) e.receptionMapUrl = 'Please enter a full URL starting with https://'
     if (v.sections.some((s) => !s.title.trim())) e.sections = 'Every information section needs a title.'
     return e
   }
@@ -171,7 +177,7 @@ export default function AdminSettings() {
     <form onSubmit={save} noValidate>
       <PageHeader
         title="Website Settings"
-        description="Everything on the public wedding website comes from here."
+        description="Everything on the public baby shower website comes from here."
         actions={
           <>
             <SaveStatus dirty={dirty} saving={saving} />
@@ -185,10 +191,50 @@ export default function AdminSettings() {
       <div className="space-y-6">
         <Card title="General">
           <div className="grid gap-5 sm:grid-cols-2">
-            <TextField label="Couple names" value={values.coupleNames} onChange={(v) => set('coupleNames', v)} error={errors.coupleNames} maxLength={80} />
-            <TextField label="Wedding date" type="date" value={values.weddingDate} onChange={(v) => set('weddingDate', v)} error={errors.weddingDate} />
-            <TextField label="Hero title" value={values.heroTitle} onChange={(v) => set('heroTitle', v)} maxLength={80} hint="Shown large on the hero, e.g. “Mir & Ella”." />
-            <TextField label="Hero subtitle" value={values.heroSubtitle} onChange={(v) => set('heroSubtitle', v)} maxLength={120} hint="e.g. “are getting married”." />
+            <TextField
+              label="Parents’ names"
+              value={values.coupleNames}
+              onChange={(v) => set('coupleNames', v)}
+              error={errors.coupleNames}
+              maxLength={80}
+              placeholder="e.g. Juan & Maria Santos"
+              hint="The hosts, on invitations, thank-you cards and the footer."
+            />
+            <TextField
+              label="Baby’s name or nickname"
+              value={values.babyName}
+              onChange={(v) => set('babyName', v)}
+              error={errors.babyName}
+              maxLength={60}
+              placeholder="e.g. Baby Santos"
+              hint="Shown large on the website and printables. The monogram uses its initials."
+            />
+            <TextField label="Shower date" type="date" value={values.weddingDate} onChange={(v) => set('weddingDate', v)} error={errors.weddingDate} hint="The countdown counts to this day (and the start time below)." />
+            <div className="space-y-2">
+              <TextField
+                label="Due date (optional)"
+                type="date"
+                value={values.dueDate ?? ''}
+                onChange={(v) => set('dueDate', v || null)}
+                error={errors.dueDate}
+                hint={values.dueDate ? `Shown as “${arrivalText({ ...values, dueVisible: true }) || '—'}”.` : 'Shown as the month, e.g. “Arriving February 2027”.'}
+              />
+              <label className="flex items-center gap-2 text-sm text-ink-soft">
+                <input type="checkbox" className="size-4 accent-ink" checked={values.dueVisible} onChange={(e) => set('dueVisible', e.target.checked)} />
+                Show the due date on the website and invitations
+              </label>
+            </div>
+            <TextField
+              className="sm:col-span-2"
+              label="Due date wording (optional)"
+              value={values.dueText}
+              onChange={(v) => set('dueText', v)}
+              maxLength={80}
+              placeholder="e.g. Arriving: February 2027"
+              hint="Leave empty to use the month of the due date."
+            />
+            <TextField label="Hero title" value={values.heroTitle} onChange={(v) => set('heroTitle', v)} maxLength={80} hint="Shown large on the hero; empty = the baby’s name." />
+            <TextField label="Hero subtitle" value={values.heroSubtitle} onChange={(v) => set('heroSubtitle', v)} maxLength={120} hint="e.g. “A baby shower for Juan & Maria”." />
             <TextAreaField
               className="sm:col-span-2"
               label="Introduction text"
@@ -239,7 +285,7 @@ export default function AdminSettings() {
                 >
                   Upload image
                 </Button>
-                <p className="mt-2 text-xs text-muted">JPG, PNG, WebP or AVIF, up to 10 MB. Stored in the Supabase “wedding-assets” bucket. A landscape photo at least 2000px wide looks best.</p>
+                <p className="mt-2 text-xs text-muted">JPG, PNG, WebP or AVIF, up to 10 MB. A bump photo, a nursery or a sweet baby-themed picture — at least 2000px wide looks best. Without one, the hero shows a little moon and stars.</p>
               </div>
             </div>
             <div className="overflow-hidden rounded-lg border border-line bg-cream">
@@ -252,22 +298,13 @@ export default function AdminSettings() {
           </div>
         </Card>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Card title="Ceremony">
-            <div className="space-y-5">
-              <TextField label="Church name" value={values.churchName} onChange={(v) => set('churchName', v)} maxLength={150} />
-              <TextField label="Time (optional)" value={values.ceremonyTime} onChange={(v) => set('ceremonyTime', v)} maxLength={40} placeholder="e.g. 2:00 PM" hint="Shown on the website, printed invitations and envelopes." />
-              <TextField label="Google Maps URL" type="url" value={values.churchMapUrl} onChange={(v) => set('churchMapUrl', v)} error={errors.churchMapUrl} />
-            </div>
-          </Card>
-          <Card title="Reception">
-            <div className="space-y-5">
-              <TextField label="Reception name" value={values.receptionName} onChange={(v) => set('receptionName', v)} maxLength={150} />
-              <TextField label="Time (optional)" value={values.receptionTime} onChange={(v) => set('receptionTime', v)} maxLength={40} placeholder="e.g. 5:30 PM" />
-              <TextField label="Google Maps URL" type="url" value={values.receptionMapUrl} onChange={(v) => set('receptionMapUrl', v)} error={errors.receptionMapUrl} />
-            </div>
-          </Card>
-        </div>
+        <Card title="Venue">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField className="sm:col-span-2" label="Venue name" value={values.churchName} onChange={(v) => set('churchName', v)} maxLength={150} placeholder="e.g. Sample Garden Venue" />
+            <TextField label="Start time (optional)" value={values.ceremonyTime} onChange={(v) => set('ceremonyTime', v)} maxLength={40} placeholder="e.g. 2:00 PM" hint="Shown on the website, invitations and envelopes; the countdown uses it." />
+            <TextField label="Google Maps URL" type="url" value={values.churchMapUrl} onChange={(v) => set('churchMapUrl', v)} error={errors.churchMapUrl} />
+          </div>
+        </Card>
 
         <WebsitePrivacyCard />
 

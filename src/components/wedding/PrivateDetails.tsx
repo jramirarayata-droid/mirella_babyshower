@@ -3,9 +3,9 @@ import { LockKeyhole } from 'lucide-react'
 import { Ornament } from '../ui/Ornament'
 import { Reveal } from './Reveal'
 
-/** Shown on the website in place of details the couple shares only with confirmed guests. */
+/** Shown on the website in place of details shared only with confirmed guests. */
 export function PrivateDetails({ venues, info, rsvpOpen }: { venues: boolean; info: boolean; rsvpOpen: boolean }) {
-  const what = venues && info ? 'The ceremony, reception and other wedding details are' : venues ? 'The ceremony and reception details are' : 'The wedding details are'
+  const what = venues && info ? 'The venue and other shower details are' : venues ? 'The venue details are' : 'The shower details are'
   return (
     <section aria-labelledby="private-details-heading" className="px-5 py-20 sm:px-8 sm:py-24">
       <Reveal className="mx-auto flex max-w-xl flex-col items-center text-center">

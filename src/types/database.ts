@@ -162,6 +162,10 @@ export type Database = {
           id: string
           singleton: boolean
           couple_names: string
+          baby_name: string
+          due_date: string | null
+          due_text: string | null
+          due_visible: boolean
           wedding_date: string
           hero_title: string | null
           hero_subtitle: string | null
@@ -215,6 +219,10 @@ export type Database = {
           id?: string
           singleton?: boolean
           couple_names?: string
+          baby_name?: string
+          due_date?: string | null
+          due_text?: string | null
+          due_visible?: boolean
           wedding_date?: string
           hero_title?: string | null
           hero_subtitle?: string | null
@@ -268,6 +276,10 @@ export type Database = {
           id?: string
           singleton?: boolean
           couple_names?: string
+          baby_name?: string
+          due_date?: string | null
+          due_text?: string | null
+          due_visible?: boolean
           wedding_date?: string
           hero_title?: string | null
           hero_subtitle?: string | null

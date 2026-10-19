@@ -110,7 +110,7 @@ export default function FindSeat() {
           <>
             <div className="mb-10 text-center">
               <p className="font-serif text-2xl font-light text-ink-soft">
-                <CoupleNames names={settings?.coupleNames ?? ''} />
+                <CoupleNames names={settings?.babyName ?? ''} />
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.34em] text-muted">{settings ? formatWeddingDate(settings.weddingDate) : ''}</p>
               <Ornament className="mt-7" />
@@ -134,7 +134,7 @@ export default function FindSeat() {
                     No signal right now — this is your seat saved on this phone ({savedTime(fromSaved)}).
                   </p>
                 )}
-                <ResultView result={result} rsvpOpen={settings ? isRsvpOpen(settings) : false} couple={settings?.coupleNames || 'The couple'} />
+                <ResultView result={result} rsvpOpen={settings ? isRsvpOpen(settings) : false} couple={settings?.coupleNames || 'The hosts'} />
                 {!fromSaved && (result.status === 'seated' || result.status === 'unseated') && result.tableName && (
                   <p className="mt-6 text-center text-xs text-muted">Saved on this phone — it will show here even without signal at the venue.</p>
                 )}
@@ -155,7 +155,7 @@ export default function FindSeat() {
           </>
         )}
       </main>
-      {settings && <Footer coupleNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />}
+      {settings && <Footer coupleNames={settings.babyName} hostNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />}
     </div>
   )
 }

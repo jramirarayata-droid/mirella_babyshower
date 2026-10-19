@@ -89,7 +89,7 @@ export const DEFAULT_SEATING_CONFIG: SeatingConfig = {
 
 export const ITEM_KINDS: { kind: ItemKind; label: string; width: number; height: number }[] = [
   { kind: 'stage', label: 'Stage', width: 420, height: 130 },
-  { kind: 'sweetheart', label: 'Couple’s table', width: 220, height: 80 },
+  { kind: 'sweetheart', label: 'Parents’ table', width: 220, height: 80 },
   { kind: 'dance_floor', label: 'Dance floor', width: 320, height: 240 },
   { kind: 'entrance', label: 'Entrance', width: 160, height: 50 },
   { kind: 'buffet', label: 'Buffet', width: 320, height: 80 },

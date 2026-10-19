@@ -41,7 +41,7 @@ const isSample = (url: string) => url.startsWith('samples/') || url.includes('im
 export default function AdminMedia() {
   const toast = useToast()
   const { settings: liveSettings } = useWeddingSettings()
-  const couple = liveSettings?.coupleNames?.trim() || 'Our Wedding'
+  const couple = liveSettings?.babyName?.trim() || 'Baby Shower'
   // Opens the website in preview mode with this layout (and the saved look), without saving anything.
   const previewLayout = (id: string) => {
     if (liveSettings) writePreviewTheme(liveSettings.theme)
@@ -76,7 +76,7 @@ export default function AdminMedia() {
   }, [])
 
   useEffect(() => {
-    document.title = 'Photos & Video · Wedding admin'
+    document.title = 'Photos & Video · Baby shower admin'
     void reloadPhotos()
     getWeddingSettings()
       .then((s) => {
@@ -255,7 +255,7 @@ export default function AdminMedia() {
     <>
       <PageHeader
         title="Photos & Video"
-        description="Your couple photos and prenup film, shown right after the introduction on the home page."
+        description="Your bump and maternity photos and a video, shown right after the introduction on the home page."
         actions={
           <div className="flex flex-wrap gap-2">
             <a
@@ -400,7 +400,7 @@ export default function AdminMedia() {
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 id="video-admin-heading" className="text-2xl text-ink">
-              Prenup Video
+              Video
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-muted">
               Best: paste an unlisted <strong className="font-medium text-ink-soft">YouTube</strong> or Vimeo link — no size limit and smooth on mobile data. Or upload an MP4 up to {VIDEO_MAX_MB} MB

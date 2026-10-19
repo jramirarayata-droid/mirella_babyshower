@@ -1,10 +1,11 @@
 import { useResolvedTheme } from '../../theme/themeContext'
 import { cn } from '../ui/cn'
 import { GreeneryCorner } from './looks/GreeneryArt'
+import { StarField } from './looks/BabyArt'
 
 /**
  * Decoration layered over the hero for each design style (purely visual).
- * `onPhoto` = drawn over the couple's photo (light lines) instead of paper.
+ * `onPhoto` = drawn over the hero photo (light lines) instead of paper.
  */
 export function HeroDecor({ onPhoto, belowNav = false }: { onPhoto: boolean; belowNav?: boolean }) {
   const { look: style } = useResolvedTheme()
@@ -19,13 +20,14 @@ export function HeroDecor({ onPhoto, belowNav = false }: { onPhoto: boolean; bel
   if (style === 'maison') {
     return (
       <div aria-hidden="true" className={cn(frame, color)}>
-        <div className="absolute inset-0 border border-current opacity-70" />
+        <div className="absolute inset-0 rounded-[28px] border border-current opacity-60" />
         <p className="absolute left-0 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 -rotate-90 bg-transparent px-3 text-[0.6rem] uppercase tracking-[0.6em] lg:block">
-          The wedding of
+          Twinkle, twinkle
         </p>
         <p className="absolute right-0 top-1/2 hidden -translate-y-1/2 translate-x-1/2 rotate-90 px-3 text-[0.6rem] uppercase tracking-[0.6em] lg:block">
-          Save the date
+          Little star
         </p>
+        <StarField light={onPhoto} />
       </div>
     )
   }

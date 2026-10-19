@@ -65,8 +65,8 @@ $$;
 create table if not exists public.wedding_settings (
   id                 uuid primary key default gen_random_uuid(),
   singleton          boolean not null default true unique check (singleton),
-  couple_names       text not null default 'Mir & Ella',
-  wedding_date       date not null default '2026-12-19',
+  couple_names       text not null default 'Juan & Maria',
+  wedding_date       date not null default '2027-03-13',
   hero_title         text,
   hero_subtitle      text,
   hero_image_url     text,
@@ -729,7 +729,7 @@ revoke execute on function public.set_updated_at() from public, anon, authentica
 
 
 -- -----------------------------------------------------------------------------
--- 10. DEFAULT WEDDING SETTINGS
+-- 10. DEFAULT SETTINGS (test information — change everything in the admin)
 -- -----------------------------------------------------------------------------
 insert into public.wedding_settings (
   couple_names, wedding_date, hero_title, hero_subtitle, hero_image_url,
@@ -737,28 +737,26 @@ insert into public.wedding_settings (
   story_text, closing_message, additional_info
 )
 values (
-  'Mir & Ella',
-  '2026-12-19',
-  'Mir & Ella',
-  'are getting married',
-  'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2400&q=80',
-  'San Francisco De Malabon Parish Church',
-  'https://maps.app.goo.gl/MhadGRaZYu4L28jc9',
-  'Lawiswis Kawayan By Japong''s Sizzling Hub',
-  'https://maps.app.goo.gl/bafw5qXFsG3142iM8',
-  'With joyful hearts, we invite you to celebrate this special day with us.',
-  'Thank you for being part of our story. We can''t wait to celebrate with you.',
+  'Juan & Maria Santos',
+  '2027-03-13',
+  'Baby Santos',
+  'A baby shower for Juan & Maria',
+  null,
+  'Sample Garden Venue',
+  null,
+  null,
+  null,
+  'A little one is on the way! Join us for an afternoon of games, sweet treats and lots of love as we get ready to welcome our baby.',
+  'Thank you for showering our little one with love. We can''t wait to celebrate with you.',
   '[
-    {"id": "dress-code", "title": "Dress Code", "icon": "shirt", "visible": true,
-     "body": "Formal attire. We would love to see you in soft, timeless tones — champagne, ivory, taupe and sage.\nKindly reserve white for the bride."},
-    {"id": "ceremony", "title": "Ceremony", "icon": "church", "visible": true,
-     "body": "Our Holy Mass will be celebrated at San Francisco De Malabon Parish Church.\nPlease arrive at least 30 minutes early so you can be seated before the processional begins."},
-    {"id": "reception", "title": "Reception", "icon": "wine", "visible": true,
-     "body": "Dinner, toasts and dancing follow at Lawiswis Kawayan By Japong''s Sizzling Hub.\nYour table number will be shown on your invitation when you RSVP."},
-    {"id": "unplugged", "title": "Unplugged Ceremony", "icon": "camera-off", "visible": true,
-     "body": "We invite you to be fully present with us. Kindly keep phones and cameras away during the ceremony — our photographers will capture every moment, and we will happily share them with you."},
+    {"id": "dress-code", "title": "What to Wear", "icon": "shirt", "visible": true,
+     "body": "Come comfy and colourful! Soft pastels are perfect — and if you have a hunch, wear pink or blue for your team."},
     {"id": "gifts", "title": "Gifts", "icon": "gift", "visible": true,
-     "body": "Your presence is the greatest gift of all.\nShould you wish to honour us further, a monetary gift toward our new life together would be warmly appreciated."}
+     "body": "Your presence is the best gift.\nIf you''d like to bring something, our wishlist shows what the baby still needs — mark an item so it isn''t doubled."},
+    {"id": "diaper-raffle", "title": "Diaper Raffle", "icon": "heart", "visible": true,
+     "body": "Bring a pack of diapers (any size) and get a ticket for our diaper raffle, drawn at the shower."},
+    {"id": "games", "title": "Games & Predictions", "icon": "clock", "visible": true,
+     "body": "Shower bingo, baby predictions and more. Bring your best guesses for the due date, weight and gender!"}
   ]'::jsonb
 )
 on conflict (singleton) do nothing;

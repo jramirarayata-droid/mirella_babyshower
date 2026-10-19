@@ -1,11 +1,11 @@
 /**
  * Print-ready layouts (millimetres) for the money envelope and paper
- * invitations. Plain HTML/SVG strings so they render identically on screen,
+ * invitations of the baby shower. Plain HTML/SVG strings so they render identically on screen,
  * in the browser's print dialog and in tests. All user text is escaped.
  */
 
 import type { StyleId } from '../theme/themes'
-import { frameSvg, ornamentSvg, sealSvg, styleType, type MonogramArt } from './printStyles'
+import { babyArtSvg, frameSvg, ornamentSvg, sealSvg, styleType, type MonogramArt } from './printStyles'
 import { addressLines } from './addressing'
 
 export type Paper = 'a4' | 'letter' | 'legal'
@@ -46,7 +46,7 @@ function safe(t: PrintTheme): PrintTheme {
   return { ...t, serif: q(t.serif), sans: q(t.sans) }
 }
 
-/** Which of the couple's details a printable shows (each can be switched off). */
+/** Which of our details a printable shows (each can be switched off). */
 export interface OurDetails {
   monogram: boolean
   names: boolean
@@ -73,7 +73,7 @@ export function markedHtml(s: string, t: Pick<PrintTheme, 'ink' | 'accent'>): st
 /** The text without its marks (e.g. for checking it isn't empty). */
 export const unmarked = (s: string) => s.replace(/\*\*|==|__/g, '')
 
-/** "Mir & Ella" → names with a styled ampersand. */
+/** "Juan & Maria" → names with a styled ampersand. */
 function coupleHtml(names: string, t: PrintTheme): string {
   const parts = names.split(/\s*(?:&|and)\s*/i).filter(Boolean)
   if (parts.length < 2) return esc(names)
@@ -100,13 +100,14 @@ export interface EnvelopeOptions {
   coupleNames: string
   dateText: string
   monogram: string
-  /** The couple's uploaded monogram, used instead of the initials when set. */
+  /** The uploaded monogram, used instead of the initials when set. */
   monogramArt?: MonogramArt | null
   theme: PrintTheme
-  /** e.g. "Our Lady of the Pillar Parish · 2:00 PM" */
+  /** The venue, e.g. "Sample Garden Venue · 2:00 PM" */
   ceremony?: string
+  /** Not used by the baby shower (one venue). */
   reception?: string
-  /** The couple's GCash / InstaPay QR (image URL), printed on the front. */
+  /** The GCash / InstaPay QR (image URL), printed on the front. */
   giftQrUrl?: string | null
   /** Front: the date, and the monogram seal (front and closing flap). Names always show. */
   showDate?: boolean
@@ -154,15 +155,15 @@ export function envelopeSvg({ coupleNames, dateText, monogram, monogramArt, them
   const u0 = W / 2
   const hasQr = Boolean(giftQrUrl)
   const details = [
-    ['CEREMONY', ceremony],
-    ['RECEPTION', reception],
-  ].filter(([, v]) => v.trim())
+    ['VENUE', ceremony],
+    ['', reception],
+  ].filter(([l, v]) => l && v.trim())
   const top = hasQr ? 20 : 30
   let v = top
   const out: string[] = []
   if (t.frame !== false) out.push(frameSvg(style, 5, 5, W - 10, L - 10, c))
   out.push(
-    `<text x="${u0}" y="${v}" text-anchor="middle" font-family="${t.sans}" font-size="2.3" letter-spacing="${ty.eyebrowTracking * 0.8}" fill="${t.accent}">WITH LOVE &amp; BEST WISHES</text>`,
+    `<text x="${u0}" y="${v}" text-anchor="middle" font-family="${t.sans}" font-size="2.3" letter-spacing="${ty.eyebrowTracking * 0.8}" fill="${t.accent}">FOR THE BABY · WITH LOVE</text>`,
   )
   v += 16
   out.push(
@@ -209,7 +210,7 @@ export function envelopeSvg({ coupleNames, dateText, monogram, monogramArt, them
   const br = W - 7
   const lineGap = 8.5
   const lines = Math.floor((L - 28 - (F + 26)) / lineGap) + 1
-  back.push(`<text x="${(bl + br) / 2}" y="${F + 14}" text-anchor="middle" font-family="${t.sans}" font-size="2.3" letter-spacing="${ty.eyebrowTracking * 0.6}" fill="${t.accent}">A MESSAGE FOR THE COUPLE</text>`)
+  back.push(`<text x="${(bl + br) / 2}" y="${F + 14}" text-anchor="middle" font-family="${t.sans}" font-size="2.3" letter-spacing="${ty.eyebrowTracking * 0.6}" fill="${t.accent}">A WISH FOR THE BABY</text>`)
   for (let i = 0; i < lines; i++) {
     const ly = F + 26 + i * lineGap
     back.push(`<line x1="${bl}" x2="${br}" y1="${ly}" y2="${ly}" stroke="${t.line}" stroke-width="0.3"/>`)
@@ -267,7 +268,7 @@ export interface EnvelopeFit {
   /** The envelope's inside size (mm). */
   w: number
   h: number
-  /** Cards that go in together (invitation, entourage, attire guide…). */
+  /** Cards that go in together (invitation, attire guide…). */
   cards: number
   /** Thickness of one card (mm): ~0.25 for 200 gsm, ~0.35 for 300 gsm. */
   thick: number
@@ -299,16 +300,23 @@ export function applyEnvelopeFit(e: EnvelopeFit): { w: number; h: number; stack:
 
 export interface InvitationCardOptions {
   guestName: string
-  /** e.g. "Maid of Honor" — shown under the name (optional). */
+  /** e.g. "Ninang" — shown under the name (optional). */
   position?: string
   withNames: string[]
+  /** The parents' names (the hosts line; '' to leave it off). */
   coupleNames: string
+  /** The baby's name or nickname, printed large. */
+  babyName: string
   dateText: string
+  /** The venue line ('' to leave it off). */
   ceremony: string
+  /** Not used by the baby shower (one venue). */
   reception: string
-  /** The ceremony / reception text has print marks (**bold**, __italic__, ==gold==). */
+  /** The venue text has print marks (**bold**, __italic__, ==gold==). */
   ceremonyMarked?: boolean
   receptionMarked?: boolean
+  /** e.g. "Arriving April 2027" ('' = none). */
+  arriving?: string
   respondBy: string | null
   qrSvg: string
   shortLink: string
@@ -318,14 +326,14 @@ export interface InvitationCardOptions {
   qrOnBack?: boolean
   /** On-screen (virtual) card: no QR or web address — just a gentle "respond by" line. */
   virtual?: boolean
-  /** Shown instead of the ceremony / reception lines when those are kept private. */
+  /** Shown instead of the venue line when it is kept private. */
   detailsNote?: string
   /** Some details were switched off: centre what's left so the card stays balanced. */
   sparse?: boolean
   fit?: number
 }
 
-/** "Mr. Joey Montes & Mrs. Vivian Montes" → one line per person, with the "&" on its own line between them. */
+/** "Tito Joey & Tita Vivian Montes" → one line per person, with the "&" on its own line between them (when long). */
 function nameLinesHtml(name: string, t: PrintTheme, z: (v: number) => number): string {
   const lines = addressLines(name)
   if (lines.length < 2) return esc(name)
@@ -373,8 +381,9 @@ export function invitationCardHtml(o: InvitationCardOptions): string {
   const f = Math.max(MIN_CARD_FIT, Math.min(1, o.fit ?? 1))
   const z = (v: number) => r2(v * f)
   const area = cardSafeArea(style)
-  const couple = ty.namesCase === 'uppercase' ? coupleHtml(o.coupleNames.toUpperCase(), t) : coupleHtml(o.coupleNames, t)
-  const centred = o.qrOnBack || o.virtual || o.sparse || !o.ceremony || !o.reception
+  const baby = esc(ty.namesCase === 'uppercase' ? o.babyName.toUpperCase() : o.babyName)
+  const hosts = o.coupleNames.trim() ? coupleHtml(o.coupleNames.trim(), t) : ''
+  const centred = o.qrOnBack || o.virtual || o.sparse || !o.ceremony
   const bottom = o.virtual
     ? `<div style="padding-top:${z(4)}mm;display:flex;flex-direction:column;align-items:center">
         ${svgBox(z(40), z(7), ornamentSvg(style, 20 * f, 4 * f, 32 * f, c))}
@@ -386,8 +395,7 @@ export function invitationCardHtml(o: InvitationCardOptions): string {
         <div style="margin-top:${z(2.5)}mm;font-size:${z(2.5)}mm;letter-spacing:${z(0.6)}mm;color:${t.muted}">PLEASE TURN OVER TO RSVP</div>
       </div>`
     : `<div style="margin-top:auto;padding-top:${z(3)}mm;display:flex;flex-direction:column;align-items:center">
-        ${svgBox(z(40), z(7), ornamentSvg(style, 20 * f, 4 * f, 32 * f, c))}
-        <div style="margin-top:${z(3)}mm;width:${z(24)}mm;height:${z(24)}mm">${o.qrSvg}</div>
+        <div style="margin-top:${z(1)}mm;width:${z(22)}mm;height:${z(22)}mm">${o.qrSvg}</div>
         <div style="margin-top:${z(2)}mm;font-size:${z(3)}mm;letter-spacing:${z(0.5)}mm;color:${t.ink};font-weight:500">SCAN TO RSVP</div>
         ${o.respondBy ? `<div style="margin-top:${z(1)}mm;font-size:${z(2.7)}mm;color:${t.soft}">Please respond on or before <b style="color:${t.ink}">${esc(o.respondBy)}</b></div>` : ''}
         <div style="margin-top:${z(0.8)}mm;word-break:break-all;color:${t.muted};font-size:${z(2.2)}mm">${esc(o.shortLink)}</div>
@@ -396,19 +404,20 @@ export function invitationCardHtml(o: InvitationCardOptions): string {
     ${t.frame === false ? '' : svgBox(base.w, base.h, frameSvg(style, 4.5, 4.5, base.w - 9, base.h - 9, c), 'position:absolute;left:0;top:0;pointer-events:none')}
     <div data-card-body style="position:absolute;left:${area.side}mm;right:${area.side}mm;top:${area.top}mm;bottom:${area.bottom}mm;overflow:hidden;display:flex;flex-direction:column">
     <div data-card-content style="flex:1 0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;overflow-wrap:anywhere">
-    <div style="margin-top:${z(3)}mm;font-size:${z(2.7)}mm;letter-spacing:${z(ty.eyebrowTracking)}mm;color:${t.accent}">TOGETHER WITH THEIR FAMILIES</div>
-    <div style="margin-top:${z(4.5)}mm;font-family:${t.serif};font-size:${z(13 * ty.namesScale)}mm;line-height:1.02;font-weight:${ty.namesWeight};letter-spacing:${ty.namesTracking}">${couple}</div>
-    <div style="margin-top:${z(3.5)}mm;font-family:${t.serif};font-style:italic;font-size:${z(4.2)}mm;color:${t.soft}">request the pleasure of your company</div>
-    <div style="margin-top:${z(3.5)}mm">${svgBox(z(40), z(8), ornamentSvg(style, 20 * f, 4.5 * f, 38 * f, c))}</div>
-    <div style="${centred ? 'margin:auto 0;padding-top:' + z(4) + 'mm;' : ''}display:flex;flex-direction:column;align-items:center">
-    <div style="margin-top:${z(centred ? 0 : 4.5)}mm;font-size:${z(2.6)}mm;letter-spacing:${z(0.6)}mm;color:${t.muted}">DEAR</div>
-    <div style="margin-top:${z(1.5)}mm;font-family:${t.serif};font-size:${z(7.4)}mm;line-height:1.1">${nameLinesHtml(o.guestName, t, z)}</div>
+    <div style="margin-top:${z(1)}mm">${svgBox(z(36), z(16), babyArtSvg(style, 18 * f, 7 * f, 34 * f, c))}</div>
+    <div style="margin-top:${z(2)}mm;font-size:${z(2.6)}mm;letter-spacing:${z(ty.eyebrowTracking)}mm;color:${t.accent}">PLEASE JOIN US FOR A BABY SHOWER FOR</div>
+    <div style="margin-top:${z(3.5)}mm;font-family:${t.serif};font-size:${z(12 * ty.namesScale)}mm;line-height:1.02;font-weight:${ty.namesWeight};letter-spacing:${ty.namesTracking}">${baby}</div>
+    ${o.arriving ? `<div style="margin-top:${z(2)}mm;font-size:${z(2.5)}mm;letter-spacing:${z(0.6)}mm;color:${t.muted}">${esc(o.arriving.toUpperCase())}</div>` : ''}
+    ${hosts ? `<div style="margin-top:${z(2.6)}mm;font-family:${t.serif};font-style:italic;font-size:${z(4.2)}mm;color:${t.soft}">hosted by ${hosts}</div>` : ''}
+    <div style="margin-top:${z(3)}mm">${svgBox(z(40), z(8), ornamentSvg(style, 20 * f, 4.5 * f, 38 * f, c))}</div>
+    <div style="${centred ? 'margin:auto 0;padding-top:' + z(3) + 'mm;' : ''}display:flex;flex-direction:column;align-items:center">
+    <div style="margin-top:${z(centred ? 0 : 3.5)}mm;font-size:${z(2.6)}mm;letter-spacing:${z(0.6)}mm;color:${t.muted}">DEAR</div>
+    <div style="margin-top:${z(1.5)}mm;font-family:${t.serif};font-size:${z(7)}mm;line-height:1.1">${nameLinesHtml(o.guestName, t, z)}</div>
     ${o.position ? `<div style="margin-top:${z(1.4)}mm;font-size:${z(2.7)}mm;letter-spacing:${z(0.7)}mm;color:${t.accent};font-weight:500">${esc(o.position.toUpperCase())}</div>` : ''}
-    ${o.withNames.length ? `<div style="margin-top:${z(1.5)}mm;font-family:${t.serif};font-style:italic;font-size:${z(4)}mm;line-height:1.3;color:${t.soft}">together with ${esc(joinNames(o.withNames))}</div>` : ''}
-    <div style="margin-top:${z(5.5)}mm;font-size:${z(3.6)}mm;letter-spacing:${z(0.9)}mm;font-weight:500">${esc(o.dateText.toUpperCase())}</div>
-    ${o.ceremony ? `<div style="margin-top:${z(3)}mm;font-size:${z(3.1)}mm;line-height:1.45;color:${t.soft}"><span style="letter-spacing:${z(0.4)}mm;color:${t.accent}">CEREMONY</span><br/>${o.ceremonyMarked ? markedHtml(o.ceremony, t) : esc(o.ceremony)}</div>` : ''}
-    ${o.reception ? `<div style="margin-top:${z(2.5)}mm;font-size:${z(3.1)}mm;line-height:1.45;color:${t.soft}"><span style="letter-spacing:${z(0.4)}mm;color:${t.accent}">RECEPTION</span><br/>${o.receptionMarked ? markedHtml(o.reception, t) : esc(o.reception)}</div>` : ''}
-    ${o.detailsNote && !o.ceremony && !o.reception ? `<div style="margin-top:${z(3.5)}mm;max-width:${z(80)}mm;font-family:${t.serif};font-style:italic;font-size:${z(3.6)}mm;line-height:1.4;color:${t.soft}">${esc(o.detailsNote)}</div>` : ''}
+    ${o.withNames.length ? `<div style="margin-top:${z(1.5)}mm;font-family:${t.serif};font-style:italic;font-size:${z(4)}mm;line-height:1.3;color:${t.soft}">and ${esc(joinNames(o.withNames))}</div>` : ''}
+    <div style="margin-top:${z(4.5)}mm;font-size:${z(3.5)}mm;letter-spacing:${z(0.9)}mm;font-weight:500">${esc(o.dateText.toUpperCase())}</div>
+    ${o.ceremony ? `<div style="margin-top:${z(2.6)}mm;font-size:${z(3.1)}mm;line-height:1.45;color:${t.soft}"><span style="letter-spacing:${z(0.4)}mm;color:${t.accent}">VENUE</span><br/>${o.ceremonyMarked ? markedHtml(o.ceremony, t) : esc(o.ceremony)}</div>` : ''}
+    ${o.detailsNote && !o.ceremony ? `<div style="margin-top:${z(3.5)}mm;max-width:${z(80)}mm;font-family:${t.serif};font-style:italic;font-size:${z(3.6)}mm;line-height:1.4;color:${t.soft}">${esc(o.detailsNote)}</div>` : ''}
     </div>
     ${bottom}
     </div></div>
@@ -420,7 +429,7 @@ export interface CardBackOptions {
   coupleNames: string
   dateText: string
   monogram: string
-  /** The couple's uploaded monogram, used instead of the initials when set. */
+  /** The uploaded monogram, used instead of the initials when set. */
   monogramArt?: MonogramArt | null
   theme: PrintTheme
   size: CardSize
@@ -439,7 +448,7 @@ export interface CardBackOptions {
 
 /**
  * Back of an invitation card: monogram crest, then (optionally) the RSVP QR
- * and the wedding details. Frameless and centred, so a millimetre or two of
+ * and the shower details. Frameless and centred, so a millimetre or two of
  * printer drift when printing the reverse doesn't show.
  */
 export function invitationBackHtml(o: CardBackOptions): string {
@@ -827,107 +836,6 @@ export function attireCardHtml(o: AttireCardOptions): string {
   return sized(inner, o.size)
 }
 
-// ---------------------------------------------------------------- entourage card
-
-export interface EntouragePrintGroup {
-  title: string
-  /** pairs = two columns (sponsors, couples); list = one centred column. */
-  layout: 'pairs' | 'list'
-  members: { name: string; role: string }[]
-}
-
-export interface EntourageCardOptions {
-  /** e.g. "The Entourage" (Admin → Entourage title). */
-  title: string
-  coupleNames: string
-  groups: EntouragePrintGroup[]
-  theme: PrintTheme
-  size: CardSize
-  /**
-   * Printed on the back of an invitation: no border (so a millimetre of
-   * printer drift when printing the reverse doesn't show), like the other backs.
-   */
-  frameless?: boolean
-  /** Your names above the title (can be left off). */
-  showNames?: boolean
-  /** 0.55–1: text scale, smaller when the entourage is long. */
-  fit?: number
-}
-
-/** Smallest text scale for the entourage card (it can hold many names). */
-export const MIN_ENTOURAGE_FIT = 0.55
-
-/**
- * The entourage as a card in the invitation set — the same size, frame and
- * type as the invitation, read from Admin → Entourage. Pairs print in two
- * columns (in order, row by row, as on the website), lists centred, each
- * group under a small-caps title. Designed at 5×7 in, scaled for 4×6.
- */
-export function entourageCardHtml(o: EntourageCardOptions): string {
-  const t = safe(o.theme)
-  const base = CARD_SIZES['5x7']
-  const style = t.style ?? 'classic'
-  const ty = styleType(style)
-  const c = { ink: t.ink, accent: t.accent, accentLight: t.accentLight, paper: t.paper, line: t.line, serif: t.serif, onColour: t.onColour }
-  const f = Math.max(MIN_ENTOURAGE_FIT, Math.min(1, o.fit ?? 1))
-  const z = (v: number) => r2(v * f)
-  const area = o.frameless ? { top: 10, bottom: 10, side: 11 } : cardSafeArea(style)
-  const couple = ty.namesCase === 'uppercase' ? o.coupleNames.toUpperCase() : o.coupleNames
-  const groups = o.groups.map((g) => ({ ...g, members: g.members.filter((m) => m.name.trim()) })).filter((g) => g.members.length)
-
-  const person = (m: { name: string; role: string }) =>
-    `<div style="min-width:0"><div style="font-family:${t.serif};font-size:${z(3.7)}mm;line-height:1.18;color:${t.ink}">${esc(m.name)}</div>${
-      m.role.trim() ? `<div style="margin-top:${z(0.3)}mm;font-size:${z(1.9)}mm;letter-spacing:${z(0.35)}mm;color:${t.muted}">${esc(m.role.toUpperCase())}</div>` : ''
-    }</div>`
-
-  // Pairs sit in two columns close to the middle, so each pair reads as a couple.
-  const cols = (a: string, b: string, mt: number) =>
-    `<div style="display:grid;grid-template-columns:1fr 1fr;column-gap:${z(6)}mm;width:100%;max-width:${z(92)}mm;margin:${z(mt)}mm auto 0">${a}${b}</div>`
-  const heading = (title: string, mt: number) =>
-    `<div style="margin-top:${z(mt)}mm;font-size:${z(2.3)}mm;letter-spacing:${z(ty.eyebrowTracking * 0.75)}mm;color:${t.accent};font-weight:500">${esc(title.toUpperCase())}</div>`
-
-  const groupHtml = (g: EntouragePrintGroup, first: boolean) => {
-    let body: string
-    if (g.layout === 'pairs' && g.members.length > 1) {
-      const rows: string[] = []
-      for (let i = 0; i < g.members.length; i += 2) {
-        const a = g.members[i]
-        const b = g.members[i + 1]
-        rows.push(b ? cols(person(a), person(b), 1.3) : `<div style="margin-top:${z(1.3)}mm">${person(a)}</div>`)
-      }
-      body = rows.join('')
-    } else {
-      body = g.members.map((m) => `<div style="margin-top:${z(1.3)}mm">${person(m)}</div>`).join('')
-    }
-    return `<div style="width:100%">${heading(g.title, first ? 0 : 3.6)}${body}</div>`
-  }
-  // Two one-person groups in a row (e.g. Best Man and Maid of Honor) share a line.
-  const blocks: string[] = []
-  for (let i = 0; i < groups.length; i++) {
-    const g = groups[i]
-    const next = groups[i + 1]
-    if (g.members.length === 1 && next?.members.length === 1) {
-      const half = (x: EntouragePrintGroup) => `<div style="min-width:0">${heading(x.title, 0)}<div style="margin-top:${z(1.3)}mm">${person(x.members[0])}</div></div>`
-      blocks.push(cols(half(g), half(next), i === 0 ? 0 : 3.6))
-      i++
-    } else {
-      blocks.push(groupHtml(g, i === 0))
-    }
-  }
-
-  const inner = `<div style="box-sizing:border-box;width:${base.w}mm;height:${base.h}mm;background:${t.paper};color:${t.ink};font-family:${t.sans};position:relative">
-    ${o.frameless || t.frame === false ? '' : svgBox(base.w, base.h, frameSvg(style, 4.5, 4.5, base.w - 9, base.h - 9, c), 'position:absolute;left:0;top:0;pointer-events:none')}
-    <div data-card-body style="position:absolute;left:${area.side}mm;right:${area.side}mm;top:${area.top}mm;bottom:${area.bottom}mm;overflow:hidden;display:flex;flex-direction:column">
-    <div data-card-content style="flex:1 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow-wrap:anywhere">
-      ${o.showNames === false ? '' : `<div style="font-size:${z(2.4)}mm;letter-spacing:${z(ty.eyebrowTracking)}mm;color:${t.accent}">${coupleHtml(couple.toUpperCase(), t)}</div>`}
-      <div style="margin-top:${z(o.showNames === false ? 0 : 1.6)}mm;font-family:${t.serif};font-size:${z(6.6 * ty.namesScale)}mm;line-height:1.08;font-weight:${ty.namesWeight};letter-spacing:${ty.namesTracking}">${esc(ty.namesCase === 'uppercase' ? o.title.toUpperCase() : o.title)}</div>
-      <div style="margin-top:${z(1.6)}mm;margin-bottom:${z(3)}mm">${svgBox(z(40), z(7), ornamentSvg(style, 20 * f, 3.5 * f, 32 * f, c))}</div>
-      ${blocks.join('\n')}
-    </div></div>
-  </div>`
-  return sized(inner, o.size)
-}
-
 // ---------------------------------------------------------------- attire guide on one card
 
 export interface AttireOneCardOptions {
@@ -1042,7 +950,7 @@ export interface ThankYouCardOptions {
   /** e.g. "Thank you". */
   title: string
   message: string
-  /** e.g. "With love and gratitude," — the couple's names follow. */
+  /** e.g. "With love and gratitude," — the parents' names follow. */
   signoff: string
   coupleNames: string
   dateText: string
@@ -1058,7 +966,7 @@ export interface ThankYouCardOptions {
 
 /**
  * A thank-you card in the invitation's design: "With gratitude", a large
- * "Thank you", an optional "Dear …", the message, and the couple's sign-off.
+ * "Thank you", an optional "Dear …", the message, and the parents' sign-off.
  * The back is the plain monogram back (invitationBackHtml without extras).
  */
 export function thankYouCardHtml(o: ThankYouCardOptions): string {

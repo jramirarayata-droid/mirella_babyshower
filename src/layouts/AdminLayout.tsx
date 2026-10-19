@@ -1,7 +1,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Armchair, CalendarClock, Camera, Music, ExternalLink, Search, Gift, Heart, ListChecks, Images, LayoutDashboard, Palette, LogOut, Mail, Menu, MessageSquareHeart, PanelLeftClose, PanelLeftOpen, Pin, PinOff, Printer, QrCode, Settings, Shirt, UserPlus, Users, X } from 'lucide-react'
+import { Armchair, CalendarClock, Camera, Music, ExternalLink, Search, Gift, Baby, ListChecks, Images, LayoutDashboard, Palette, LogOut, Mail, Menu, MessageSquareHeart, PanelLeftClose, PanelLeftOpen, Pin, PinOff, Printer, QrCode, Settings, Shirt, UserPlus, X } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../hooks/useToast'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
@@ -43,8 +43,7 @@ const NAV_GROUPS: { title: string | null; items: { to: string; label: string; ic
       { to: '/admin/media', label: 'Photos & Video', icon: Images },
       { to: '/admin/guest-photos', label: 'Guest Photos', icon: Camera },
       { to: '/admin/music', label: 'Music', icon: Music },
-      { to: '/admin/outfits', label: 'Outfit Gallery', icon: Shirt },
-      { to: '/admin/entourage', label: 'Entourage', icon: Users },
+      { to: '/admin/outfits', label: 'What to Wear', icon: Shirt },
       { to: '/admin/schedule', label: 'Schedule', icon: CalendarClock },
       { to: '/admin/look', label: 'Look & Feel', icon: Palette },
       { to: '/admin/settings', label: 'Website Settings', icon: Settings },
@@ -299,15 +298,15 @@ export default function AdminLayout() {
 
   const heart = (
     <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-champagne/60 text-champagne">
-      <Heart aria-hidden="true" className="size-4" strokeWidth={1.5} />
+      <Baby aria-hidden="true" className="size-4" strokeWidth={1.5} />
     </span>
   )
   const brand = (
     <div className="flex items-center gap-2.5">
       {heart}
       <div className="leading-tight">
-        <p className="font-serif text-xl text-ink">{settings?.coupleNames || 'Our Wedding'}</p>
-        <p className="text-[0.65rem] uppercase tracking-[0.22em] text-muted">Wedding admin</p>
+        <p className="font-serif text-xl text-ink">{settings?.babyName || 'Baby Shower'}</p>
+        <p className="text-[0.65rem] uppercase tracking-[0.22em] text-muted">Baby shower admin</p>
       </div>
     </div>
   )

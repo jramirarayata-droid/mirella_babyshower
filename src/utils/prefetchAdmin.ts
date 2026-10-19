@@ -21,7 +21,6 @@ export function prefetchAdminPages() {
     () => import('../pages/AdminGuestPhotos'),
     () => import('../pages/AdminMusic'),
     () => import('../pages/AdminOutfits'),
-    () => import('../pages/AdminEntourage'),
     () => import('../pages/AdminLookFeel'),
     () => import('../pages/AdminSchedule'),
     () => import('../pages/AdminSettings'),

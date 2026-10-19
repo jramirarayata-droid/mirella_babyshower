@@ -67,7 +67,7 @@ export function HostProvider({ children }: { children: ReactNode }) {
   return (
     <HostContext.Provider value={value}>
       {children}
-      <Modal open={asking} onClose={() => setAsking(false)} title="Host mode" description="Type the 4-digit host code from the couple." size="sm" tone="wedding">
+      <Modal open={asking} onClose={() => setAsking(false)} title="Host mode" description="Type the 4-digit host code from the parents-to-be." size="sm" tone="guest">
         <HostCodeForm
           onSignedIn={(t) => {
             signIn(t)

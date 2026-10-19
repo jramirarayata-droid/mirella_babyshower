@@ -3,12 +3,10 @@ import type { InvitationWithRSVP } from '../types/rsvp'
 import type { EntourageLink } from '../services/entourageService'
 
 const PLURALS: Record<string, string> = {
-  groomsmen: 'Groomsman',
-  'parents of the groom': 'Parent of the Groom',
-  'parents of the bride': 'Parent of the Bride',
+  godparents: 'Godparent',
 }
 
-/** "Bridesmaids" → "Bridesmaid", "Principal Sponsors" → "Principal Sponsor". */
+/** "Ninangs" → "Ninang", "Godparents" → "Godparent". */
 export function singularRole(title: string): string {
   const t = title.trim()
   const known = PLURALS[t.toLowerCase()]

@@ -1,25 +1,36 @@
 import { sizedUrl, srcSetOf } from '../../utils/imageSizes'
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ChevronDown, Info } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import type { WeddingSettings } from '../../types/wedding'
-import { formatWeddingDate } from '../../utils/formatting'
+import { arrivalText, formatWeddingDate } from '../../utils/formatting'
 import { Ornament } from '../ui/Ornament'
 import { cn } from '../ui/cn'
 import { CoupleNames } from './CoupleNames'
 import { HeroDecor } from './HeroDecor'
 import { ArchFlowers } from './ArchFlowers'
 import { GreeneryPhotoFrame } from './looks/GreeneryArt'
-import { GardenPhotoSpray, PetalsAround, RoundCountdown } from './looks/LookArt'
+import { GardenPhotoSpray } from './looks/LookArt'
+import { BalloonsAround, CloudsAround, MoonShape, RainbowArches, StarShape, SunBehind, Twinkle } from './looks/BabyArt'
 import { Monogram } from './Monogram'
 import { isRsvpOpen } from '../../services/settingsService'
 import { useFinderOpen } from '../../hooks/useFinderOpen'
-import { GuestMenu, useGuestLinks } from './GuestMenu'
+import { GuestMenu } from './GuestMenu'
 import { MusicToggle } from './MusicPlayer'
 import { useResolvedTheme } from '../../theme/themeContext'
 
 type Tone = 'onPhoto' | 'onPaper'
+
+/** The line above the baby's name, per look (others: "Join us for a baby shower"). */
+const EYEBROW: Partial<Record<string, string>> = {
+  clouds: 'We’re over the moon',
+  balloons: 'Oh baby!',
+  maison: 'Twinkle, twinkle, little star',
+  deco: 'Here comes the sun',
+  garden: 'A little blossom is on the way',
+  arch: 'Somewhere over the rainbow',
+}
 
 /** Hero in one of four layouts, chosen in Admin → Look & Feel. */
 export function Hero({ settings }: { settings: WeddingSettings }) {
@@ -48,12 +59,20 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
         fetchPriority="high"
       />
     ) : (
-      <div aria-hidden="true" className={cn('bg-linen', className)} />
+      // No photo yet: a soft sky with a sleeping moon, so the hero still looks finished.
+      <div aria-hidden="true" className={cn('grid place-items-center bg-[linear-gradient(180deg,var(--color-linen),var(--color-cream))]', className)}>
+        <div className="relative w-[38%] max-w-40 text-champagne">
+          <MoonShape className="w-full opacity-80" />
+          <StarShape className="absolute -right-[30%] -top-[18%] w-[26%] opacity-70" />
+          <Twinkle className="absolute -left-[34%] top-[30%] w-[18%] opacity-60" />
+        </div>
+      </div>
     )
 
-  const names = settings.heroTitle || settings.coupleNames
-  // Save the Date leads with its own line; every other look keeps the classic one.
-  const eyebrow = look === 'savedate' ? 'Save the Date' : 'Together with their families'
+  const names = settings.heroTitle || settings.babyName
+  // Each look has its own opening line; the rest say what the day is.
+  const eyebrow = EYEBROW[look] ?? 'Join us for a baby shower'
+  const arriving = arrivalText(settings)
 
   // ---------------------------------------------------------------- split
   if (heroLayout === 'split') {
@@ -78,8 +97,8 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
             <motion.div {...fade(0.8)} className="mt-9 flex flex-col items-center gap-4">
               <Ornament />
               <p className="text-sm font-medium uppercase tracking-[0.36em] text-ink sm:text-base">{formatWeddingDate(settings.weddingDate)}</p>
+              {arriving && <p className="hero-arriving font-serif text-lg italic text-ink-soft">{arriving}</p>}
             </motion.div>
-            <DayOf settings={settings} tone="onPaper" reduce={reduce} />
           </div>
         </div>
       </header>
@@ -90,21 +109,35 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
   if (heroLayout === 'framed') {
     return (
       <header className="hero hero-paper paper-texture relative flex min-h-[100svh] flex-col text-ink">
-        {/* Eucalyptus & Gold frames the photo itself here, so the page frame would be one frame too many. */}
-        {!['leaf', 'garden', 'story'].includes(look) && <HeroDecor onPhoto={false} belowNav />}
+        {/* Looks that decorate the photo itself skip the page frame (one frame too many). */}
+        {!['leaf', 'garden', 'clouds', 'balloons', 'arch'].includes(look) && <HeroDecor onPhoto={false} belowNav />}
         <Nav settings={settings} tone="onPaper" reduce={reduce} />
         <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 pb-20 pt-6 text-center">
           <motion.p {...fade(0.1)} className="hero-eyebrow eyebrow">
             {eyebrow}
           </motion.p>
-          <div className="hero-arch-wrap relative mt-7">
+          <div className="hero-arch-wrap relative isolate mt-7">
             <motion.div
               {...fade(0.25)}
               className="hero-arch relative aspect-[3/4] w-[min(72vw,340px)] overflow-hidden rounded-t-full border border-champagne/50 p-2 shadow-card"
             >
               <div className="hero-arch-photo relative size-full overflow-hidden rounded-t-full">{photo('absolute inset-0 size-full object-cover')}</div>
             </motion.div>
-            {look === 'leaf' ? <GreeneryPhotoFrame /> : look === 'garden' ? <GardenPhotoSpray /> : look === 'story' ? <PetalsAround /> : <ArchFlowers />}
+            {look === 'arch' && <RainbowArches className="absolute -top-[16%] left-1/2 -z-10 w-[150%] max-w-none -translate-x-1/2" />}
+            {look === 'deco' && <SunBehind />}
+            {look === 'leaf' ? (
+              <GreeneryPhotoFrame />
+            ) : look === 'garden' ? (
+              <GardenPhotoSpray />
+            ) : look === 'clouds' ? (
+              <CloudsAround />
+            ) : look === 'maison' ? (
+              <CloudsAround clouds={false} />
+            ) : look === 'balloons' ? (
+              <BalloonsAround />
+            ) : look === 'arch' || look === 'deco' ? null : (
+              <ArchFlowers />
+            )}
           </div>
           <motion.h1 {...fade(0.45)} className="hero-names mt-9 text-[clamp(3rem,10vw,5.8rem)] font-light leading-[0.95] tracking-tight text-ink">
             <CoupleNames names={names} />
@@ -117,8 +150,8 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
           <motion.div {...fade(0.75)} className="mt-8 flex flex-col items-center gap-4">
             <Ornament />
             <p className="text-sm font-medium uppercase tracking-[0.36em] text-ink sm:text-base">{formatWeddingDate(settings.weddingDate)}</p>
+            {arriving && <p className="hero-arriving font-serif text-lg italic text-ink-soft">{arriving}</p>}
           </motion.div>
-          <DayOf settings={settings} tone="onPaper" reduce={reduce} />
         </div>
         <ScrollCue tone="onPaper" reduce={reduce} />
       </header>
@@ -163,13 +196,8 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
         <motion.div {...fade(0.85)} className={cn('mt-9 flex flex-col gap-4', left ? 'items-start' : 'items-center')}>
           {left ? <span aria-hidden="true" className="h-px w-20 bg-white/50" /> : <Ornament light />}
           <p className="text-sm font-medium uppercase tracking-[0.36em] text-white sm:text-base">{formatWeddingDate(settings.weddingDate)}</p>
+          {arriving && <p className="hero-arriving font-serif text-lg italic text-white/90">{arriving}</p>}
         </motion.div>
-        {look === 'savedate' && (
-          <motion.div {...fade(1)} className="mt-8">
-            <RoundCountdown date={settings.weddingDate} />
-          </motion.div>
-        )}
-        <DayOf settings={settings} tone="onPhoto" reduce={reduce} align={left ? 'start' : 'center'} />
       </div>
 
       <ScrollCue tone="onPhoto" reduce={reduce} />
@@ -232,64 +260,12 @@ function Nav({ settings, tone, reduce }: { settings: WeddingSettings; tone: Tone
   )
 }
 
-/** Is it the wedding day in the Philippines? (`?dayof` previews it.) */
-function useIsWeddingDay(weddingDate: string): boolean {
-  const { search } = useLocation()
-  if (new URLSearchParams(search).has('dayof')) return true
-  try {
-    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Manila' }).format(new Date()) === weddingDate
-  } catch {
-    return false
-  }
-}
-
-/** On the wedding day the hero puts what guests need right then up front. */
-function DayOf({ settings, tone, reduce, align = 'center' }: { settings: WeddingSettings; tone: Tone; reduce: boolean | null; align?: 'center' | 'start' }) {
-  const today = useIsWeddingDay(settings.weddingDate)
-  const links = useGuestLinks().filter((l) => l.to === '/seat' || l.to === '/photos')
-  if (!today) return null
-  const onPhoto = tone === 'onPhoto'
-  const pill = cn(
-    'inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-[0.78rem] font-medium uppercase tracking-[0.2em] shadow-soft transition',
-    onPhoto ? 'bg-white text-ink hover:bg-ivory' : 'bg-ink text-ivory hover:bg-ink-soft',
-  )
-  const ghost = cn(
-    'inline-flex min-h-11 items-center gap-2 rounded-full border px-5 text-[0.78rem] font-medium uppercase tracking-[0.2em] transition',
-    onPhoto ? 'border-white/60 text-white hover:bg-white/10' : 'border-ink/40 text-ink hover:bg-ink/5',
-  )
-  return (
-    <motion.div
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 1 }}
-      className={cn('mt-9 flex flex-col gap-3', align === 'start' ? 'items-start' : 'items-center')}
-    >
-      <p className={cn('font-serif text-xl italic', onPhoto ? 'text-white/90' : 'text-ink-soft')}>Today’s the day! 🤍</p>
-      <div className={cn('flex flex-wrap gap-2', align === 'start' ? 'justify-start' : 'justify-center')}>
-        {links.map((l) => {
-          const Icon = l.icon
-          return (
-            <Link key={l.to} to={l.to} className={pill}>
-              <Icon aria-hidden="true" className="size-4" strokeWidth={1.6} />
-              {l.to === '/photos' ? 'Share photos' : l.label}
-            </Link>
-          )
-        })}
-        <button type="button" onClick={() => scrollToSection('details', reduce)} className={ghost}>
-          <Info aria-hidden="true" className="size-4" strokeWidth={1.6} />
-          Details
-        </button>
-      </div>
-    </motion.div>
-  )
-}
-
 function ScrollCue({ tone, reduce }: { tone: Tone; reduce: boolean | null }) {
   return (
     <button
       type="button"
       onClick={() => scrollToSection('details', reduce)}
-      aria-label="Scroll to wedding details"
+      aria-label="Scroll to the shower details"
       className={cn(
         'absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 flex -translate-x-1/2 flex-col items-center gap-1 rounded p-2 text-[0.65rem] uppercase tracking-[0.3em] transition',
         tone === 'onPhoto' ? 'text-white/70 hover:text-white' : 'text-muted hover:text-ink',

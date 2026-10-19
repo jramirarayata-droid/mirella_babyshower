@@ -114,7 +114,7 @@ export default function GuestPhotos() {
       <main className="flex flex-1 flex-col items-center px-4 pb-20 pt-10 sm:px-8">
         {settings && (
           <p className="text-center font-serif text-2xl font-light text-ink-soft">
-            <CoupleNames names={settings.coupleNames} />
+            <CoupleNames names={settings.babyName} />
           </p>
         )}
         {!info && !error ? (
@@ -127,7 +127,7 @@ export default function GuestPhotos() {
             <Ornament className="mt-6" />
             <p className="mt-8 leading-relaxed text-ink-soft">The guest photo gallery opens closer to the celebration. Please check back soon.</p>
             <Link to="/" className="mt-6 inline-block text-sm text-gold underline-offset-4 hover:underline">
-              Back to the wedding website
+              Back to the baby shower website
             </Link>
           </div>
         ) : info ? (
@@ -172,7 +172,7 @@ export default function GuestPhotos() {
           </>
         ) : null}
       </main>
-      {settings && <Footer coupleNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />}
+      {settings && <Footer coupleNames={settings.babyName} hostNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />}
     </div>
   )
 }
@@ -276,7 +276,7 @@ function Uploader({ info, onAdded, onChanged }: { info: GuestPhotosInfo; onAdded
             ? 'Adding photos has just closed.'
             : res.stopped === 'full'
               ? 'The gallery is full — thank you!'
-              : `${res.added ? `Thank you! ${res.added} ${res.added === 1 ? 'photo' : 'photos'} added${res.status === 'pending' ? ' — they’ll appear once the couple approves them' : ''}.` : ''}${failed ? ` ${failed} couldn’t be added.` : ''}${note ? ` ${note}` : ''}`.trim(),
+              : `${res.added ? `Thank you! ${res.added} ${res.added === 1 ? 'photo' : 'photos'} added${res.status === 'pending' ? ' — they’ll appear once they’re approved' : ''}.` : ''}${failed ? ` ${failed} couldn’t be added.` : ''}${note ? ` ${note}` : ''}`.trim(),
       })
       if (res.added) onAdded()
     } catch (e) {
@@ -385,7 +385,7 @@ function Uploader({ info, onAdded, onChanged }: { info: GuestPhotosInfo; onAdded
       >
         Not {guest.name.split(' ')[0]}? Change name
       </button>
-      {info.approval === 'approve' && <p className="mt-2 text-xs text-muted">The couple looks at each photo before it shows in the gallery.</p>}
+      {info.approval === 'approve' && <p className="mt-2 text-xs text-muted">Each photo is checked before it shows in the gallery.</p>}
     </section>
   )
 }

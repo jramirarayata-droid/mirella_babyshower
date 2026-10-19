@@ -308,7 +308,7 @@ export async function hostLanded(token: string | null, key: string, prize: strin
     const m = error.message ?? ''
     throw new FriendlyError(
       m.includes('NOT_HOST')
-        ? 'This host link no longer works. Ask the couple for the new one.'
+        ? 'This host link no longer works. Ask the parents-to-be for the new one.'
         : m.includes('RAFFLE_HIDDEN')
           ? 'The raffle has been hidden on the website.'
           : m.includes('NAME_GONE')

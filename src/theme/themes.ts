@@ -4,7 +4,7 @@
  * Every template is defined by three base colours (background, text, accent),
  * a heading/body font pair and a hero layout. All other shades used by the
  * site are derived from those three and adjusted until they pass WCAG
- * contrast, so any combination the couple picks stays readable.
+ * contrast, so any combination picked stays readable.
  */
 
 export type HeroLayout = 'center' | 'left' | 'split' | 'framed'
@@ -12,6 +12,7 @@ export type HeroLayout = 'center' | 'left' | 'split' | 'framed'
 /**
  * A design style: its own section designs, ornaments, textures and type rules.
  * These four are also the printable designs (Printables, envelope, posters).
+ * (The ids are internal; guests and the admin only see the names.)
  */
 export type StyleId = 'classic' | 'maison' | 'deco' | 'heritage'
 
@@ -19,7 +20,7 @@ export type StyleId = 'classic' | 'maison' | 'deco' | 'heritage'
  * Website-only design looks. Each builds on a base print style (`print`) so
  * printables, the invitation envelope and the admin stay exactly as they are.
  */
-export type LookOnlyId = 'leaf' | 'garden' | 'savedate' | 'arch' | 'story' | 'damask'
+export type LookOnlyId = 'leaf' | 'garden' | 'clouds' | 'arch' | 'balloons'
 export type LookId = StyleId | LookOnlyId
 
 export interface StyleInfo {
@@ -30,70 +31,62 @@ export interface StyleInfo {
   allowsDark: boolean
   /** The printable design this look uses (website-only looks). */
   print?: StyleId
-  /** Script font for the couple's names (website-only looks). */
+  /** Script font for the baby's name (website-only looks). */
   script?: FontOption
 }
 
 export const STYLES: StyleInfo[] = [
-  { id: 'classic', name: 'Classic', description: 'Soft and timeless — fine lines, airy paper and a small diamond motif.', allowsDark: false },
-  { id: 'maison', name: 'Maison Noir', description: 'Dark editorial luxury — numbered sections, gold rules, fashion-magazine type.', allowsDark: true },
-  { id: 'deco', name: 'Gilded Deco', description: 'Art Deco glamour — gold fans, sunbursts, stepped frames, 1920s ballroom.', allowsDark: true },
-  { id: 'heritage', name: 'Heritage', description: 'Filipino luxury — capiz-shell shimmer and woven banig borders.', allowsDark: false },
+  { id: 'classic', name: 'Soft & Sweet', description: 'Gentle and timeless — fine lines, airy paper and tiny stars.', allowsDark: false },
+  { id: 'maison', name: 'Twinkle Little Star', description: 'A starry night — midnight blues, gold stars and a crescent moon.', allowsDark: true },
+  { id: 'deco', name: 'Hello Sunshine', description: 'Bright and cheerful — sunbursts, rays and sunny stepped frames.', allowsDark: false },
+  { id: 'heritage', name: 'Heritage', description: 'Filipino charm — capiz-shell shimmer and woven banig borders.', allowsDark: false },
 ]
 
-/** Website-only looks, drawn from favourite wedding-site designs and redrawn in our own way. */
+/** Website-only looks, drawn for this site. */
 export const LOOKS: StyleInfo[] = [
   {
-    id: 'leaf',
-    name: 'Eucalyptus & Gold',
-    description: 'Painted watercolour greenery spilling over fine gold frames, with a graceful script for your names.',
+    id: 'clouds',
+    name: 'Over the Moon',
+    description: 'Fluffy clouds, a sleepy moon and twinkling stars, with a round countdown to the shower.',
     allowsDark: false,
     print: 'classic',
-    script: { id: 'pinyon', family: 'Pinyon Script', spec: '', fallback: 'cursive' },
+    script: { id: 'sniglet', family: 'Sniglet', spec: 'wght@400;800', fallback: 'cursive' },
   },
   {
-    id: 'garden',
-    name: 'Watercolour Garden',
-    description: 'Soft painted garden roses and greenery under your photo, flowing script names.',
+    id: 'balloons',
+    name: 'Oh Baby! Balloons',
+    description: 'Soft balloons floating up around a round photo, with rounded cards.',
+    allowsDark: false,
+    print: 'classic',
+    script: { id: 'pacifico', family: 'Pacifico', spec: '', fallback: 'cursive' },
+  },
+  {
+    id: 'arch',
+    name: 'Boho Rainbow',
+    description: 'Muted rainbow arches over your photo, arched cards and airy type.',
+    allowsDark: false,
+    print: 'classic',
+  },
+  {
+    id: 'leaf',
+    name: 'Sweet Greenery',
+    description: 'Painted watercolour greenery over fine lines — lovely for a surprise or a boy or girl.',
     allowsDark: false,
     print: 'classic',
     script: { id: 'great-vibes', family: 'Great Vibes', spec: '', fallback: 'cursive' },
   },
   {
-    id: 'savedate',
-    name: 'Save the Date',
-    description: 'Your photo full-screen with “Save the Date” in script and a round countdown.',
+    id: 'garden',
+    name: 'Little Blossom',
+    description: 'Soft painted blooms under your photo, with a flowing script for the baby’s name.',
     allowsDark: false,
     print: 'classic',
-    script: { id: 'alex-brush', family: 'Alex Brush', spec: '', fallback: 'cursive' },
-  },
-  {
-    id: 'arch',
-    name: 'Sunlit Arch',
-    description: 'Warm and relaxed — a soft sun-circle over your photo, arched cards, airy type.',
-    allowsDark: false,
-    print: 'classic',
-  },
-  {
-    id: 'story',
-    name: 'Love Story',
-    description: 'Romantic — a round photo with scattered rose petals, rounded blush cards.',
-    allowsDark: false,
-    print: 'classic',
-    script: { id: 'parisienne', family: 'Parisienne', spec: '', fallback: 'cursive' },
-  },
-  {
-    id: 'damask',
-    name: 'Damask',
-    description: 'Rich and formal — a fine gold damask pattern with an ivory name medallion.',
-    allowsDark: false,
-    print: 'classic',
-    script: { id: 'pinyon', family: 'Pinyon Script', spec: '', fallback: 'cursive' },
+    script: { id: 'great-vibes', family: 'Great Vibes', spec: '', fallback: 'cursive' },
   },
 ]
 
-/** Every style shown in Look & Feel: the four print-ready styles, then the website-only looks. */
-export const ALL_STYLES: StyleInfo[] = [...STYLES, ...LOOKS]
+/** Every style shown in Look & Feel: the website-only looks first, then the four print-ready styles. */
+export const ALL_STYLES: StyleInfo[] = [...LOOKS, ...STYLES]
 
 export const findStyle = (id: string | undefined) => ALL_STYLES.find((s) => s.id === id) ?? STYLES[0]
 /** The printable design behind any look (website-only looks fall back to their base). */
@@ -165,79 +158,57 @@ export interface Template {
 }
 
 export const TEMPLATES: Template[] = [
-  { id: 'classic', name: 'Classic Ivory', description: 'Ivory, charcoal and champagne — timeless.', background: '#FAF7F2', text: '#2B2A28', accent: '#B89B6A', headingFont: 'cormorant', bodyFont: 'jost', heroLayout: 'center' },
-  { id: 'sage', name: 'Sage Garden', description: 'Soft greens for garden and outdoor weddings.', background: '#F6F7F2', text: '#26302A', accent: '#7F9377', headingFont: 'eb-garamond', bodyFont: 'lato', heroLayout: 'framed' },
-  { id: 'rose', name: 'Dusty Rose', description: 'Blush and rose, romantic and warm.', background: '#FBF5F3', text: '#3A2A2B', accent: '#C08A86', headingFont: 'playfair', bodyFont: 'montserrat', heroLayout: 'split' },
-  { id: 'filipiniana', name: 'Filipiniana', description: 'Capiz ivory with deep maroon, inspired by Filipino heritage.', background: '#FBF8F1', text: '#2E1F1C', accent: '#8C2F39', headingFont: 'marcellus', bodyFont: 'jost', heroLayout: 'framed' },
-  { id: 'terracotta', name: 'Terracotta', description: 'Sun-warmed sand and clay, relaxed and boho.', background: '#FAF4EE', text: '#33261F', accent: '#C0714F', headingFont: 'cormorant', bodyFont: 'karla', heroLayout: 'left' },
-  { id: 'minimal', name: 'Modern Minimal', description: 'Crisp white and black, editorial and clean.', background: '#FFFFFF', text: '#141414', accent: '#8C8C8C', headingFont: 'bodoni', bodyFont: 'inter', heroLayout: 'split' },
-  { id: 'coastal', name: 'Coastal Blue', description: 'Dusty blue and sand for beach and island weddings.', background: '#F6F8F9', text: '#1F2A33', accent: '#6F8FA6', headingFont: 'lora', bodyFont: 'nunito-sans', heroLayout: 'left' },
-  { id: 'lavender', name: 'Lavender Mist', description: 'Soft lilac, light and dreamy.', background: '#F9F7FB', text: '#2D2835', accent: '#9C8AB4', headingFont: 'cormorant', bodyFont: 'josefin', heroLayout: 'center' },
-  { id: 'emerald', name: 'Emerald & Gold', description: 'Deep emerald with gold, formal and grand.', background: '#F7F6F1', text: '#1F3029', accent: '#B08D4C', headingFont: 'cinzel', bodyFont: 'raleway', heroLayout: 'center' },
-  { id: 'burgundy', name: 'Burgundy Romance', description: 'Rich burgundy on cream, perfect for December.', background: '#FBF7F4', text: '#2B1A1D', accent: '#7E2A3A', headingFont: 'dm-serif', bodyFont: 'dm-sans', heroLayout: 'framed' },
-  // ---- Maison Noir
-  { style: 'maison', id: 'maison-noir', name: 'Noir & Gold', description: 'Black velvet with warm gold — the signature look.', background: '#0E0D0C', text: '#F3EDE2', accent: '#C8A96A', headingFont: 'bodoni', bodyFont: 'jost', heroLayout: 'center' },
-  { style: 'maison', id: 'maison-midnight', name: 'Midnight Champagne', description: 'Deep midnight blue with soft champagne.', background: '#0F1420', text: '#EEE9DF', accent: '#D4B98C', headingFont: 'playfair', bodyFont: 'montserrat', heroLayout: 'left' },
-  { style: 'maison', id: 'maison-onyx', name: 'Onyx Emerald', description: 'Near-black emerald with antique gold.', background: '#0C1512', text: '#EDEFE8', accent: '#B9975B', headingFont: 'cormorant', bodyFont: 'raleway', heroLayout: 'center' },
-  { style: 'maison', id: 'maison-bordeaux', name: 'Bordeaux Nuit', description: 'Dark wine with rose-gold light.', background: '#170C0F', text: '#F2E6E4', accent: '#C79A6B', headingFont: 'dm-serif', bodyFont: 'dm-sans', heroLayout: 'split' },
-  { style: 'maison', id: 'maison-espresso', name: 'Espresso Silk', description: 'Rich espresso brown with caramel gold.', background: '#1A1411', text: '#F1E9DF', accent: '#C9A27E', headingFont: 'gilda', bodyFont: 'lato', heroLayout: 'framed' },
-  { style: 'maison', id: 'maison-silver', name: 'Charcoal Silver', description: 'Charcoal and moonlit silver, very modern.', background: '#141414', text: '#EFEFEF', accent: '#B8B8B8', headingFont: 'italiana', bodyFont: 'inter', heroLayout: 'left' },
-  { style: 'maison', id: 'maison-navy', name: 'Navy Couture', description: 'Ink navy with brushed gold.', background: '#0D1726', text: '#ECE7DE', accent: '#C5A46D', headingFont: 'cormorant', bodyFont: 'josefin', heroLayout: 'center' },
-  { style: 'maison', id: 'maison-plum', name: 'Plum Velvet', description: 'Dark plum with soft antique gold.', background: '#1A1020', text: '#EFE6F0', accent: '#C9A87C', headingFont: 'playfair', bodyFont: 'raleway', heroLayout: 'framed' },
-  { style: 'maison', id: 'maison-atelier', name: 'Ivory Atelier', description: 'The Maison look on warm ivory paper.', background: '#F7F3EC', text: '#151312', accent: '#A6824B', headingFont: 'bodoni', bodyFont: 'jost', heroLayout: 'split' },
-  { style: 'maison', id: 'maison-blanc', name: 'Blanc Editorial', description: 'Crisp white, black type, a touch of gold.', background: '#FFFFFF', text: '#111111', accent: '#9A7B4F', headingFont: 'prata', bodyFont: 'inter', heroLayout: 'center' },
-  // ---- Gilded Deco
-  { style: 'deco', id: 'deco-gatsby', name: 'Gatsby Black & Gold', description: 'Jet black and bright gold — pure 1920s glamour.', background: '#101010', text: '#F1E7D0', accent: '#D4AF37', headingFont: 'poiret', bodyFont: 'josefin', heroLayout: 'center' },
-  { style: 'deco', id: 'deco-champagne', name: 'Champagne Ballroom', description: 'Champagne paper with polished gold.', background: '#F8F3E8', text: '#2A241B', accent: '#B08D4C', headingFont: 'poiret', bodyFont: 'montserrat', heroLayout: 'framed' },
-  { style: 'deco', id: 'deco-emerald', name: 'Emerald Deco', description: 'Deep emerald lacquer with gold inlay.', background: '#0B2A22', text: '#F0EBDD', accent: '#CDAA5C', headingFont: 'cinzel', bodyFont: 'josefin', heroLayout: 'center' },
-  { style: 'deco', id: 'deco-ivory', name: 'Ivory Sunburst', description: 'Ivory with warm brass sunbursts.', background: '#FBF7EF', text: '#23201A', accent: '#A8843F', headingFont: 'forum', bodyFont: 'raleway', heroLayout: 'split' },
-  { style: 'deco', id: 'deco-sapphire', name: 'Sapphire Jazz', description: 'Midnight sapphire with gold — a jazz-age evening.', background: '#0E1A33', text: '#EDE8DC', accent: '#CFAE6B', headingFont: 'italiana', bodyFont: 'josefin', heroLayout: 'left' },
-  { style: 'deco', id: 'deco-rosegold', name: 'Rose Gold Deco', description: 'Blush paper with rose-gold geometry.', background: '#FAF2EF', text: '#2F2223', accent: '#B07A6A', headingFont: 'poiret', bodyFont: 'montserrat', heroLayout: 'framed' },
-  { style: 'deco', id: 'deco-onyx', name: 'Onyx & Pearl', description: 'Black onyx with pearl and platinum.', background: '#121212', text: '#F4F1EA', accent: '#CFC6B4', headingFont: 'cinzel', bodyFont: 'raleway', heroLayout: 'center' },
-  { style: 'deco', id: 'deco-teal', name: 'Teal Lounge', description: 'Dark teal with antique gold.', background: '#0D2629', text: '#EAF0EE', accent: '#C9A35F', headingFont: 'forum', bodyFont: 'josefin', heroLayout: 'left' },
-  { style: 'deco', id: 'deco-blush', name: 'Blush Gilded', description: 'Soft blush and gilded lines, light and elegant.', background: '#FBF5F2', text: '#2B2224', accent: '#B98E5E', headingFont: 'italiana', bodyFont: 'montserrat', heroLayout: 'split' },
-  { style: 'deco', id: 'deco-ruby', name: 'Ruby Ballroom', description: 'Deep ruby with gold for a grand December night.', background: '#2A0C12', text: '#F3E7E3', accent: '#D2AE6D', headingFont: 'poiret', bodyFont: 'raleway', heroLayout: 'center' },
+  // ---- Soft & Sweet
+  { id: 'classic', name: 'Cream & Honey', description: 'Warm cream with soft honey gold — sweet for any baby.', background: '#FBF8F2', text: '#3A332B', accent: '#C29A5B', headingFont: 'cormorant', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { id: 'pink', name: 'Blush Pink', description: 'Pale blush with rosy pink — for a little girl.', background: '#FDF5F6', text: '#3D2A2E', accent: '#D58A98', headingFont: 'playfair', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { id: 'blue', name: 'Baby Blue', description: 'Soft sky blue with powder blue — for a little boy.', background: '#F4F8FC', text: '#24324A', accent: '#7FA3C9', headingFont: 'lora', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { id: 'mint', name: 'Mint Sprout', description: 'Fresh mint and soft green — lovely for a surprise.', background: '#F3FAF6', text: '#24362D', accent: '#79B394', headingFont: 'eb-garamond', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { id: 'lemon', name: 'Buttercup', description: 'Buttery yellow, happy and bright.', background: '#FFFBEE', text: '#3A3222', accent: '#D7AE3E', headingFont: 'cormorant', bodyFont: 'karla', heroLayout: 'center' },
+  { id: 'lavender', name: 'Lavender Dream', description: 'Soft lilac, light and dreamy.', background: '#F9F6FC', text: '#2F2838', accent: '#A08BC4', headingFont: 'cormorant', bodyFont: 'josefin', heroLayout: 'framed' },
+  { id: 'peach', name: 'Peach Fuzz', description: 'Warm peach and apricot, cosy and soft.', background: '#FFF6F1', text: '#3D2B23', accent: '#E0957A', headingFont: 'playfair', bodyFont: 'lato', heroLayout: 'split' },
+  { id: 'team', name: 'Team Pink or Blue', description: 'Pink and blue together — for a gender reveal.', background: '#FBF7FA', text: '#2E2A3A', accent: '#B98BB8', headingFont: 'dm-serif', bodyFont: 'dm-sans', heroLayout: 'framed' },
+  { id: 'oat', name: 'Oatmeal & Sage', description: 'Calm neutrals: oatmeal, linen and sage.', background: '#F8F5EF', text: '#2F2D27', accent: '#94A383', headingFont: 'cormorant', bodyFont: 'karla', heroLayout: 'left' },
+  { id: 'minimal', name: 'Modern Minimal', description: 'Crisp white and soft grey, clean and simple.', background: '#FFFFFF', text: '#1E1E1E', accent: '#9A9A9A', headingFont: 'bodoni', bodyFont: 'inter', heroLayout: 'split' },
+  // ---- Twinkle Little Star
+  { style: 'maison', id: 'maison-noir', name: 'Midnight & Gold', description: 'Deep midnight blue with warm gold stars — the signature look.', background: '#121A33', text: '#F1EDE3', accent: '#D9B86C', headingFont: 'cormorant', bodyFont: 'nunito-sans', heroLayout: 'center' },
+  { style: 'maison', id: 'maison-dusk', name: 'Dusky Lilac', description: 'Twilight purple with soft silver-gold.', background: '#211A33', text: '#EFE9F4', accent: '#CDB4E0', headingFont: 'playfair', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'maison', id: 'maison-ocean', name: 'Night Ocean', description: 'Ink teal night with pale moonlight.', background: '#0F2430', text: '#EAF2F2', accent: '#A9D3D6', headingFont: 'lora', bodyFont: 'lato', heroLayout: 'center' },
+  { style: 'maison', id: 'maison-day', name: 'Starry Morning', description: 'The starry look on soft cloud white with navy and gold.', background: '#F6F8FC', text: '#1D2742', accent: '#B8954C', headingFont: 'cormorant', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  // ---- Hello Sunshine
+  { style: 'deco', id: 'deco-sunshine', name: 'Sunshine Yellow', description: 'Cheerful yellow with sunny gold rays.', background: '#FFFAEB', text: '#33291A', accent: '#E0A526', headingFont: 'poiret', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'deco', id: 'deco-citrus', name: 'Citrus Sun', description: 'Tangerine and lemon, bright and happy.', background: '#FFF7EE', text: '#38251A', accent: '#E58A3C', headingFont: 'forum', bodyFont: 'karla', heroLayout: 'center' },
+  { style: 'deco', id: 'deco-sky', name: 'Sun & Sky', description: 'Sky blue paper with golden sun.', background: '#F2F8FD', text: '#22324A', accent: '#D69E2E', headingFont: 'italiana', bodyFont: 'nunito-sans', heroLayout: 'split' },
+  { style: 'deco', id: 'deco-blush', name: 'Rosy Sunrise', description: 'Blush paper and a rose-gold sunrise.', background: '#FDF4F1', text: '#3A2626', accent: '#D1866E', headingFont: 'poiret', bodyFont: 'montserrat', heroLayout: 'framed' },
   // ---- Heritage
-  { style: 'heritage', id: 'heritage-capiz', name: 'Capiz Ivory', description: 'Capiz-shell ivory with deep Filipiniana maroon.', background: '#FBF7EE', text: '#2B201A', accent: '#8C2F39', headingFont: 'marcellus', bodyFont: 'jost', heroLayout: 'framed' },
-  { style: 'heritage', id: 'heritage-banig', name: 'Banig Natural', description: 'Woven-mat naturals: sand, rattan and brown.', background: '#F7F0E3', text: '#33261C', accent: '#9C6B3C', headingFont: 'cormorant', bodyFont: 'karla', heroLayout: 'left' },
-  { style: 'heritage', id: 'heritage-sampaguita', name: 'Sampaguita', description: 'Jasmine white with leaf green.', background: '#FCFBF6', text: '#26302A', accent: '#6E8B5C', headingFont: 'eb-garamond', bodyFont: 'lato', heroLayout: 'framed' },
-  { style: 'heritage', id: 'heritage-pina', name: 'Piña Cloth', description: 'Piña fibre cream with soft golden thread.', background: '#F8F5EC', text: '#2E2A24', accent: '#A28449', headingFont: 'prata', bodyFont: 'jost', heroLayout: 'center' },
-  { style: 'heritage', id: 'heritage-inabel', name: 'Inabel Indigo', description: 'Ilocano weave indigo on cotton white.', background: '#F5F6F8', text: '#1C2433', accent: '#2F4E86', headingFont: 'marcellus', bodyFont: 'nunito-sans', heroLayout: 'split' },
-  { style: 'heritage', id: 'heritage-narra', name: 'Narra Wood', description: 'Warm narra wood and carved brown.', background: '#F6EFE6', text: '#2E1E15', accent: '#8A5A36', headingFont: 'lora', bodyFont: 'karla', heroLayout: 'left' },
-  { style: 'heritage', id: 'heritage-santan', name: 'Santan Coral', description: 'Santan-flower coral, bright and joyful.', background: '#FCF5F1', text: '#33221E', accent: '#B24E39', headingFont: 'playfair', bodyFont: 'montserrat', heroLayout: 'framed' },
-  { style: 'heritage', id: 'heritage-mangrove', name: 'Mangrove Green', description: 'Island greens for garden and beach weddings.', background: '#F3F5EE', text: '#1F2B22', accent: '#47704F', headingFont: 'cormorant', bodyFont: 'raleway', heroLayout: 'center' },
-  { style: 'heritage', id: 'heritage-perlas', name: 'Perlas Pearl', description: 'South Sea pearl and soft taupe.', background: '#FAF8F5', text: '#2A2826', accent: '#8F7F63', headingFont: 'gilda', bodyFont: 'lato', heroLayout: 'framed' },
-  { style: 'heritage', id: 'heritage-terno', name: 'Terno Burgundy', description: 'Terno-gown burgundy on capiz cream.', background: '#FBF6F3', text: '#2B171B', accent: '#7E2A3A', headingFont: 'dm-serif', bodyFont: 'dm-sans', heroLayout: 'left' },
-  // ---- Eucalyptus & Gold (website only)
-  { style: 'leaf', id: 'leaf-ivory', name: 'Ivory & Eucalyptus', description: 'Warm ivory paper, antique-gold lines.', background: '#FAF7F1', text: '#2B2925', accent: '#A8854F', headingFont: 'cormorant', bodyFont: 'jost', heroLayout: 'framed' },
-  { style: 'leaf', id: 'leaf-sage', name: 'Sage Mist', description: 'Soft sage paper with olive-gold lines.', background: '#F5F6F0', text: '#27302A', accent: '#8C7F4E', headingFont: 'eb-garamond', bodyFont: 'lato', heroLayout: 'framed' },
-  { style: 'leaf', id: 'leaf-blush', name: 'Blush & Eucalyptus', description: 'Barely-there blush with rose-gold lines.', background: '#FBF6F3', text: '#35292A', accent: '#AF8463', headingFont: 'cormorant', bodyFont: 'montserrat', heroLayout: 'framed' },
-  { style: 'leaf', id: 'leaf-forest', name: 'Forest & Gold', description: 'Linen white, deep green type and brushed gold.', background: '#F7F6F0', text: '#1F2E25', accent: '#9F7F43', headingFont: 'prata', bodyFont: 'raleway', heroLayout: 'center' },
-  // ---- Watercolour Garden (website only)
-  { style: 'garden', id: 'garden-blush', name: 'Blush Garden', description: 'Blush paper, rose-gold accents.', background: '#FBF6F2', text: '#3A2C2B', accent: '#B5806F', headingFont: 'cormorant', bodyFont: 'montserrat', heroLayout: 'framed' },
-  { style: 'garden', id: 'garden-ivory', name: 'Ivory Garden', description: 'Warm ivory with antique gold.', background: '#FAF7F1', text: '#2E2A25', accent: '#A8854F', headingFont: 'cormorant', bodyFont: 'jost', heroLayout: 'framed' },
-  { style: 'garden', id: 'garden-peach', name: 'Peach Garden', description: 'Peach-washed paper with apricot.', background: '#FCF6F0', text: '#3A2B22', accent: '#BE8660', headingFont: 'playfair', bodyFont: 'lato', heroLayout: 'framed' },
-  { style: 'garden', id: 'garden-sage', name: 'Sage Garden', description: 'Fresh sage paper with olive.', background: '#F6F7F1', text: '#26302A', accent: '#7F8E62', headingFont: 'eb-garamond', bodyFont: 'lato', heroLayout: 'framed' },
-  // ---- Save the Date (website only)
-  { style: 'savedate', id: 'savedate-champagne', name: 'Champagne', description: 'Ivory and champagne gold.', background: '#FAF7F2', text: '#2B2A28', accent: '#AE8B55', headingFont: 'cormorant', bodyFont: 'jost', heroLayout: 'center' },
-  { style: 'savedate', id: 'savedate-rose', name: 'Rose', description: 'Soft blush with dusty rose.', background: '#FBF5F3', text: '#3A2A2B', accent: '#B47A74', headingFont: 'playfair', bodyFont: 'montserrat', heroLayout: 'center' },
-  { style: 'savedate', id: 'savedate-sage', name: 'Sage', description: 'Linen with garden sage.', background: '#F6F7F2', text: '#26302A', accent: '#788C6C', headingFont: 'eb-garamond', bodyFont: 'lato', heroLayout: 'center' },
-  { style: 'savedate', id: 'savedate-dusk', name: 'Dusk Blue', description: 'Cool white with dusk blue.', background: '#F6F8F9', text: '#1F2A38', accent: '#5E7E9A', headingFont: 'lora', bodyFont: 'nunito-sans', heroLayout: 'center' },
-  // ---- Sunlit Arch (website only)
-  { style: 'arch', id: 'arch-terracotta', name: 'Terracotta Sun', description: 'Sun-warmed sand and terracotta.', background: '#FAF4EE', text: '#33261F', accent: '#B4664A', headingFont: 'cormorant', bodyFont: 'karla', heroLayout: 'center' },
-  { style: 'arch', id: 'arch-apricot', name: 'Apricot', description: 'Peach paper and apricot glow.', background: '#FCF5EF', text: '#3A2A22', accent: '#C2805C', headingFont: 'cormorant', bodyFont: 'josefin', heroLayout: 'center' },
-  { style: 'arch', id: 'arch-sand', name: 'Sand & Sage', description: 'Sand with dusty sage.', background: '#F8F4EC', text: '#2E2B22', accent: '#7E8A62', headingFont: 'lora', bodyFont: 'karla', heroLayout: 'center' },
-  { style: 'arch', id: 'arch-clay', name: 'Clay & Gold', description: 'Clay cream with brass gold.', background: '#FAF6EF', text: '#2C241C', accent: '#A07A42', headingFont: 'cormorant', bodyFont: 'raleway', heroLayout: 'left' },
-  // ---- Love Story (website only)
-  { style: 'story', id: 'story-rose', name: 'Rose Petal', description: 'Blush paper and rose.', background: '#FCF6F5', text: '#3A2A2C', accent: '#B07479', headingFont: 'cormorant', bodyFont: 'montserrat', heroLayout: 'framed' },
-  { style: 'story', id: 'story-gold', name: 'Blush & Gold', description: 'Blush paper with soft gold.', background: '#FBF6F2', text: '#33292A', accent: '#A9844F', headingFont: 'cormorant', bodyFont: 'jost', heroLayout: 'framed' },
-  { style: 'story', id: 'story-mauve', name: 'Mauve', description: 'Pale mauve, dreamy and warm.', background: '#FAF6F8', text: '#33282F', accent: '#94708A', headingFont: 'playfair', bodyFont: 'raleway', heroLayout: 'framed' },
-  { style: 'story', id: 'story-lavender', name: 'Lavender', description: 'Soft lilac and lavender.', background: '#F9F7FB', text: '#2D2835', accent: '#8676A6', headingFont: 'cormorant', bodyFont: 'josefin', heroLayout: 'framed' },
-  // ---- Damask (website only)
-  { style: 'damask', id: 'damask-ivory', name: 'Ivory & Gold', description: 'Ivory silk with gold damask.', background: '#FAF6EE', text: '#2A251E', accent: '#A4803C', headingFont: 'cormorant', bodyFont: 'jost', heroLayout: 'split' },
-  { style: 'damask', id: 'damask-champagne', name: 'Champagne', description: 'Deeper champagne with antique gold.', background: '#F6EFE2', text: '#2E261C', accent: '#97743A', headingFont: 'prata', bodyFont: 'lato', heroLayout: 'split' },
-  { style: 'damask', id: 'damask-sage', name: 'Sage Damask', description: 'Sage silk with olive damask.', background: '#F4F5EE', text: '#24302A', accent: '#6F7F55', headingFont: 'cormorant', bodyFont: 'raleway', heroLayout: 'split' },
-  { style: 'damask', id: 'damask-burgundy', name: 'Burgundy & Gold', description: 'Cream with burgundy damask for December.', background: '#FBF6F2', text: '#2B171B', accent: '#7E2A3A', headingFont: 'dm-serif', bodyFont: 'dm-sans', heroLayout: 'split' },
+  { style: 'heritage', id: 'heritage-capiz', name: 'Capiz Pearl', description: 'Capiz-shell ivory with soft rose.', background: '#FCF8F2', text: '#33261F', accent: '#C27D7D', headingFont: 'marcellus', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'heritage', id: 'heritage-banig', name: 'Banig Natural', description: 'Woven-mat naturals: sand, rattan and honey.', background: '#F8F1E5', text: '#35281D', accent: '#B08048', headingFont: 'cormorant', bodyFont: 'karla', heroLayout: 'left' },
+  { style: 'heritage', id: 'heritage-sampaguita', name: 'Sampaguita', description: 'Jasmine white with leaf green.', background: '#FCFBF6', text: '#26302A', accent: '#6E9A6A', headingFont: 'eb-garamond', bodyFont: 'lato', heroLayout: 'framed' },
+  { style: 'heritage', id: 'heritage-inabel', name: 'Inabel Blue', description: 'Ilocano weave blue on cotton white.', background: '#F5F7FA', text: '#1E2737', accent: '#5577A8', headingFont: 'marcellus', bodyFont: 'nunito-sans', heroLayout: 'split' },
+  // ---- Over the Moon (website only)
+  { style: 'clouds', id: 'clouds-blue', name: 'Sky Blue', description: 'Pale sky, white clouds and golden stars.', background: '#F2F7FC', text: '#25344D', accent: '#86A9D1', headingFont: 'lora', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'clouds', id: 'clouds-pink', name: 'Pink Sky', description: 'Cotton-candy pink with soft gold.', background: '#FDF4F7', text: '#3D2B33', accent: '#DE93AE', headingFont: 'lora', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'clouds', id: 'clouds-lilac', name: 'Lilac Dusk', description: 'Lilac dusk sky with silver stars.', background: '#F7F4FC', text: '#2F2A40', accent: '#A595D1', headingFont: 'lora', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'clouds', id: 'clouds-neutral', name: 'Sand & Moon', description: 'Warm sand with a honey moon — neutral.', background: '#FAF6EF', text: '#36302A', accent: '#C9A46A', headingFont: 'lora', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  // ---- Oh Baby! Balloons (website only)
+  { style: 'balloons', id: 'balloons-pastel', name: 'Pastel Party', description: 'Mixed pastel balloons on cream.', background: '#FFFAF5', text: '#3A3030', accent: '#E79BA6', headingFont: 'dm-serif', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'balloons', id: 'balloons-blue', name: 'Blue Balloons', description: 'Powder blue balloons and cloud white.', background: '#F4F8FC', text: '#24324A', accent: '#7FA3C9', headingFont: 'dm-serif', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'balloons', id: 'balloons-pink', name: 'Pink Balloons', description: 'Rosy pink balloons on blush.', background: '#FDF4F6', text: '#3D2A2E', accent: '#D98A9C', headingFont: 'dm-serif', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'balloons', id: 'balloons-sage', name: 'Sage Balloons', description: 'Sage and sand balloons, gender-neutral.', background: '#F7F7F1', text: '#2C3129', accent: '#93A986', headingFont: 'dm-serif', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  // ---- Boho Rainbow (website only)
+  { style: 'arch', id: 'arch-terracotta', name: 'Terracotta Rainbow', description: 'Sun-warmed sand and terracotta.', background: '#FAF4EE', text: '#33261F', accent: '#C27A5C', headingFont: 'cormorant', bodyFont: 'karla', heroLayout: 'center' },
+  { style: 'arch', id: 'arch-blush', name: 'Blush Rainbow', description: 'Blush, peach and mauve.', background: '#FCF5F1', text: '#3A2A26', accent: '#CF8F86', headingFont: 'cormorant', bodyFont: 'josefin', heroLayout: 'center' },
+  { style: 'arch', id: 'arch-sage', name: 'Sage Rainbow', description: 'Sand with dusty sage and mustard.', background: '#F8F4EC', text: '#2E2B22', accent: '#8C9A6C', headingFont: 'lora', bodyFont: 'karla', heroLayout: 'center' },
+  { style: 'arch', id: 'arch-blue', name: 'Dusty Blue Rainbow', description: 'Oat with dusty blue and clay.', background: '#F7F5F0', text: '#26303A', accent: '#7C98AF', headingFont: 'cormorant', bodyFont: 'raleway', heroLayout: 'left' },
+  // ---- Sweet Greenery (website only)
+  { style: 'leaf', id: 'leaf-ivory', name: 'Ivory & Greenery', description: 'Warm ivory paper with soft gold lines.', background: '#FAF7F1', text: '#2B2925', accent: '#A8854F', headingFont: 'cormorant', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'leaf', id: 'leaf-sage', name: 'Sage Mist', description: 'Soft sage paper with olive lines.', background: '#F5F6F0', text: '#27302A', accent: '#8C9A6A', headingFont: 'eb-garamond', bodyFont: 'lato', heroLayout: 'framed' },
+  { style: 'leaf', id: 'leaf-blue', name: 'Greenery & Blue', description: 'Cool white with powder-blue lines.', background: '#F5F8FA', text: '#25303A', accent: '#7E9DB5', headingFont: 'cormorant', bodyFont: 'nunito-sans', heroLayout: 'framed' },
+  { style: 'leaf', id: 'leaf-blush', name: 'Greenery & Blush', description: 'Barely-there blush with rosy lines.', background: '#FBF6F3', text: '#35292A', accent: '#C08B83', headingFont: 'cormorant', bodyFont: 'montserrat', heroLayout: 'framed' },
+  // ---- Little Blossom (website only)
+  { style: 'garden', id: 'garden-blush', name: 'Blush Blossom', description: 'Blush paper with rosy accents.', background: '#FBF6F2', text: '#3A2C2B', accent: '#C3877A', headingFont: 'cormorant', bodyFont: 'montserrat', heroLayout: 'framed' },
+  { style: 'garden', id: 'garden-peach', name: 'Peach Blossom', description: 'Peach-washed paper with apricot.', background: '#FCF6F0', text: '#3A2B22', accent: '#C98E66', headingFont: 'playfair', bodyFont: 'lato', heroLayout: 'framed' },
+  { style: 'garden', id: 'garden-lilac', name: 'Lilac Blossom', description: 'Soft lilac with mauve.', background: '#FAF6FA', text: '#352B36', accent: '#A784A4', headingFont: 'cormorant', bodyFont: 'josefin', heroLayout: 'framed' },
+  { style: 'garden', id: 'garden-ivory', name: 'Ivory Blossom', description: 'Warm ivory with soft gold.', background: '#FAF7F1', text: '#2E2A25', accent: '#A8854F', headingFont: 'cormorant', bodyFont: 'nunito-sans', heroLayout: 'framed' },
 ]
 
 export const HERO_LAYOUTS: { id: HeroLayout; name: string; description: string }[] = [
@@ -247,7 +218,7 @@ export const HERO_LAYOUTS: { id: HeroLayout; name: string; description: string }
   { id: 'framed', name: 'Arched frame', description: 'Photo in an arched frame on a paper background.' },
 ]
 
-export const DEFAULT_THEME: ThemeSettings = { template: 'classic' }
+export const DEFAULT_THEME: ThemeSettings = { template: 'clouds-blue' }
 
 // ---------------------------------------------------------------- colour math
 
@@ -352,7 +323,7 @@ export interface ResolvedTheme {
   style: StyleId
   /** The website design look (the style itself, or a website-only look). */
   look: LookId
-  /** Script font for the couple's names, when the look has one. */
+  /** Script font for the baby's name, when the look has one. */
   script?: FontOption
   dark: boolean
   palette: Palette
@@ -361,7 +332,7 @@ export interface ResolvedTheme {
   heroLayout: HeroLayout
 }
 
-export const findTemplate = (id: string | undefined) => TEMPLATES.find((t) => t.id === id) ?? TEMPLATES[0]
+export const findTemplate = (id: string | undefined) => TEMPLATES.find((t) => t.id === id) ?? TEMPLATES.find((t) => t.id === DEFAULT_THEME.template) ?? TEMPLATES[0]
 export const findHeading = (id: string | undefined) => HEADING_FONTS.find((f) => f.id === id)
 export const findBody = (id: string | undefined) => BODY_FONTS.find((f) => f.id === id)
 
@@ -388,7 +359,7 @@ export function parseThemeSettings(value: unknown): ThemeSettings {
   const o = value as Record<string, unknown>
   const str = (k: string) => (typeof o[k] === 'string' && o[k] ? (o[k] as string) : undefined)
   return {
-    template: str('template') ?? 'classic',
+    template: str('template') ?? DEFAULT_THEME.template,
     headingFont: str('headingFont'),
     bodyFont: str('bodyFont'),
     background: isHex(o.background) ? o.background : undefined,
@@ -427,7 +398,7 @@ export function themeVars(t: ResolvedTheme): Record<string, string> {
 }
 
 /**
- * The admin pages keep the couple's accent and fonts but always use the
+ * The admin pages keep the site's accent and fonts but always use the
  * classic, light design so forms and tables stay familiar (and Printables,
  * which read these colours, always print on light paper).
  */

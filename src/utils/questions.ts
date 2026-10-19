@@ -6,9 +6,9 @@ export function builtinEnabled(config: RsvpConfig | undefined, key: BuiltinKey):
   return config?.builtins?.[key]?.enabled !== false
 }
 
-export const DEFAULT_GUEST_PRICE = 799
+export const DEFAULT_GUEST_PRICE = 0
 
-/** Price per additional guest the couple set in RSVP Questions (0 = no price shown). */
+/** Price per additional guest set in RSVP Questions (0 = no price shown; the default for a shower). */
 export function guestPrice(config: RsvpConfig | undefined | null): number {
   const p = config?.builtins?.additionalGuest?.price
   return typeof p === 'number' && Number.isFinite(p) && p >= 0 ? p : DEFAULT_GUEST_PRICE
@@ -16,7 +16,7 @@ export function guestPrice(config: RsvpConfig | undefined | null): number {
 
 export const formatPeso = (n: number) => `₱${n.toLocaleString('en-PH', { maximumFractionDigits: 2 })}`
 
-/** "₱799 each" style text, or '' when no price is set. */
+/** "₱500 each" style text, or '' when no price is set. */
 export function guestPriceEach(config: RsvpConfig | undefined | null): string {
   const p = guestPrice(config)
   return p > 0 ? `${formatPeso(p)} each` : ''

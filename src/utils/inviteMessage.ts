@@ -1,16 +1,16 @@
 import { siteBaseUrl } from './share'
 
-/** Placeholders the couple can use in the invitation message. */
+/** Placeholders that can be used in the invitation message. */
 export const INVITE_PLACEHOLDERS = [
   { key: '{name}', label: 'Guest’s name' },
-  { key: '{date}', label: 'Wedding date' },
+  { key: '{date}', label: 'Shower date' },
   { key: '{couple}', label: 'Your names' },
   { key: '{link}', label: 'Their invitation link' },
 ] as const
 
 export const DEFAULT_INVITE_MESSAGE = `Hi {name}! 💌
 
-We're getting married on {date}, and we would love for you to celebrate with us.
+A little one is on the way! 🍼 We're having a baby shower on {date}, and we would love for you to celebrate with us.
 
 Here's your invitation — just tap to open it:
 {link}

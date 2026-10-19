@@ -13,7 +13,7 @@ export function RaffleTeaser({ teaser, className }: { teaser: RsvpTeaser; classN
   if (!teaser.enabled || !(teaser.title.trim() || teaser.highlight.trim())) return null
   return (
     <motion.aside
-      aria-label="Wedding raffle"
+      aria-label="Baby shower raffle"
       data-raffle-teaser
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}

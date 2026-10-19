@@ -43,7 +43,7 @@ export function HeadcountSummary({ invitations, side }: { invitations: Invitatio
         </span>
         {side === 'all' && (groom > 0 || bride > 0) && (
           <span className="text-sm text-muted sm:ml-auto">
-            Groom’s side <strong className="font-medium tabular-nums text-ink">{groom}</strong> · Bride’s side{' '}
+            Dad’s side <strong className="font-medium tabular-nums text-ink">{groom}</strong> · Mom’s side{' '}
             <strong className="font-medium tabular-nums text-ink">{bride}</strong>
           </span>
         )}

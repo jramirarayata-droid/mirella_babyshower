@@ -44,11 +44,11 @@ export function ResponseDetailModal({ invitation, onClose }: { invitation: Invit
           <Item label="RSVP">
             <span className="inline-flex flex-wrap items-center gap-1.5">
               <AttendanceBadge status={invitation.status} />
-              {r?.recordedByAdmin && <Badge tone="gold">Confirmed by couple</Badge>}
+              {r?.recordedByAdmin && <Badge tone="gold">Confirmed by hosts</Badge>}
             </span>
           </Item>
           <Item label="Allowed guest requests">{invitation.maxAdditionalGuests}</Item>
-          <Item label="Included by the couple" wide>
+          <Item label="Included by the hosts" wide>
             {includedGuests(invitation).length ? includedGuests(invitation).map((g) => g.guestName).join(', ') : 'None'}
           </Item>
           {!r && <Item label="Response" wide>This invitation has not responded yet.</Item>}
@@ -93,8 +93,8 @@ export function ResponseDetailModal({ invitation, onClose }: { invitation: Invit
                   'None requested'
                 )}
               </Item>
-              <Item label="Message to the couple" wide>
-                {r.messageToCouple ? <span className="font-serif text-lg italic">“{r.messageToCouple}”</span> : 'No message'}
+              <Item label="Wish for the baby" wide>
+                {r.messageToCouple ? <span className="font-serif text-lg italic">“{r.messageToCouple}”</span> : 'No wish'}
               </Item>
             </>
           )}

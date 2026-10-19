@@ -9,7 +9,7 @@
 -- -----------------------------------------------------------------------------
 alter table public.wedding_settings
   add column if not exists outfit_title text default 'Attire Inspiration',
-  add column if not exists outfit_subtitle text default 'A few ideas to help you plan your look for the day.',
+  add column if not exists outfit_subtitle text default 'A few ideas to help you plan your look for the shower.',
   add column if not exists outfit_section_visible boolean not null default true;
 
 create table if not exists public.outfit_images (
@@ -60,17 +60,7 @@ revoke all on public.outfit_images from anon;
 grant select on public.outfit_images to anon;
 grant select, insert, update, delete on public.outfit_images to authenticated;
 
--- Temporary sample illustrations (files live in the site's public/samples/ folder).
-insert into public.outfit_images (gender, image_url, caption, sort_order)
-select * from (values
-  ('male',   'samples/outfits/male-classic-suit.svg', 'Classic dark suit & tie', 1),
-  ('male',   'samples/outfits/male-barong.svg',       'Barong Tagalog',          2),
-  ('male',   'samples/outfits/male-light-suit.svg',   'Light neutral suit',      3),
-  ('female', 'samples/outfits/female-gown.svg',       'Champagne evening gown',  1),
-  ('female', 'samples/outfits/female-filipiniana.svg','Modern Filipiniana',      2),
-  ('female', 'samples/outfits/female-cocktail.svg',   'Dusty rose midi dress',   3)
-) as v(gender, image_url, caption, sort_order)
-where not exists (select 1 from public.outfit_images);
+-- (No sample outfits: the attire gallery starts empty and is optional.)
 
 -- -----------------------------------------------------------------------------
 -- 2. Message to the couple (last RSVP question, attending guests only)

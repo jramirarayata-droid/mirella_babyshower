@@ -3,11 +3,10 @@ import { FileSpreadsheet } from 'lucide-react'
 import { useAdminData } from '../../hooks/useAdminData'
 import { useWeddingSettings } from '../../hooks/useWeddingSettings'
 import { useToast } from '../../hooks/useToast'
-import { listEntourageLinks } from '../../services/entourageService'
 import { listSeats, listTables } from '../../services/seatingService'
 import type { InvitationWithRSVP } from '../../types/rsvp'
 import { partyMembers } from '../../utils/seatingPeople'
-import { entouragePositions, invitationPosition } from '../../utils/positions'
+import { invitationPosition } from '../../utils/positions'
 import { downloadXlsx, type Cell } from '../../utils/xlsx'
 import { toFriendlyMessage } from '../../utils/errors'
 import { Button } from '../ui/Button'
@@ -20,7 +19,7 @@ const RSVP_LABEL: Record<string, string> = { attending: 'Attending', declining: 
 
 /**
  * "Export to Excel": every guest (invitees, included guests and approved
- * extras) with their table and chair — and, if wanted, their entourage role.
+ * extras) with their table and chair — and, if wanted, their position.
  * Two sheets: alphabetical, and grouped by table.
  */
 export function GuestExport({ className }: { className?: string }) {
@@ -36,10 +35,11 @@ export function GuestExport({ className }: { className?: string }) {
     if (!data) return
     setBusy(true)
     try {
-      const [seats, tables, links] = await Promise.all([listSeats(), listTables(), roles ? listEntourageLinks() : Promise.resolve([])])
+      const [seats, tables] = await Promise.all([listSeats(), listTables()])
       const tableById = new Map(tables.map((t) => [t.id, t]))
       const seatOf = new Map(seats.map((s) => [`${s.invitationId}:${s.guestId ?? ''}`, s]))
-      const auto = roles ? entouragePositions(settings?.entourage ?? [], links) : new Map<string, string>()
+      // Positions are typed per invitation (e.g. “Ninang”).
+      const auto = new Map<string, string>()
       const tableOrder = new Map(tables.map((t, i) => [t.id, t.sortOrder * 1000 + i]))
 
       type Row = { name: string; party: string; side: string; rsvp: string; tableId: string | null; table: string; seat: number | null; role: string }
@@ -56,7 +56,7 @@ export function GuestExport({ className }: { className?: string }) {
           rows.push({
             name: p.name,
             party: p.isInvitee ? '' : p.partyName,
-            side: p.side === 'bride' ? 'Bride' : 'Groom',
+            side: p.side === 'bride' ? 'Mom' : 'Dad',
             rsvp: RSVP_LABEL[inv.status] ?? inv.status,
             tableId,
             table: tableId ? (tableById.get(tableId)?.name ?? '') : '',
@@ -70,7 +70,7 @@ export function GuestExport({ className }: { className?: string }) {
         return
       }
 
-      const header = ['Name', 'Invited with', 'Side', 'RSVP', 'Table', 'Seat', ...(roles ? ['Entourage role'] : [])]
+      const header = ['Name', 'Invited with', 'Side', 'RSVP', 'Table', 'Seat', ...(roles ? ['Position'] : [])]
       const line = (r: Row): Cell[] => [r.name, r.party, r.side, r.rsvp, r.table, r.seat, ...(roles ? [r.role] : [])]
       const byName = [...rows].sort((a, b) => a.name.localeCompare(b.name))
       const byTable = [...rows].sort((a, b) => {
@@ -78,10 +78,10 @@ export function GuestExport({ className }: { className?: string }) {
         const tb = b.tableId ? (tableOrder.get(b.tableId) ?? 1e9) : 2e9
         return ta - tb || a.table.localeCompare(b.table) || (a.seat ?? 999) - (b.seat ?? 999) || a.name.localeCompare(b.name)
       })
-      const tableHeader = ['Table', 'Seat', 'Name', 'Invited with', 'Side', 'RSVP', ...(roles ? ['Entourage role'] : [])]
+      const tableHeader = ['Table', 'Seat', 'Name', 'Invited with', 'Side', 'RSVP', ...(roles ? ['Position'] : [])]
       const tableLine = (r: Row): Cell[] => [r.table || 'Not seated', r.seat, r.name, r.party, r.side, r.rsvp, ...(roles ? [r.role] : [])]
 
-      const couple = (settings?.coupleNames ?? 'Wedding').replace(/&/g, 'and').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')
+      const couple = (settings?.babyName ?? 'Baby-Shower').replace(/&/g, 'and').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')
       const today = new Date().toISOString().slice(0, 10)
       downloadXlsx(`${couple}-guest-list-${today}.xlsx`, [
         { name: 'Guest list', header, rows: byName.map(line) },
@@ -147,8 +147,8 @@ export function GuestExport({ className }: { className?: string }) {
         <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-line p-3 text-sm">
           <input type="checkbox" className="mt-0.5 size-4 accent-ink" checked={roles} onChange={(e) => setRoles(e.target.checked)} />
           <span>
-            <span className="font-medium text-ink">Include entourage roles</span>
-            <span className="mt-0.5 block text-muted">E.g. Principal Sponsor, Maid of Honor — from the Entourage, or typed on the invitation.</span>
+            <span className="font-medium text-ink">Include positions</span>
+            <span className="mt-0.5 block text-muted">E.g. Ninang or Lola — as typed on the invitation.</span>
           </span>
         </label>
         <p className="mt-4 text-xs text-muted">The file contains guests’ names — keep it private and share it only with your coordinator or venue.</p>

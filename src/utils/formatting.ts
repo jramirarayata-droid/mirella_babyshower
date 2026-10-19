@@ -115,7 +115,18 @@ export function daysUntil(isoDate: string): number | null {
   return Math.round((d.getTime() - today.getTime()) / 86_400_000)
 }
 
-/** "Mir & Ella" → "M & E". Returns '' when the names can't be split. */
+/**
+ * The baby's monogram: the initials of the name without a leading "Baby"
+ * ("Baby Santos" → "S", "Liam Santos" → "LS"; "Baby" alone → "B").
+ */
+export function babyMonogram(babyName: string): string {
+  const words = babyName.trim().split(/\s+/).filter(Boolean)
+  const rest = words.length > 1 && /^baby$/i.test(words[0]) ? words.slice(1) : words
+  const letters = rest.slice(0, 2).map((w) => w[0]!.toUpperCase()).join('')
+  return letters || 'B'
+}
+
+/** "Juan & Maria" → "J & M". Returns '' when the names can't be split. */
 export function monogram(names: string, separator = ' & '): string {
   const parts = names.split(/\s*&\s*|\s+and\s+/i).map((p) => p.trim()).filter(Boolean)
   if (parts.length === 2) return `${parts[0][0]}${separator}${parts[1][0]}`
@@ -157,4 +168,13 @@ export function toManilaParts(iso: string): { date: string; time: string } {
 /** Manila date + time → ISO instant (Philippines has no daylight saving: always +08:00). */
 export function fromManilaParts(date: string, time: string): string {
   return new Date(`${date}T${time || '23:59'}:00+08:00`).toISOString()
+}
+
+/** "Arriving: April 2027" (or the own wording), '' when there's no due date or it's hidden. */
+export function arrivalText(s: { dueDate: string | null; dueText: string; dueVisible: boolean }): string {
+  if (!s.dueVisible) return ''
+  if (s.dueText.trim()) return s.dueText.trim()
+  const d = s.dueDate ? parseISODate(s.dueDate) : null
+  if (!d) return ''
+  return `Arriving ${d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
 }

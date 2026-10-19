@@ -14,7 +14,7 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg'
   /** Prevent closing (e.g. while saving). */
   locked?: boolean
-  tone?: 'wedding' | 'admin'
+  tone?: 'guest' | 'admin'
 }
 
 const FOCUSABLE = 'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])'
@@ -100,9 +100,9 @@ export function Modal({ open, onClose, title, description, children, footer, siz
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className={cn('flex items-start justify-between gap-4 border-b border-line/70 px-5 pb-4 pt-5 sm:px-7', tone === 'wedding' && 'text-center')}>
-              <div className={cn('min-w-0 flex-1', tone === 'wedding' && 'pl-8')}>
-                <h2 id={titleId} className={cn('font-serif text-ink', tone === 'wedding' ? 'text-3xl' : 'text-2xl')}>
+            <div className={cn('flex items-start justify-between gap-4 border-b border-line/70 px-5 pb-4 pt-5 sm:px-7', tone === 'guest' && 'text-center')}>
+              <div className={cn('min-w-0 flex-1', tone === 'guest' && 'pl-8')}>
+                <h2 id={titleId} className={cn('font-serif text-ink', tone === 'guest' ? 'text-3xl' : 'text-2xl')}>
                   {title}
                 </h2>
                 {description && (

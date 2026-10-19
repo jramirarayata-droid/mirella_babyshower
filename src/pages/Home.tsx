@@ -17,7 +17,6 @@ import { PrivateDetails } from '../components/wedding/PrivateDetails'
 import { useDisplayPrefs } from '../hooks/useDisplayPrefs'
 import { OutfitGallery } from '../components/wedding/OutfitGallery'
 import { MotifSection } from '../components/wedding/MotifSwatches'
-import { Entourage } from '../components/wedding/Entourage'
 import { GiftCard } from '../components/wedding/GiftCard'
 import { Reveal } from '../components/wedding/Reveal'
 import { RSVPCallout } from '../components/wedding/RSVPCallout'
@@ -40,7 +39,7 @@ export default function Home() {
   const [gift, setGift] = useState<PublicGift | null>(null)
 
   useEffect(() => {
-    if (settings) document.title = `${settings.coupleNames} · ${formatWeddingDate(settings.weddingDate)}`
+    if (settings) document.title = `${settings.babyName} · Baby Shower · ${formatWeddingDate(settings.weddingDate)}`
   }, [settings])
 
   useEffect(() => {
@@ -88,7 +87,7 @@ export default function Home() {
         ))}
         <GuestPhotosTeaser />
         {(() => {
-          // Details the couple shares only with confirmed guests (Website Settings → Privacy).
+          // Details shared only with confirmed guests (Website Settings → Privacy).
           // While the choice is loading, nothing is shown, so private details never flash up.
           if (!display) return null
           const { hideVenues, hideInfo } = display.website
@@ -113,9 +112,6 @@ export default function Home() {
         ) : (
           <MotifSection title={settings.motifTitle} colors={settings.motifColors} />
         )}
-        {settings.entourageVisible && (
-          <Entourage title={settings.entourageTitle} subtitle={settings.entourageSubtitle} groups={settings.entourage} />
-        )}
         {gift && (
           <section aria-label={gift.title} className="px-5 pt-8 sm:px-8">
             <Reveal>
@@ -132,7 +128,7 @@ export default function Home() {
           buttonLabel={settings.rsvpButtonLabel}
         />
       </main>
-      <Footer coupleNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />
+      <Footer coupleNames={settings.babyName} hostNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />
     </>
   )
 }

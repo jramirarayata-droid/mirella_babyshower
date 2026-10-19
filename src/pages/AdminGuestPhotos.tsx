@@ -36,7 +36,7 @@ export default function AdminGuestPhotos() {
   const toast = useToast()
   const [cfg, setCfg] = useState<GuestPhotoSettings | null>(null)
   const { settings: wedding } = useWeddingSettings()
-  const couple = wedding?.coupleNames?.trim() || 'Our Wedding'
+  const couple = wedding?.babyName?.trim() || 'Baby Shower'
   const [save, setSave] = useState<Save>('idle')
   const [photos, setPhotos] = useState<AdminGuestPhoto[] | null>(null)
   const [filter, setFilter] = useState<Filter>('all')
@@ -50,7 +50,7 @@ export default function AdminGuestPhotos() {
   const load = useCallback(() => adminListGuestPhotos().then(setPhotos), [])
 
   useEffect(() => {
-    document.title = 'Guest Photos · Wedding admin'
+    document.title = 'Guest Photos · Baby shower admin'
     getGuestPhotoSettings()
       .then((c) => {
         latest.current = c
@@ -144,7 +144,7 @@ export default function AdminGuestPhotos() {
           const who = p.uploaderName.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '') || 'guest'
           files.push({ name: `${String(part * ZIP_PART + i + 1).padStart(4, '0')}-${who}.jpg`, data: new Uint8Array(await res.arrayBuffer()) })
         }
-        files.push({ name: 'README.txt', data: enc.encode(`Guest photos from the wedding website.\nPart ${part + 1} of ${parts}, downloaded ${new Date().toLocaleString()}.\n`) })
+        files.push({ name: 'README.txt', data: enc.encode(`Guest photos from the baby shower website.\nPart ${part + 1} of ${parts}, downloaded ${new Date().toLocaleString()}.\n`) })
         const zip = new Blob([makeZip(files)], { type: 'application/zip' })
         downloadBlob(zip, `guest-photos${parts > 1 ? `-part-${part + 1}-of-${parts}` : ''}.zip`)
       }

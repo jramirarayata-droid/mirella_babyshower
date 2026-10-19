@@ -12,15 +12,16 @@ interface Props {
   status: AttendanceStatus
   guestName: string
   tableNumber: string | null
-  /** Chair (0-based) when the couple pre-assigned the seat — shows the chair and a map link. */
+  /** Chair (0-based) when a seat was pre-assigned — shows the chair and a map link. */
   seatIndex?: number | null
   /** Find My Seat is open to guests. */
   showMap?: boolean
+  /** Shown at the bottom (the baby's name). */
   coupleNames: string
   weddingDate: string
   requestedGuests: number
-  /** Ceremony and reception, shown to guests who are attending. */
-  venues?: Pick<WeddingSettings, 'weddingDate' | 'coupleNames' | 'churchName' | 'ceremonyTime' | 'churchMapUrl' | 'receptionName' | 'receptionTime' | 'receptionMapUrl'>
+  /** The venue, shown to guests who are attending. */
+  venues?: Pick<WeddingSettings, 'weddingDate' | 'coupleNames' | 'babyName' | 'churchName' | 'ceremonyTime' | 'churchMapUrl'>
 }
 
 export function SuccessState({ status, guestName, tableNumber, seatIndex = null, showMap = false, coupleNames, weddingDate, requestedGuests, venues }: Props) {
@@ -66,18 +67,18 @@ export function SuccessState({ status, guestName, tableNumber, seatIndex = null,
 
         {attending ? (
           <motion.h1 {...item(0.5)} className="mt-5 text-[2.2rem] leading-tight text-ink sm:text-[2.6rem]">
-            We&apos;re so happy you&apos;ll be celebrating with us! <span aria-hidden="true">❤️</span>
+            We&apos;re so happy you&apos;ll be celebrating with us and our little one! <span aria-hidden="true">🤍</span>
           </motion.h1>
         ) : (
           <motion.div {...item(0.5)}>
             <h1 className="mt-5 text-[2.2rem] leading-tight text-ink sm:text-[2.6rem]">Thank you for letting us know.</h1>
             <p className="mt-4 font-serif text-xl italic text-ink-soft">
-              Your warm wishes mean so much to us. <span aria-hidden="true">❤️</span>
+              Your warm wishes for our little one mean so much to us. <span aria-hidden="true">🤍</span>
             </p>
           </motion.div>
         )}
 
-        {attending && (
+        {attending && tableNumber && (
           <motion.div
             {...item(0.65)}
             className="mx-auto mt-8 max-w-xs rounded-xl border border-champagne/60 bg-champagne-light/30 px-6 py-5 shadow-soft"
@@ -100,7 +101,7 @@ export function SuccessState({ status, guestName, tableNumber, seatIndex = null,
                 )}
               </>
             ) : (
-              <p className="mt-2 text-xs text-muted">Please take note of this for the reception.</p>
+              <p className="mt-2 text-xs text-muted">Please take note of this for the shower.</p>
             )}
           </motion.div>
         )}
@@ -128,7 +129,7 @@ export function SuccessState({ status, guestName, tableNumber, seatIndex = null,
 
       <motion.div {...item(1.1)} className="mt-8">
         <Link to="/" className="rounded px-3 py-2 text-sm uppercase tracking-[0.2em] text-muted underline-offset-4 hover:text-ink hover:underline">
-          Back to our wedding website
+          Back to the baby shower website
         </Link>
       </motion.div>
     </section>

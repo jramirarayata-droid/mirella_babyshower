@@ -3,7 +3,10 @@ import { includedGuests, requestedGuests } from './guests'
 
 export type SideFilter = 'all' | GuestSide
 
-export const SIDE_LABEL: Record<GuestSide, string> = { groom: 'Groom’s side', bride: 'Bride’s side' }
+/** Which family a guest is from (stored as 'groom' / 'bride' internally). */
+export const SIDE_LABEL: Record<GuestSide, string> = { groom: 'Dad’s side', bride: 'Mom’s side' }
+/** Short form for badges. */
+export const SIDE_SHORT: Record<GuestSide, string> = { groom: 'Dad', bride: 'Mom' }
 
 export const bySide = <T extends { side: GuestSide }>(list: T[], side: SideFilter): T[] => (side === 'all' ? list : list.filter((i) => i.side === side))
 

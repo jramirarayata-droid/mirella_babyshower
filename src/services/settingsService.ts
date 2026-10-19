@@ -141,8 +141,12 @@ function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
   return {
     id: row.id,
     coupleNames: row.couple_names ?? '',
+    babyName: row.baby_name?.trim() || 'Baby',
     weddingDate: row.wedding_date ?? '',
-    heroTitle: row.hero_title ?? row.couple_names ?? '',
+    dueDate: row.due_date ?? null,
+    dueText: row.due_text ?? '',
+    dueVisible: row.due_visible !== false,
+    heroTitle: row.hero_title ?? row.baby_name ?? '',
     heroSubtitle: row.hero_subtitle ?? '',
     heroImageUrl: row.hero_image_url ?? '',
     churchName: row.church_name ?? '',
@@ -154,7 +158,7 @@ function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
     storyText: row.story_text ?? '',
     closingMessage: row.closing_message ?? '',
     sections: parseSections(row.additional_info),
-    outfitTitle: row.outfit_title ?? 'Attire Inspiration',
+    outfitTitle: row.outfit_title ?? 'What to Wear',
     outfitSubtitle: row.outfit_subtitle ?? '',
     outfitSectionVisible: row.outfit_section_visible !== false,
     outfitLayout: (row as { outfit_layout?: string | null }).outfit_layout === 'pairs' ? 'pairs' : 'tabs',
@@ -164,18 +168,18 @@ function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
     rsvpShowDeadline: row.rsvp_show_deadline ?? true,
     rsvpButtonLabel: row.rsvp_button_label?.trim() || 'RSVP',
     entourage: parseEntourage(row.entourage),
-    entourageVisible: row.entourage_visible !== false,
+    entourageVisible: false,
     entourageTitle: row.entourage_title ?? 'The Entourage',
     entourageSubtitle: row.entourage_subtitle ?? '',
     motifTitle: row.motif_title ?? 'Our Motif',
     motifColors: parseMotif(row.motif_colors),
     galleryVisible: row.gallery_visible !== false,
     mediaOrder: Array.isArray((row as { media_order?: unknown }).media_order) ? ((row as { media_order: unknown[] }).media_order.filter((x) => typeof x === 'string') as string[]) : [],
-    galleryTitle: row.gallery_title ?? 'Our Story in Frames',
+    galleryTitle: row.gallery_title ?? 'Waiting for You, Little One',
     gallerySubtitle: row.gallery_subtitle ?? '',
     galleryLayout: GALLERY_LAYOUTS.find((g) => g.id === row.gallery_layout)?.id ?? 'grid',
     videoVisible: row.video_visible !== false,
-    videoTitle: row.video_title ?? 'Our Prenup Film',
+    videoTitle: row.video_title ?? 'Our Baby Journey',
     videoCaption: row.video_caption ?? '',
     videoUrl: row.video_url ?? '',
     videoPosterUrl: row.video_poster_url ?? '',
@@ -195,11 +199,11 @@ function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
 
 const emptyToNull = (v: string) => (v.trim() ? v.trim() : null)
 
-/** Public: loads the single wedding_settings row that drives the website. */
+/** Public: loads the single settings row (wedding_settings) that drives the website. */
 export async function getWeddingSettings(): Promise<WeddingSettings> {
   const { data, error } = await supabase.from('wedding_settings').select('*').limit(1).maybeSingle()
   if (error || !data) {
-    logError('getWeddingSettings', error ?? 'No wedding_settings row found. Did you run supabase/schema.sql?')
+    logError('getWeddingSettings', error ?? 'No settings row found. Did you run supabase/schema.sql?')
     throw new FriendlyError()
   }
   return fromRow(data as Tables<'wedding_settings'>)
@@ -218,7 +222,11 @@ export async function updateWeddingSettings(id: string, input: WeddingSettingsIn
     .from('wedding_settings')
     .update({
       couple_names: input.coupleNames.trim(),
+      baby_name: input.babyName.trim().slice(0, 60) || 'Baby',
       wedding_date: input.weddingDate,
+      due_date: input.dueDate || null,
+      due_text: emptyToNull(input.dueText.slice(0, 80)),
+      due_visible: input.dueVisible,
       hero_title: emptyToNull(input.heroTitle),
       hero_subtitle: emptyToNull(input.heroSubtitle),
       hero_image_url: emptyToNull(input.heroImageUrl),
@@ -364,7 +372,7 @@ export function orderMedia<T extends { key: string }>(items: T[], order: string[
     .map((x) => x.it)
 }
 
-/** Admin: couple photo gallery section. */
+/** Admin: bump photo gallery section. */
 export function updateGallerySettings(id: string, input: GallerySettings): Promise<WeddingSettings> {
   return updatePartial(
     id,
@@ -379,7 +387,7 @@ export function updateGallerySettings(id: string, input: GallerySettings): Promi
   )
 }
 
-/** Admin: prenup video section. */
+/** Admin: the main video section. */
 export function updateVideoSettings(id: string, input: VideoSettings): Promise<WeddingSettings> {
   return updatePartial(
     id,

@@ -109,7 +109,7 @@ function Show({ source }: { source: Source }) {
   const [musicLive, setMusicLive] = useState(false)
 
   useEffect(() => {
-    document.title = settings ? `Presenting · ${settings.coupleNames}` : 'Presenting'
+    document.title = settings ? `Presenting · ${settings.babyName}` : 'Presenting'
   }, [settings])
 
   // ---------------------------------------------------------------- what to show
@@ -175,7 +175,7 @@ function Show({ source }: { source: Source }) {
   useEffect(() => {
     if (source !== 'ours' || !settings) return
     let alive = true
-    setTitle(settings.galleryTitle || 'Our story')
+    setTitle(settings.galleryTitle || 'Waiting for you')
     ourSlides(settings)
       .then((s) => alive && setSlides(s))
       .catch(() => alive && setSlides([]))
@@ -388,7 +388,7 @@ function Show({ source }: { source: Source }) {
     return ['30% 35%', '70% 30%', '50% 60%', '35% 65%', '65% 60%', '50% 40%'][seed % 6]
   }, [curId])
 
-  const coupleNames = settings?.coupleNames ?? ''
+  const coupleNames = settings?.babyName ?? ''
   const films = slides?.filter((s) => s.kind !== 'photo').length ?? 0
   const photos = count - films
   const summary = [photos ? `${photos} ${photos === 1 ? 'photo' : 'photos'}` : '', films ? `${films} ${films === 1 ? 'film' : 'films'}` : ''].filter(Boolean).join(' · ')
@@ -488,7 +488,7 @@ function Show({ source }: { source: Source }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, duration: 1.4, ease: EASE }}
               >
-                {source === 'guests' ? title || 'Shared by our guests' : title || 'Our story'}
+                {source === 'guests' ? title || 'Shared by our guests' : title || 'Waiting for you'}
               </motion.h1>
               {phase === 'ready' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2, duration: 1 }}>

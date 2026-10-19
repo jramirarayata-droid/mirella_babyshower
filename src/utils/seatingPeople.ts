@@ -8,7 +8,7 @@ export interface SeatPerson {
   /** The invitee's name, for "party of …" grouping. */
   partyName: string
   isInvitee: boolean
-  /** Groom's or bride's side (from the invitation). */
+  /** Dad's or Mom's side (from the invitation; stored as 'groom' / 'bride'). */
   side: GuestSide
   /** Hasn't RSVP'd yet (only listed when seats can be pre-assigned). */
   pending?: boolean

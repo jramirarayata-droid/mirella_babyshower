@@ -112,7 +112,7 @@ export function SeatingImageExport({ config, tables, items, counts, chair, statu
       spaced(ctx, 'SEATING PLAN', PAD, PAD + 18, 4)
       ctx.fillStyle = theme.ink
       ctx.font = `300 56px ${theme.serif}`
-      ctx.fillText(settings?.coupleNames ?? 'Our wedding', PAD - 2, PAD + 78, cw * 0.62)
+      ctx.fillText(settings?.babyName ?? 'Baby Shower', PAD - 2, PAD + 78, cw * 0.62)
       if (settings?.weddingDate) {
         ctx.fillStyle = theme.muted
         ctx.font = `400 18px ${theme.sans}`
@@ -162,7 +162,7 @@ export function SeatingImageExport({ config, tables, items, counts, chair, statu
         }
       }
 
-      const couple = (settings?.coupleNames ?? 'Wedding').replace(/&/g, 'and').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')
+      const couple = (settings?.babyName ?? 'Baby-Shower').replace(/&/g, 'and').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')
       const base = `${couple}-seating-plan${names === 'none' ? '' : '-with-names'}-${new Date().toISOString().slice(0, 10)}`
       if (format === 'pdf') {
         const jpeg = await canvasToBlob(canvas, 'image/jpeg', 0.93)

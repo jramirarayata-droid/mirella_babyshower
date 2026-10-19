@@ -36,7 +36,7 @@ export default function AdminGuests() {
   const [savingId, setSavingId] = useState<string | null>(null)
 
   useEffect(() => {
-    document.title = 'Extra guests · Wedding admin'
+    document.title = 'Extra guests · Baby shower admin'
   }, [])
 
   const list = useMemo(() => data?.guests ?? [], [data])
@@ -127,7 +127,7 @@ export default function AdminGuests() {
             className="input-base min-h-11 py-2.5 sm:w-auto"
           >
             <option value="all">Added by anyone</option>
-            <option value="admin">Included by couple</option>
+            <option value="admin">Included by hosts</option>
             <option value="invitee">Guest requests</option>
           </select>
           <SearchInput label="Search guests" placeholder="Search guest or invitee…" value={query} onChange={setQuery} />

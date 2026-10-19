@@ -27,19 +27,37 @@ export interface InfoSection {
   visible: boolean
 }
 
+/**
+ * The site settings (internal name kept from the framework). For the baby
+ * shower: coupleNames = the parents' names, weddingDate = the shower date,
+ * churchName / churchMapUrl / ceremonyTime = the one venue.
+ */
 export interface WeddingSettings {
   id: string
+  /** The parents' names, e.g. "Juan & Maria Santos". */
   coupleNames: string
-  weddingDate: string // ISO date, YYYY-MM-DD
+  /** The baby's name or nickname, e.g. "Baby Santos". */
+  babyName: string
+  /** The shower date (ISO, YYYY-MM-DD). */
+  weddingDate: string
+  /** Optional due date (ISO); shown as the month unless dueText is set. */
+  dueDate: string | null
+  /** Own wording for the due date, e.g. "Arriving: February 2027" ('' = from dueDate). */
+  dueText: string
+  dueVisible: boolean
   heroTitle: string
   heroSubtitle: string
   heroImageUrl: string
+  /** The venue. */
   churchName: string
-  /** Optional, e.g. "3:00 PM" */
+  /** Optional start time, e.g. "2:00 PM". */
   ceremonyTime: string
+  /** Not used by the baby shower (one venue). */
   receptionTime: string
   churchMapUrl: string
+  /** Not used by the baby shower (one venue). */
   receptionName: string
+  /** Not used by the baby shower (one venue). */
   receptionMapUrl: string
   storyText: string
   closingMessage: string

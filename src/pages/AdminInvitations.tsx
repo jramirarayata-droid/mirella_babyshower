@@ -16,8 +16,6 @@ import { ResponsiveTable, type Column } from '../components/ui/ResponsiveTable'
 import { TableSkeleton } from '../components/ui/Skeleton'
 import type { SeatingTable } from '../types/seating'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
-import { useEntourageLinks } from '../hooks/useEntourageLinks'
-import { entouragePositions } from '../utils/positions'
 import { InvitationFormModal, type RecordChoice } from '../components/admin/InvitationFormModal'
 import { ResponseDetailModal } from '../components/admin/ResponseDetailModal'
 import { IncludeInvitationModal } from '../components/admin/IncludeInvitationModal'
@@ -72,15 +70,15 @@ export default function AdminInvitations() {
   const [separating, setSeparating] = useState(false)
   const [newTables, setNewTables] = useState<SeatingTable[]>([])
   const { settings } = useWeddingSettings()
-  const { links } = useEntourageLinks()
-  const autoPositions = useMemo(() => entouragePositions(settings?.entourage ?? [], links), [settings, links])
+  // Positions are typed per invitation (there is no entourage).
+  const autoPositions = useMemo(() => new Map<string, string>(), [])
   const tables = useMemo(() => {
     const base = data?.tables ?? []
     return [...base, ...newTables.filter((t) => !base.some((b) => b.id === t.id))]
   }, [data, newTables])
 
   useEffect(() => {
-    document.title = 'Invitations · Wedding admin'
+    document.title = 'Invitations · Baby shower admin'
   }, [])
 
   // Virtual invitations: who has opened theirs, and the message copied with each link.
@@ -156,7 +154,7 @@ export default function AdminInvitations() {
       const next = { ...webPrivacy, ...patch }
       await saveWebsitePrivacy(next)
       setWebPrivacy(next)
-      toast.success('Hidden on your wedding website. Confirmed guests still see them on their invitation.')
+      toast.success('Hidden on your baby shower website. Confirmed guests still see them on their invitation.')
     } catch (e) {
       toast.error(toFriendlyMessage(e))
     } finally {
@@ -333,7 +331,7 @@ export default function AdminInvitations() {
 
   const columns: Column<InvitationWithRSVP>[] = [
     { key: 'name', header: 'Invitee', cell: (r) => <span className="font-medium text-ink">{r.inviteeName}</span>, hideOnMobile: true },
-    { key: 'side', header: 'Side', cell: (r) => <Badge tone={r.side === 'bride' ? 'rose' : 'gold'}>{r.side === 'bride' ? 'Bride' : 'Groom'}</Badge>, className: 'whitespace-nowrap' },
+    { key: 'side', header: 'Side', cell: (r) => <Badge tone={r.side === 'bride' ? 'rose' : 'gold'}>{r.side === 'bride' ? 'Mom' : 'Dad'}</Badge>, className: 'whitespace-nowrap' },
     { key: 'table', header: 'Table', cell: (r) => r.tableNumber || '—' },
     {
       key: 'included',
@@ -404,8 +402,8 @@ export default function AdminInvitations() {
           onChange={setSide}
           options={[
             { value: 'all', label: 'All', count: data?.invitations.length },
-            { value: 'groom', label: 'Groom’s side', count: data ? bySide(data.invitations, 'groom').length : undefined },
-            { value: 'bride', label: 'Bride’s side', count: data ? bySide(data.invitations, 'bride').length : undefined },
+            { value: 'groom', label: 'Dad’s side', count: data ? bySide(data.invitations, 'groom').length : undefined },
+            { value: 'bride', label: 'Mom’s side', count: data ? bySide(data.invitations, 'bride').length : undefined },
           ]}
         />
         <SearchInput label="Search by invitee name" placeholder="Search by invitee name…" value={query} onChange={setQuery} />
@@ -441,7 +439,6 @@ export default function AdminInvitations() {
         tables={tables}
         invitations={data?.invitations ?? []}
         onTableCreated={(t) => setNewTables((l) => [...l, t])}
-        autoPosition={editing ? autoPositions.get(`${editing.id}:`) ?? '' : ''}
         onSeparate={(guest) => editing && (setFormOpen(false), setToSeparate({ invitation: editing, guestId: guest.id, name: guest.guestName, sameLink: Boolean(guest.mergedFrom?.invitationCode) }))}
       />
 
@@ -464,7 +461,7 @@ export default function AdminInvitations() {
           <>
             <p className="font-medium text-ink">{toSeparate?.name}</p>
             <p className="mt-2">
-              They leave {toSeparate?.invitation.inviteeName}’s invitation and get their own, keeping their chair and entourage place.{' '}
+              They leave {toSeparate?.invitation.inviteeName}’s invitation and get their own, keeping their chair.{' '}
               {toSeparate?.sameLink
                 ? 'Their old link and its details (position, allowed guests) come back.'
                 : 'They get a new link — copy it from their row afterwards.'}{' '}

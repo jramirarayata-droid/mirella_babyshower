@@ -141,7 +141,7 @@ export default function AdminSeating() {
   live.current = { tables: tables ?? [], items, config, seats }
 
   useEffect(() => {
-    document.title = 'Seating · Wedding admin'
+    document.title = 'Seating · Baby shower admin'
     Promise.all([getWeddingSettings(), listTables(), listItems(), listSeats(), listNotices()])
       .then(([s, t, it, se, n]) => {
         setSettingsId(s.id)
@@ -1300,8 +1300,8 @@ function UnseatedCard({
             {(
               [
                 { v: 'all', l: `All ${people.length}` },
-                { v: 'groom', l: `Groom ${count('groom')}` },
-                { v: 'bride', l: `Bride ${count('bride')}` },
+                { v: 'groom', l: `Dad ${count('groom')}` },
+                { v: 'bride', l: `Mom ${count('bride')}` },
               ] as const
             ).map((o) => (
               <button
@@ -1326,7 +1326,7 @@ function UnseatedCard({
                 <li key={`${p.invitationId}:${p.guestId ?? ''}`} className="rounded-md px-2 py-1.5 hover:bg-cream">
                   <span className="text-ink">{p.name}</span>
                   {!p.isInvitee && <span className="text-muted"> · with {p.partyName}</span>}
-                  <span className="text-muted"> · {p.side === 'bride' ? 'Bride' : 'Groom'}</span>
+                  <span className="text-muted"> · {p.side === 'bride' ? 'Mom' : 'Dad'}</span>
                   {plan && <span className="ml-1 rounded bg-champagne-light/50 px-1.5 py-0.5 text-[0.7rem] text-ink-soft">{plan}</span>}
                 </li>
               )
@@ -1407,7 +1407,7 @@ function SeatPicker({
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-ink">{p.name}</span>
                     <span className="block truncate text-xs text-muted">
-                      {p.side === 'bride' ? 'Bride’s side' : 'Groom’s side'} · {p.isInvitee ? 'Invitee' : `With ${p.partyName}`}
+                      {p.side === 'bride' ? 'Mom’s side' : 'Dad’s side'} · {p.isInvitee ? 'Invitee' : `With ${p.partyName}`}
                       {p.pending ? ' · no RSVP yet' : ''}
                       {seat ? ` · now at ${tableName(seat.tableId)}, chair ${seat.seatIndex + 1} (will move)` : ' · not seated'}
                     </span>

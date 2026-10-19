@@ -5,7 +5,7 @@ import { useWeddingSettings } from '../hooks/useWeddingSettings'
 import { getHostWheel, getPublicWheel, type HostWheelState } from '../services/raffleService'
 import { useHost } from '../hooks/hostContext'
 import { toFriendlyMessage } from '../utils/errors'
-import { monogram } from '../utils/formatting'
+import { babyMonogram } from '../utils/formatting'
 import { PublicHeader } from '../components/wedding/PublicHeader'
 import { Footer } from '../components/wedding/Footer'
 import { CoupleNames } from '../components/wedding/CoupleNames'
@@ -131,7 +131,7 @@ export default function Raffle() {
       <main className="flex flex-1 flex-col items-center px-5 pb-20 pt-10 text-center sm:px-8">
         {settings && (
           <p className="font-serif text-2xl font-light text-ink-soft">
-            <CoupleNames names={settings.coupleNames} />
+            <CoupleNames names={settings.babyName} />
           </p>
         )}
         <h1 className="mt-4 text-[2.5rem] leading-tight text-ink sm:text-5xl">{isHost ? 'Raffle & Bingo' : 'Raffle'}</h1>
@@ -157,21 +157,21 @@ export default function Raffle() {
               {state.status === 'error'
                 ? state.message
                 : state.hostHidden
-                  ? 'The raffle is hidden on the website right now. Once the couple sets it to Visible (Admin → Raffle), this page lets you run the prize wheel and Bingo.'
+                  ? 'The raffle is hidden on the website right now. Once it is set to Visible (Admin → Raffle), this page lets you run the prize wheel and Bingo.'
                   : 'The raffle isn’t open yet. Please check back closer to the celebration.'}
             </p>
             <Link to="/" className="mt-6 inline-block text-sm text-gold underline-offset-4 hover:underline">
-              Back to the wedding website
+              Back to the baby shower website
             </Link>
           </div>
         ) : (
           <>
             <p className="mt-6 max-w-md leading-relaxed text-ink-soft">
-              Our host will spin the wheel at the reception. {state.names.length} {state.names.length === 1 ? 'name is' : 'names are'} on it
-              {state.masked ? ' — partly hidden until the wedding day.' : '.'} There’s Bingo too — the numbers are called on the big screen.
+              Our host will spin the wheel at the shower. {state.names.length} {state.names.length === 1 ? 'name is' : 'names are'} on it
+              {state.masked ? ' — partly hidden until the day of the shower.' : '.'} There’s Bingo too — the numbers are called on the big screen.
             </p>
             <div className="mt-10 w-full max-w-md">
-              <RaffleWheel names={state.names} rotation={0} spinning={false} idle centre={settings ? monogram(settings.coupleNames, '&') : ''} />
+              <RaffleWheel names={state.names} rotation={0} spinning={false} idle centre={settings ? babyMonogram(settings.babyName) : ''} />
             </div>
             {state.hostCode && (
               <button type="button" onClick={host.askCode} className="mt-16 inline-flex items-center gap-1 text-[0.7rem] text-muted/70 underline-offset-4 transition hover:text-ink hover:underline">
@@ -181,7 +181,7 @@ export default function Raffle() {
           </>
         )}
       </main>
-      {settings && <Footer coupleNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />}
+      {settings && <Footer coupleNames={settings.babyName} hostNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />}
     </div>
   )
 }

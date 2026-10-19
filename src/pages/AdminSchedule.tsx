@@ -113,7 +113,7 @@ export default function AdminSchedule() {
               <input type="date" className="input-base" aria-label="Reveal date" value={draft.date} onChange={(e) => setDraft((d) => ({ ...d, date: e.target.value }))} />
               <input type="time" className="input-base" aria-label="Reveal time (Philippine time)" value={draft.time} onChange={(e) => setDraft((d) => ({ ...d, time: e.target.value }))} />
             </div>
-            <p className="text-xs text-muted">Philippine time.{settings && ` Your wedding is ${formatWeddingDate(settings.weddingDate)}.`}</p>
+            <p className="text-xs text-muted">Philippine time.{settings && ` Your shower is on ${formatWeddingDate(settings.weddingDate)}.`}</p>
             <div className="flex flex-wrap items-center gap-2">
               <SaveStatus dirty={dirty} saving={busy === 'reveal'} />
               <Button onClick={() => void saveReveal(draftIso)} disabled={!dirty || !draftIso} loading={busy === 'reveal'} loadingText="Saving…">
@@ -126,7 +126,7 @@ export default function AdminSchedule() {
               )}
               {settings && !draft.date && (
                 <Button variant="outline" onClick={() => setDraft({ date: settings.weddingDate, time: '17:00' })}>
-                  Use the wedding day
+                  Use the shower day
                 </Button>
               )}
             </div>
@@ -138,9 +138,9 @@ export default function AdminSchedule() {
               {settings && (
                 <Row
                   icon={Heart}
-                  title="Wedding website"
+                  title="Baby shower website"
                   status={{ on: true, text: 'Always showing' }}
-                  detail={`Wedding day: ${formatWeddingDate(settings.weddingDate)}. On the day, the top of the page shows Find my seat, Photos and the details.`}
+                  detail={`Shower day: ${formatWeddingDate(settings.weddingDate)}. The countdown on the home page counts down to it.`}
                   to="/admin/settings"
                 />
               )}

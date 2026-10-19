@@ -44,7 +44,7 @@ export default function AdminOutfits() {
   }, [])
 
   useEffect(() => {
-    document.title = 'Outfit gallery · Wedding admin'
+    document.title = 'What to Wear · Baby shower admin'
     void reload()
     getWeddingSettings()
       .then((s) => {
@@ -119,8 +119,8 @@ export default function AdminOutfits() {
   return (
     <>
       <PageHeader
-        title="Outfit Gallery"
-        description="Dress code motif and attire inspiration shown on the home page, below the wedding details."
+        title="What to Wear"
+        description="Optional. Motif colours (e.g. pastels, Team Pink / Team Blue) and outfit ideas shown on the home page, below the shower details. Without photos, only the motif colours show."
       />
 
       {section ? (
@@ -329,7 +329,7 @@ function OutfitRow({
           id={`label-${outfit.id}`}
           value={label}
           maxLength={60}
-          placeholder="Label, e.g. Principal Sponsors (optional)"
+          placeholder="Label, e.g. Team Pink (optional)"
           onChange={(e) => setLabel(e.target.value)}
           onBlur={() => label.trim() !== outfit.label && onLabel(label)}
           onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
@@ -518,7 +518,7 @@ function AddOutfitModal({
         {shown && <img src={shown} alt="Preview" className="mx-auto aspect-[3/4] w-40 rounded object-cover shadow-soft" />}
 
         <div>
-          <TextField label="Label (optional)" value={label} onChange={setLabel} maxLength={60} placeholder="e.g. Principal Sponsors" hint="Who this look is for — shown as a small tag above the caption." />
+          <TextField label="Label (optional)" value={label} onChange={setLabel} maxLength={60} placeholder="e.g. Team Pink" hint="Who this look is for — shown as a small tag above the caption." />
           <div className="mt-2">
             <LabelPicks value={label.trim()} onPick={setLabel} />
           </div>
@@ -537,7 +537,7 @@ function AddOutfitModal({
 }
 
 /** Quick picks for who an outfit is for. */
-const LABEL_PICKS = ['Principal Sponsors', 'Parents & Relatives', 'Entourage', 'Guests']
+const LABEL_PICKS = ['Team Pink', 'Team Blue', 'Parents-to-be', 'Family', 'Guests']
 
 function LabelPicks({ value, onPick }: { value: string; onPick: (v: string) => void }) {
   return (
@@ -606,7 +606,7 @@ function PairRow({ pair, busy, onLabel }: { pair: OutfitPair; busy: boolean; onL
           id={id}
           value={label}
           maxLength={60}
-          placeholder="e.g. Principal Sponsors (optional)"
+          placeholder="e.g. Team Blue (optional)"
           onChange={(e) => setLabel(e.target.value)}
           onBlur={() => (label.trim() !== pair.label || mixed) && onLabel(label)}
           onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}

@@ -54,7 +54,7 @@ export default function AdminLookFeel() {
   const [stamp] = useState(() => Date.now().toString(36))
 
   useEffect(() => {
-    document.title = 'Look & Feel · Wedding admin'
+    document.title = 'Look & Feel · Baby shower admin'
   }, [])
 
   // Load every template's fonts once so the gallery cards show real type.
@@ -114,7 +114,7 @@ export default function AdminLookFeel() {
   const currentStyle = findStyle(template.style)
   const tab = styleTab ?? currentStyle.id
   const bg = values.background ?? template.background
-  // Dark pages are only designed for in styles made for them (e.g. Maison Noir).
+  // Dark pages are only designed for in styles made for them (Twinkle Little Star).
   const bgTooDark = !currentStyle.allowsDark && !isLightEnough(bg)
 
   const pickTemplate = (t: Template) => setValues({ template: t.id })
@@ -176,7 +176,7 @@ export default function AdminLookFeel() {
             <p className="mt-1 text-sm text-muted">
               A <strong className="font-medium text-ink-soft">style</strong> is the whole design — section layouts, ornaments, textures and type. Each style has
               its own templates (colour and font presets). Picking a template resets fonts, colours and layout to that template. The newer looks
-              (Eucalyptus & Gold and beyond) change the website only — Printables keep their own designs.
+              (Over the Moon, Oh Baby! Balloons, Boho Rainbow, Sweet Greenery and Little Blossom) change the website only — Printables use Soft &amp; Sweet for them, or pick a print design there.
             </p>
             <div role="tablist" aria-label="Design style" className="mt-5 grid grid-cols-2 gap-1 rounded-lg bg-cream p-1 sm:grid-cols-5">
               {ALL_STYLES.map((st) => (
@@ -211,14 +211,16 @@ export default function AdminLookFeel() {
                     >
                       <div className="flex h-28 flex-col items-center justify-center px-3 text-center" style={{ background: r.palette.ivory, color: r.palette.ink }}>
                         <span className="text-[0.55rem] uppercase tracking-[0.3em]" style={{ color: r.palette.gold, fontFamily: `"${r.body.family}"` }}>
-                          Together with their families
+                          Join us for a baby shower
                         </span>
                         <span className="mt-1 text-[1.7rem] leading-none" style={{ fontFamily: `"${(r.script ?? r.heading).family}", serif` }}>
-                          Mir <em style={{ color: r.palette.champagne }}>&amp;</em> Ella
+                          Little One
                         </span>
                         <span className="mt-2 flex items-center gap-1.5" aria-hidden="true">
                           <span className="h-px w-6" style={{ background: r.palette.champagne }} />
-                          <span className="size-1 rotate-45 border" style={{ borderColor: r.palette.champagne }} />
+                          <svg viewBox="0 0 24 24" className="size-2.5" style={{ color: r.palette.champagne }}>
+                            <path d="M12 1.5c.5 5.6 2.3 8.6 10.5 10.5-8.2 1.9-10 4.9-10.5 10.5C11.5 16.9 9.7 13.9 1.5 12 9.7 10.1 11.5 7.1 12 1.5Z" fill="currentColor" />
+                          </svg>
                           <span className="h-px w-6" style={{ background: r.palette.champagne }} />
                         </span>
                       </div>
@@ -257,7 +259,7 @@ export default function AdminLookFeel() {
                 value={values.headingFont ?? template.headingFont}
                 options={HEADING_FONTS}
                 onChange={(v) => (v === template.headingFont ? clear('headingFont') : set('headingFont', v))}
-                sample="Mir & Ella"
+                sample="Baby Santos"
                 sampleClass="text-3xl"
               />
               <FontSelect
@@ -265,7 +267,7 @@ export default function AdminLookFeel() {
                 value={values.bodyFont ?? template.bodyFont}
                 options={BODY_FONTS}
                 onChange={(v) => (v === template.bodyFont ? clear('bodyFont') : set('bodyFont', v))}
-                sample="Will you be joining us?"
+                sample="Will you join us for the baby shower?"
                 sampleClass="text-base"
               />
             </div>
@@ -278,7 +280,7 @@ export default function AdminLookFeel() {
             {bgTooDark && (
               <p role="alert" className="mt-3 flex items-start gap-2 rounded-lg bg-rose/5 px-3 py-2 text-sm text-rose">
                 <TriangleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-                This background is too dark for the {currentStyle.name} style. Choose a lighter colour, or a style made for dark pages (Maison Noir or Gilded Deco).
+                This background is too dark for the {currentStyle.name} style. Choose a lighter colour, or the style made for dark pages (Twinkle Little Star).
               </p>
             )}
 

@@ -11,7 +11,7 @@ interface ConfirmDialogProps {
   loading?: boolean
   loadingText?: string
   destructive?: boolean
-  tone?: 'wedding' | 'admin'
+  tone?: 'guest' | 'admin'
   onConfirm: () => void
   onCancel: () => void
 }
@@ -55,7 +55,7 @@ export function ConfirmDialog({
         </>
       }
     >
-      <div className={tone === 'wedding' ? 'text-center text-ink-soft' : 'text-ink-soft'}>{message}</div>
+      <div className={tone === 'guest' ? 'text-center text-ink-soft' : 'text-ink-soft'}>{message}</div>
     </Modal>
   )
 }

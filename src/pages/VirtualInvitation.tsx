@@ -64,10 +64,10 @@ export default function VirtualInvitationPage() {
   }, [code])
 
   const inv = load.status === 'ready' ? load.inv : null
-  const coupleNames = settings?.coupleNames ?? ''
+  const coupleNames = settings?.babyName ?? ''
 
   useEffect(() => {
-    document.title = coupleNames ? `You’re invited · ${coupleNames}` : 'You’re invited'
+    document.title = coupleNames ? `You’re invited · ${coupleNames} · Baby Shower` : 'You’re invited'
   }, [coupleNames])
 
   const rsvpOpen = settings ? isRsvpOpen(settings) : false
@@ -154,7 +154,7 @@ export default function VirtualInvitationPage() {
         )}
       </main>
 
-      {stage === 'card' && settings && card.ready && <Footer coupleNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />}
+      {stage === 'card' && settings && card.ready && <Footer coupleNames={settings.babyName} hostNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />}
     </div>
   )
 }
@@ -211,10 +211,10 @@ function Actions({
       {replied === 'attending' && <EventDetails venues={settings} className="mb-5" />}
       {action}
       {message && <p className={`max-w-sm font-serif text-lg italic leading-relaxed text-ink-soft ${action ? 'mt-4' : ''}`}>{message}</p>}
-      <nav aria-label="More about the wedding" className="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-1">
+      <nav aria-label="More about the baby shower" className="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-1">
         <Link to="/" className={link}>
           <Globe aria-hidden="true" className="size-3.5" strokeWidth={1.6} />
-          Our wedding website
+          Our baby shower website
         </Link>
         {!hideLinks && (
         <a href={calendarUrl(settings)} target="_blank" rel="noopener noreferrer" className={link}>
@@ -225,13 +225,7 @@ function Actions({
         {!hideLinks && settings.churchMapUrl && (
           <a href={settings.churchMapUrl} target="_blank" rel="noopener noreferrer" className={link}>
             <MapPin aria-hidden="true" className="size-3.5" strokeWidth={1.6} />
-            Ceremony map
-          </a>
-        )}
-        {!hideLinks && settings.receptionMapUrl && (
-          <a href={settings.receptionMapUrl} target="_blank" rel="noopener noreferrer" className={link}>
-            <MapPin aria-hidden="true" className="size-3.5" strokeWidth={1.6} />
-            Reception map
+            Venue map
           </a>
         )}
       </nav>

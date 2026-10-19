@@ -2,7 +2,7 @@ export const FRIENDLY_ERRORS = {
   notFound: "We couldn't find an invitation with that name. Please check the spelling and try again.",
   generic: 'Something went wrong while processing your request. Please try again in a moment.',
   invalid: 'Some of your answers need another look. Please review the form and try again.',
-  unavailable: 'This invitation is no longer available. Please contact the couple for help.',
+  unavailable: 'This invitation is no longer available. Please contact the parents-to-be for help.',
 } as const
 
 /** Error whose message is always safe to show to a user. */

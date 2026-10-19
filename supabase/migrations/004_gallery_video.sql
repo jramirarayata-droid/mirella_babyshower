@@ -1,18 +1,18 @@
 -- =============================================================================
---  MIGRATION 004 — couple photo gallery + prenup video highlight
+--  MIGRATION 004 — bump photo gallery + baby video highlight
 --  Run AFTER 003. Safe to re-run. (Already applied to the live project.)
 -- =============================================================================
 
 alter table public.wedding_settings
   add column if not exists gallery_visible boolean not null default true,
-  add column if not exists gallery_title text default 'Our Story in Frames',
-  add column if not exists gallery_subtitle text default 'A few of our favourite moments together.',
+  add column if not exists gallery_title text default 'Waiting for You, Little One',
+  add column if not exists gallery_subtitle text default 'A few moments from our journey to meeting you.',
   add column if not exists gallery_layout text not null default 'grid',
   add column if not exists video_visible boolean not null default true,
-  add column if not exists video_title text default 'Our Prenup Film',
+  add column if not exists video_title text default 'Our Baby Journey',
   add column if not exists video_caption text,
-  add column if not exists video_url text default 'samples/video/prenup-sample.mp4',
-  add column if not exists video_poster_url text default 'samples/video/prenup-poster.jpg';
+  add column if not exists video_url text,
+  add column if not exists video_poster_url text;
 
 alter table public.wedding_settings drop constraint if exists wedding_settings_gallery_layout_valid;
 alter table public.wedding_settings add constraint wedding_settings_gallery_layout_valid check (gallery_layout in ('grid', 'carousel'));
@@ -86,23 +86,9 @@ create trigger gallery_images_activity_log after insert or delete on public.gall
 revoke execute on function public.enforce_gallery_limit() from public, anon, authenticated;
 revoke execute on function public.log_gallery_activity() from public, anon, authenticated;
 
--- Sample photos (free Unsplash images, linked — they use none of your storage).
-insert into public.gallery_images (image_url, caption, sort_order)
-select * from (values
-  ('https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1400&q=80', 'By the sea', 1),
-  ('https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=1600&q=80', 'Sunset promise', 2),
-  ('https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1600&q=80', 'Golden hour', 3),
-  ('https://images.unsplash.com/photo-1501901609772-df0848060b33?auto=format&fit=crop&w=1600&q=80', 'Laughing through it all', 4),
-  ('https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1600&q=80', 'The promise', 5),
-  ('https://images.unsplash.com/photo-1460978812857-470ed1c77af0?auto=format&fit=crop&w=1600&q=80', 'Forever begins', 6),
-  ('https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1600&q=80', 'Every step together', 7),
-  ('https://images.unsplash.com/photo-1550005809-91ad75fb315f?auto=format&fit=crop&w=1600&q=80', 'In bloom', 8),
-  ('https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1600&q=80', 'Hand in hand', 9),
-  ('https://images.unsplash.com/photo-1513279922550-250c2129b13a?auto=format&fit=crop&w=1600&q=80', 'Our first sunset', 10)
-) as v(image_url, caption, sort_order)
-where not exists (select 1 from public.gallery_images);
+-- (No sample photos: the bump gallery starts empty.)
 
--- Storage: allow MP4/WebM uploads up to 30 MB for the prenup video.
+-- Storage: allow MP4/WebM uploads up to 30 MB for the baby video.
 update storage.buckets
 set file_size_limit = 31457280,
     allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'video/mp4', 'video/webm']

@@ -118,7 +118,7 @@ export function MediaSectionsAdmin() {
             More sections
           </h2>
           <p className="mt-1 text-sm text-muted">
-            Extra photo galleries and videos — e.g. “The Proposal”, “Save the Date film”. They appear on the home page after your gallery and film, in this order.
+            Extra photo galleries and videos — e.g. “The Nursery”, “Gender Reveal film”. They appear on the home page after your gallery and film, in this order.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

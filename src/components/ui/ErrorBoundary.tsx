@@ -57,14 +57,13 @@ function GuestFallback({ onRetry }: { onRetry: () => void }) {
   const s = peekWeddingSettings()
   const venues = s
     ? [
-        { label: 'Ceremony', name: s.churchName, time: s.ceremonyTime, map: s.churchMapUrl },
-        { label: 'Reception', name: s.receptionName, time: s.receptionTime, map: s.receptionMapUrl },
+        { label: 'Venue', name: s.churchName, time: s.ceremonyTime, map: s.churchMapUrl },
       ].filter((v) => v.name)
     : []
   return (
     <main role="alert" data-page-error className="flex min-h-[100svh] items-center justify-center bg-ivory px-6 py-16 text-ink">
       <div className="w-full max-w-md text-center">
-        {s?.coupleNames && <p className="font-serif text-4xl italic text-ink">{s.coupleNames}</p>}
+        {s?.babyName && <p className="font-serif text-4xl italic text-ink">{s.babyName}</p>}
         {s?.weddingDate && <p className="mt-2 text-xs uppercase tracking-[0.3em] text-muted">{formatWeddingDate(s.weddingDate)}</p>}
         <p className="mt-8 font-serif text-2xl text-ink">Something went wrong on this page.</p>
         <p className="mt-2 text-sm text-ink-soft">It’s not you — please try again. Your details are safe.</p>

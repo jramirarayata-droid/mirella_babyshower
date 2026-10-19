@@ -217,7 +217,7 @@ export function validateInvitation(input: InvitationInput): InvitationErrors {
   const errors: InvitationErrors = {}
   const name = normalizeSpaces(input.inviteeName)
   if (!name) errors.inviteeName = 'Invitee name is required.'
-  if (input.side !== 'groom' && input.side !== 'bride') errors.side = 'Choose the Groom’s side or the Bride’s side.'
+  if (input.side !== 'groom' && input.side !== 'bride') errors.side = 'Choose Dad’s side or Mom’s side.'
   else if (name.length > LIMITS.inviteeName) errors.inviteeName = `Please keep the name under ${LIMITS.inviteeName} characters.`
   const max = input.maxAdditionalGuests
   if (!Number.isInteger(max) || max < 0 || max > LIMITS.maxAdditionalGuestsPerInvitation) {

@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   const [activity, setActivity] = useState<ActivityLog[] | null>(null)
 
   useEffect(() => {
-    document.title = 'Dashboard · Wedding admin'
+    document.title = 'Dashboard · Baby shower admin'
   }, [])
 
   useEffect(() => {
@@ -290,11 +290,11 @@ export default function AdminDashboard() {
 
           <section aria-labelledby="messages-heading">
             <h2 id="messages-heading" className="mb-3 font-sans text-sm font-semibold uppercase tracking-[0.14em] text-muted">
-              Messages from guests
+              Wishes for the baby
             </h2>
             <Panel>
               {messages.length === 0 ? (
-                <p className="px-5 py-8 text-center text-sm text-muted">No messages yet. They’ll appear here as guests RSVP.</p>
+                <p className="px-5 py-8 text-center text-sm text-muted">No wishes yet. They’ll appear here as guests RSVP.</p>
               ) : (
                 <ul className="grid gap-px bg-line/60 sm:grid-cols-2">
                   {messages.map((m) => (

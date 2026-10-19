@@ -1,6 +1,6 @@
 /*
- * Suggestions for how an invitation is addressed ("Mr. & Mrs. Juan dela Cruz").
- * Only suggestions: nothing is filled in until the couple picks or types one.
+ * Suggestions for how an invitation is addressed ("Tita Ana", "The dela Cruz
+ * Family"). Only suggestions: nothing is filled in until one is picked or typed.
  */
 
 /** Words that belong to the surname in front of it: "dela Cruz", "de los Santos", "San Juan". */
@@ -41,32 +41,33 @@ export function addressSuggestions(invitee: string, included: string[]): string[
   if (others.length === 1) {
     const b = others[0]
     const sameSurname = a.last && b.last && same(a.last, b.last)
-    add(`Mr. & Mrs. ${withSuffix(a)}`)
     if (sameSurname) {
       add(`${a.first} & ${b.first} ${a.last}`)
-      add(`Mr. & Mrs. ${withSuffix(b)}`)
+      add(`The ${a.last} Family`)
     } else {
       add(`${withSuffix(a)} & ${withSuffix(b)}`)
     }
     add(`${a.first} & ${b.first}`)
+    add(`Tito ${a.first} & Tita ${b.first}`)
   } else if (others.length > 1) {
     if (a.last) add(`The ${a.last} Family`)
-    add(`Mr. & Mrs. ${withSuffix(a)} & Family`)
+    add(`${a.first} & Family`)
     add(`${withSuffix(a)} & Family`)
   } else {
-    add(`Mr. ${withSuffix(a)}`)
-    add(`Ms. ${withSuffix(a)}`)
-    add(`Mrs. ${withSuffix(a)}`)
+    add(`Tita ${a.first}`)
+    add(`Tito ${a.first}`)
+    add(`Ninang ${a.first}`)
+    add(`Ninong ${a.first}`)
   }
   return out
 }
 
 /** Titles that can be put in front of whatever is typed. */
-export const ADDRESS_TITLES = ['Mr. & Mrs.', 'Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Dr. & Mrs.', 'Engr. & Mrs.', 'Atty. & Mrs.', 'Hon. & Mrs.', 'Rev.'] as const
+export const ADDRESS_TITLES = ['Tita', 'Tito', 'Ninang', 'Ninong', 'Lola', 'Lolo', 'Ate', 'Kuya', 'Dr.', 'Ms.', 'Mr.'] as const
 
-const LEADING_TITLE = /^((mr|mrs|ms|miss|dr|engr|atty|hon|rev|arch|capt|col|gen|prof|sen|gov|mayor)\.?(\s*&\s*(mr|mrs|ms|dr)\.?)?)\s+/i
+const LEADING_TITLE = /^((tita|tito|ninang|ninong|lola|lolo|ate|kuya|mr|mrs|ms|miss|dr|engr|atty|hon|rev|arch|capt|col|gen|prof|sen|gov|mayor)\.?(\s*&\s*(mr|mrs|ms|dr|tita|tito)\.?)?)\s+/i
 
-/** Puts a title in front, replacing one that's already there: ("Mr. Juan", "Dr. & Mrs.") → "Dr. & Mrs. Juan". */
+/** Puts a title in front, replacing one that's already there: ("Tito Juan", "Ninong") → "Ninong Juan". */
 export function withTitle(text: string, title: string): string {
   const rest = text.replace(/\s+/g, ' ').trim().replace(LEADING_TITLE, '')
   return `${title} ${rest}`.trim()

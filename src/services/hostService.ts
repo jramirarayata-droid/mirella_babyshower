@@ -62,7 +62,7 @@ export async function hostLogin(pin: string): Promise<HostLogin> {
 
 export function hostLoginMessage(r: Extract<HostLogin, { ok: false }>): string {
   if (r.reason === 'locked') return `Too many tries. Please wait about ${r.minutes ?? 15} minutes.`
-  if (r.reason === 'off') return 'Host mode is turned off. The couple can set a host code in Admin → Raffle.'
+  if (r.reason === 'off') return 'Host mode is turned off. A host code can be set in Admin → Raffle.'
   if (r.reason === 'hidden') return 'Host mode isn’t available right now.'
   return `That code isn’t right.${r.left !== undefined && r.left <= 5 ? ` ${r.left} ${r.left === 1 ? 'try' : 'tries'} left.` : ''}`
 }

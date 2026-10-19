@@ -19,7 +19,7 @@ export default function AdminLogin() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    document.title = 'Admin login · Wedding'
+    document.title = 'Admin login · Baby Shower'
   }, [])
 
   if (loading) return <PageLoader />
@@ -65,7 +65,7 @@ export default function AdminLogin() {
         </form>
         <p className="mt-6 text-center">
           <Link to="/" className="text-sm text-muted underline-offset-4 hover:text-ink hover:underline">
-            Back to the wedding website
+            Back to the baby shower website
           </Link>
         </p>
       </div>

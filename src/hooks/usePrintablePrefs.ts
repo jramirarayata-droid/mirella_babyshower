@@ -26,12 +26,12 @@ export interface PrintablePrefs {
   showPositions: boolean
   rotateBacks: boolean
   envelopeQr: boolean
-  /** Details printed on the front (the rest re-centres when some are off). */
+  /** Details printed on the front (the rest re-centres when some are off). showCeremony = the venue; showReception is not used. */
   showCeremony: boolean
   showReception: boolean
   showRespondBy: boolean
   showWithNames: boolean
-  /** The entourage in the invitation set: not printed, as a separate card, or on the back of each invitation. */
+  /** (Not used: there is no entourage at a baby shower. Kept so saved setups still load.) */
   entourage: 'off' | 'insert' | 'back'
   /** Attire guide: everything on one card, or spread over cards (bigger photos). */
   attireLayout: 'one' | 'cards'
@@ -64,7 +64,7 @@ export interface PrintablePrefs {
   leaflets: Leaflet[]
   /** Your monogram, names and date on each printable (each can be switched off). */
   ours: Record<OursKey, OurDetails>
-  /** Money envelope front: names always; the date, ceremony, reception and monogram seal can be left off. */
+  /** Gift envelope front: the baby's name always; the date, venue and monogram seal can be left off (envReception is not used). */
   envDate: boolean
   envCeremony: boolean
   envReception: boolean
@@ -75,7 +75,7 @@ export interface PrintablePrefs {
   gtkEdits: Record<string, { title: string; body: string }>
   /** Your own "Good to know" sections, for print only. */
   gtkExtra: { id: string; title: string; body: string }[]
-  /** Ceremony / reception lines on the invitation front, worded for print only (may use **bold**, *italic*, ==gold==). Missing = the website's. */
+  /** The venue line on the invitation front (`ceremony`), worded for print only (may use **bold**, *italic*, ==gold==). Missing = the website's. */
   frontText: { ceremony?: string; reception?: string }
   /** Your paper as measured (mm, short × long), when it isn't exactly its stated size — the design is centred on it. */
   paperMeasured: Partial<Record<Paper, PaperMeasured>>
@@ -117,7 +117,7 @@ export const DEFAULT_PRINTABLE_PREFS: PrintablePrefs = {
   attireLayout: 'one',
   thanksTitle: 'Thank you',
   thanksMessage:
-    'Thank you for celebrating our wedding day with us. Your presence, your prayers and your kindness made the day truly special, and we will treasure the memories we shared with you.',
+    'Thank you for showering our little one with so much love. Your presence, your gifts and your kind wishes made our baby shower truly special, and we can’t wait for you to meet our baby.',
   thanksSign: 'With love and gratitude,',
   nameCardsPer: 2,
   nameCardsTable: true,
@@ -144,7 +144,7 @@ export const DEFAULT_PRINTABLE_PREFS: PrintablePrefs = {
   frontText: {},
   paperMeasured: {},
   cardBorder: true,
-  attireAvoid: { on: true, title: 'Please refrain from wearing', items: 'Slippers\nSando\nShorts\nAbove-the-knee skirts' },
+  attireAvoid: { on: false, title: 'A gentle request', items: 'Strong perfume\nSmoking near the mom-to-be' },
 }
 
 const KEY = 'printables'

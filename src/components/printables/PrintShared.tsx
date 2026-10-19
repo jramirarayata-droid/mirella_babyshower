@@ -84,7 +84,7 @@ export function EmptyPreview({ children }: { children: ReactNode }) {
 }
 
 export type DetailKey = 'monogram' | 'names' | 'date'
-const DETAIL_LABELS: Record<DetailKey, string> = { monogram: 'Monogram', names: 'Our names', date: 'Wedding date' }
+const DETAIL_LABELS: Record<DetailKey, string> = { monogram: 'Monogram', names: 'Names', date: 'Shower date' }
 
 /** "Our details": switch the monogram, names and date on or off for one printable. */
 export function OurDetailsSwitches({

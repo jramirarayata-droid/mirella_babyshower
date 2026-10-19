@@ -47,7 +47,7 @@ export interface FaceText {
   sub?: string
   /** Tiny line at the bottom (e.g. "Mir & Ella · December 19, 2026"). */
   footer?: string
-  /** The couple's monogram, small, above everything. */
+  /** The monogram, small, above everything. */
   seal?: { text: string; art?: MonogramArt | null }
 }
 

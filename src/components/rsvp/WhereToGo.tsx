@@ -1,14 +1,13 @@
-import { CalendarPlus, Church, GlassWater, MapPin } from 'lucide-react'
+import { CalendarPlus, MapPin, PartyPopper } from 'lucide-react'
 import type { WeddingSettings } from '../../types/wedding'
 import { calendarUrl } from '../../utils/calendar'
 
-type Venues = Pick<WeddingSettings, 'weddingDate' | 'coupleNames' | 'churchName' | 'ceremonyTime' | 'churchMapUrl' | 'receptionName' | 'receptionTime' | 'receptionMapUrl'>
+type Venues = Pick<WeddingSettings, 'weddingDate' | 'coupleNames' | 'babyName' | 'churchName' | 'ceremonyTime' | 'churchMapUrl'>
 
-/** The confirmation page's "Where to go": ceremony and reception, easy to spot, with map links. */
+/** The confirmation page's "Where to go": the venue, easy to spot, with a map link. */
 export function WhereToGo({ venues }: { venues: Venues }) {
   const stops = [
-    { key: 'ceremony', label: 'Ceremony', name: venues.churchName, time: venues.ceremonyTime, map: venues.churchMapUrl, Icon: Church },
-    { key: 'reception', label: 'Reception', name: venues.receptionName, time: venues.receptionTime, map: venues.receptionMapUrl, Icon: GlassWater },
+    { key: 'venue', label: 'Baby shower', name: venues.churchName, time: venues.ceremonyTime, map: venues.churchMapUrl, Icon: PartyPopper },
   ].filter((s) => s.name.trim())
   if (!stops.length) return null
   return (

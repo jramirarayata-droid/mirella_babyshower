@@ -26,7 +26,7 @@ import {
   type RaffleSettings,
 } from '../services/raffleService'
 import { toFriendlyMessage } from '../utils/errors'
-import { formatDateTime, fromManilaParts, monogram, toManilaParts } from '../utils/formatting'
+import { formatDateTime, fromManilaParts, babyMonogram, toManilaParts } from '../utils/formatting'
 import { copyText, siteBaseUrl } from '../utils/share'
 import { PageHeader } from '../components/admin/PageHeader'
 import { Button } from '../components/ui/Button'
@@ -112,7 +112,7 @@ function WheelRaffle({ tabs }: { tabs: ReactNode }) {
   const latest = useRef<RaffleSettings>(DEFAULT_RAFFLE)
 
   useEffect(() => {
-    document.title = 'Raffle · Wedding admin'
+    document.title = 'Raffle · Baby shower admin'
     Promise.all([getRaffleSettings(), getRafflePool(), getRaffleDraws(), getRaffleRound()])
       .then(([c, p, d, r]) => {
         latest.current = c
@@ -279,7 +279,7 @@ function WheelRaffle({ tabs }: { tabs: ReactNode }) {
     }
   }
 
-  const centre = settings ? monogram(settings.coupleNames, '&') : ''
+  const centre = settings ? babyMonogram(settings.babyName) : ''
 
   // Present: this round's knocked-out names (left) and today's winners (right), as guests see them.
   const sides = useMemo(() => {
@@ -299,7 +299,7 @@ function WheelRaffle({ tabs }: { tabs: ReactNode }) {
     <>
       <PageHeader
         title="Raffle"
-        description="A prize wheel the host spins at the reception. Winners are saved here."
+        description="A prize wheel the host spins at the shower — perfect for a diaper raffle. Winners are saved here."
         actions={
           <Button variant="outline" onClick={openPresent} disabled={!allNames.length} icon={<Maximize2 aria-hidden="true" className="size-4" />}>
             Present
@@ -397,8 +397,8 @@ function WheelRaffle({ tabs }: { tabs: ReactNode }) {
               <h2 className="text-xl text-ink">Names on the wheel</h2>
               <select className="input-base" value={cfg.pool} onChange={(e) => update({ pool: e.target.value as RaffleSettings['pool'] })} aria-label="Whose names">
                 <option value="all">All guests</option>
-                <option value="groom">Groom’s side only</option>
-                <option value="bride">Bride’s side only</option>
+                <option value="groom">Dad’s side only</option>
+                <option value="bride">Mom’s side only</option>
               </select>
               <Toggle label="Attending guests only" hint="Only guests who confirmed they’re coming." checked={cfg.attendingOnly} onChange={(v) => update({ attendingOnly: v })} />
               <Toggle
@@ -412,7 +412,7 @@ function WheelRaffle({ tabs }: { tabs: ReactNode }) {
             <section className="space-y-3 rounded-xl border border-line bg-paper p-5 shadow-soft">
               <h2 className="text-xl text-ink">Hide names</h2>
               <select className="input-base" value={cfg.mask} onChange={(e) => update({ mask: e.target.value as RaffleSettings['mask'] })} aria-label="Name masking">
-                <option value="auto">Masked until the wedding day</option>
+                <option value="auto">Masked until the day of the shower</option>
                 <option value="on">Always masked</option>
                 <option value="off">Show full names</option>
               </select>
@@ -689,7 +689,7 @@ function HostLinkCard({ visible }: { visible: boolean }) {
     <section className="space-y-3 rounded-xl border border-line bg-paper p-5 shadow-soft">
       <h2 className="text-xl text-ink">Host access</h2>
       <p className="text-sm text-muted">
-        Let your host or MC run the prize wheel and Bingo on the wedding website — Spin, Draw and Present for the TV — without your admin password. Results are saved here.
+        Let your host or MC run the prize wheel and Bingo on the shower website — Spin, Draw and Present for the TV — without your admin password. Results are saved here.
       </p>
       {!visible && <p className="text-xs text-gold">Host access only works while the raffle page is visible.</p>}
 
@@ -817,7 +817,7 @@ function RaffleWebsite({ tabs }: { tabs: ReactNode }) {
   const timer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
-    document.title = 'Raffle · Wedding admin'
+    document.title = 'Raffle · Baby shower admin'
     getRaffleSettings()
       .then((c) => {
         latest.current = c
@@ -848,7 +848,7 @@ function RaffleWebsite({ tabs }: { tabs: ReactNode }) {
 
   return (
     <>
-      <PageHeader title="Raffle" description="When the raffle shows on the wedding website, and how your host runs the games there." />
+      <PageHeader title="Raffle" description="When the raffle shows on the shower website, and how your host runs the games there." />
       {tabs}
       {!cfg ? (
         <div className="grid gap-6 lg:grid-cols-2">

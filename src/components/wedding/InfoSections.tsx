@@ -15,7 +15,7 @@ export function InfoSections({ sections }: { sections: InfoSection[] }) {
         <Reveal className="section-title text-center">
           <p className="eyebrow">Good to Know</p>
           <h2 id="info-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
-            Wedding Details
+            Shower Details
           </h2>
           <Ornament className="mt-8" />
         </Reveal>

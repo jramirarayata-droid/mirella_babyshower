@@ -33,7 +33,7 @@ interface Item {
   icon: typeof Mail
 }
 
-/** Everything a guest can do, by name — shows only what the couple has switched on. */
+/** Everything a guest can do, by name — shows only what has been switched on in the admin. */
 export function useGuestLinks(): Item[] {
   const { settings } = useWeddingSettings()
   const display = useDisplayPrefs()
@@ -48,10 +48,10 @@ export function useGuestLinks(): Item[] {
     }
   }, [])
   if (!settings) return []
-  const items: Item[] = [{ to: '/#details', label: 'Wedding details', hint: 'Date, venues and what to know', icon: Info }]
+  const items: Item[] = [{ to: '/#details', label: 'Shower details', hint: 'Date, venue and what to know', icon: Info }]
   if (isRsvpOpen(settings)) items.push({ to: '/rsvp', label: settings.rsvpButtonLabel.trim().toUpperCase() === 'RSVP' ? 'RSVP' : settings.rsvpButtonLabel, hint: 'Let us know if you can come', icon: Mail })
-  if (isFinderOpen(settings.seatingConfig, display?.revealAt)) items.push({ to: '/seat', label: 'Find my seat', hint: 'Your table at the reception', icon: Armchair })
-  if (photos) items.push({ to: '/photos', label: 'Photos', hint: 'See and share photos from the day', icon: Camera })
+  if (isFinderOpen(settings.seatingConfig, display?.revealAt)) items.push({ to: '/seat', label: 'Find my seat', hint: 'Your table at the shower', icon: Armchair })
+  if (photos) items.push({ to: '/photos', label: 'Photos', hint: 'See and share photos from the shower', icon: Camera })
   return items
 }
 
@@ -124,7 +124,7 @@ export function GuestMenu({ tone = 'light' }: { tone?: 'light' | 'onPhoto' }) {
               className="absolute inset-y-0 right-0 flex w-[min(22rem,88vw)] flex-col overflow-y-auto bg-ivory px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] text-left shadow-lift"
             >
               <div className="flex items-center justify-between">
-                <p className="font-serif text-2xl text-ink">{settings && <CoupleNames names={settings.coupleNames} />}</p>
+                <p className="font-serif text-2xl text-ink">{settings && <CoupleNames names={settings.babyName} />}</p>
                 <button type="button" onClick={() => setOpen(false)} aria-label="Close" autoFocus className="grid size-10 place-items-center rounded-full text-ink-soft hover:bg-cream">
                   <X className="size-5" />
                 </button>
@@ -196,7 +196,7 @@ export function GuestMenu({ tone = 'light' }: { tone?: 'light' | 'onPhoto' }) {
                       [
                         { to: '/raffle', label: 'Raffle & Bingo', hint: 'Spin, draw and present', icon: Gift },
                         { to: '/present/guests', label: 'Present guest photos', hint: 'Photos shared by guests, live', icon: Images },
-                        { to: '/present/ours', label: 'Present our photos & videos', hint: 'From the wedding website', icon: Clapperboard },
+                        { to: '/present/ours', label: 'Present our photos & videos', hint: 'From the shower website', icon: Clapperboard },
                       ] as const
                     ).map((it) => {
                       const Icon = it.icon

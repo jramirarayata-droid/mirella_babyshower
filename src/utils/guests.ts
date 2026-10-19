@@ -11,4 +11,4 @@ export const requestedGuests = (inv: Pick<InvitationWithRSVP, 'guests'>): Additi
 export const includedGuestNames = (inv: Pick<InvitationWithRSVP, 'guests'>): string[] => includedGuests(inv).map((g) => g.guestName)
 
 export const guestSourceLabel = (addedBy: AdditionalGuest['addedBy']): string =>
-  addedBy === 'admin' ? 'Included by couple' : 'Guest request'
+  addedBy === 'admin' ? 'Included by hosts' : 'Guest request'

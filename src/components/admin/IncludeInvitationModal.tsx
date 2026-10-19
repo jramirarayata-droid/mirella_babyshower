@@ -61,7 +61,6 @@ export function IncludeInvitationModal({ from, invitations, tables, seatedKeys, 
     if (seatedKeys.has(`${from.id}:`)) out.push(`Keeps their chair${table ? ` at ${table}` : ''} in Seating.`)
     else if (table) out.push(`Not in a chair yet — you can seat them at ${table} from ${possessive(into.inviteeName)} party in Seating.`)
     const role = positions.get(`${from.id}:`)
-    if (role) out.push(`Stays in the entourage as ${role}.`)
     if (from.positionMode === 'custom' && from.positionLabel.trim() && from.positionLabel.trim() !== role)
       out.push(`The position on their own card (“${from.positionLabel.trim()}”) is kept aside and comes back if you separate them again.`)
     const opens = openCounts.get(from.id) ?? 0
@@ -71,7 +70,7 @@ export function IncludeInvitationModal({ from, invitations, tables, seatedKeys, 
     if (answer === 'attending' && !into.response) out.push(`${possessive(name)} answer (Attending) becomes the answer for ${possessive(into.inviteeName)} invitation.`)
     else if (answer === 'attending') out.push(`${possessive(into.inviteeName)} invitation already has an answer, so it stays. ${possessive(name)} answer is kept aside.`)
     else if (answer === 'declining') out.push(`${name} answered “can’t come”. That isn’t carried over (it would decline the whole invitation) — remove them from the invitation if they still can’t come.`)
-    if (into.side !== from.side) out.push(`${name} will count on the ${into.side === 'bride' ? 'bride’s' : 'groom’s'} side, like ${into.inviteeName}.`)
+    if (into.side !== from.side) out.push(`${name} will count on the ${into.side === 'bride' ? 'mom’s' : 'dad’s'} side, like ${into.inviteeName}.`)
     return out
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, into, seatedKeys, positions, openCounts, tables])
@@ -82,7 +81,7 @@ export function IncludeInvitationModal({ from, invitations, tables, seatedKeys, 
       onClose={onClose}
       locked={saving}
       title={from ? `Include ${from.inviteeName} in another invitation` : ''}
-      description="They become an included guest on the invitation you pick. Their chair, entourage place and link carry over."
+      description="They become an included guest on the invitation you pick. Their chair and link carry over."
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={saving}>
@@ -130,7 +129,7 @@ export function IncludeInvitationModal({ from, invitations, tables, seatedKeys, 
                     {names.length > 0 && <span className="block truncate text-xs text-muted">with {names.join(', ')}</span>}
                   </span>
                   {tableName(i.tableId) && <span className="hidden text-xs text-muted sm:inline">{tableName(i.tableId)}</span>}
-                  <Badge tone={i.side === 'bride' ? 'rose' : 'gold'}>{i.side === 'bride' ? 'Bride' : 'Groom'}</Badge>
+                  <Badge tone={i.side === 'bride' ? 'rose' : 'gold'}>{i.side === 'bride' ? 'Mom' : 'Dad'}</Badge>
                 </button>
               )
             })}

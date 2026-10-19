@@ -38,7 +38,7 @@ import { CoupleNames } from '../components/wedding/CoupleNames'
 
 type Step = 'search' | 'found' | 'card' | 'form' | 'success'
 
-const FALLBACK = { coupleNames: 'Mir & Ella', weddingDate: '2026-12-19' }
+const FALLBACK = { babyName: 'Baby', weddingDate: '' }
 
 export default function RSVP() {
   const { settings, loading: settingsLoading } = useWeddingSettings()
@@ -58,7 +58,7 @@ export default function RSVP() {
   const [closedByServer, setClosedByServer] = useState(false)
   const [gift, setGift] = useState<PublicGift | null>(null)
   const [tableName, setTableName] = useState<string | null>(null)
-  // Chair number — only when the couple pre-assigned the seat.
+  // Chair number — only when the seat was pre-assigned.
   const [seatNo, setSeatNo] = useState<number | null>(null)
   const submittingRef = useRef(false)
   // The envelope and card (same as the virtual invitation link).
@@ -66,7 +66,8 @@ export default function RSVP() {
   const [details, setDetails] = useState<{ id: string; d: CardDetails | null } | null>(null)
   const cardW = useCardWidth(330)
 
-  const coupleNames = settings?.coupleNames ?? FALLBACK.coupleNames
+  // Headers and the footer show the baby's name.
+  const coupleNames = settings?.babyName ?? FALLBACK.babyName
   const weddingDate = settings?.weddingDate ?? FALLBACK.weddingDate
 
   useEffect(() => {
@@ -98,7 +99,7 @@ export default function RSVP() {
     if (status === 'found' && invitation) setStep((s) => (s === 'search' ? (fromCard ? 'form' : 'found') : s))
   }, [status, invitation, fromCard])
 
-  // The invitee's position for the card ("Groom's Mother"), once their invitation is found.
+  // The invitee's details for the card (e.g. "Ninang"), once their invitation is found.
   useEffect(() => {
     if (!invitation || details?.id === invitation.invitationId) return
     let alive = true
@@ -292,11 +293,11 @@ export default function RSVP() {
         )}
       </main>
 
-      {!(step === 'found' && opening) && <Footer coupleNames={coupleNames} weddingDate={weddingDate} closingMessage={settings?.closingMessage} />}
+      {!(step === 'found' && opening) && <Footer coupleNames={coupleNames} hostNames={settings?.coupleNames} weddingDate={weddingDate} closingMessage={settings?.closingMessage} />}
 
       <ConfirmDialog
         open={confirmOpen}
-        tone="wedding"
+        tone="guest"
         title="Are you sure?"
         message="Your RSVP will be recorded using the information you provided."
         cancelLabel="Cancel"

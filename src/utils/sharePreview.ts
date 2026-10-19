@@ -110,19 +110,21 @@ export async function renderSharePreview(s: WeddingSettings): Promise<Blob> {
 
   ctx.fillStyle = p.gold
   ctx.font = `500 15px ${sans}`
-  spaced(ctx, 'YOU’RE INVITED TO THE WEDDING OF', mid, cy + 98, 3.5)
+  spaced(ctx, 'YOU’RE INVITED TO A BABY SHOWER FOR', mid, cy + 98, 3.5)
 
   ctx.fillStyle = p.ink
-  const names = s.coupleNames || 'Our Wedding'
+  const names = s.babyName || 'Baby'
   const size = fitFont(ctx, names, serif, '300', 78, cw - 100)
   ctx.font = `300 ${size}px ${serif}`
   ctx.fillText(names, mid, cy + 200)
 
   ctx.fillStyle = p.inkSoft
   ctx.font = `italic 26px ${serif}`
-  ctx.fillText('request the pleasure of your company', mid, cy + 256)
+  const hosts = s.coupleNames.trim() ? `hosted by ${s.coupleNames.trim()}` : 'a little one is on the way'
+  ctx.font = `italic ${fitFont(ctx, hosts, serif, 'italic', 26, cw - 90)}px ${serif}`
+  ctx.fillText(hosts, mid, cy + 256)
 
-  // Ornament: line · diamond · line.
+  // Ornament: line · star · line.
   ctx.strokeStyle = p.champagne
   ctx.lineWidth = 1.2
   ctx.beginPath()
@@ -131,13 +133,16 @@ export async function renderSharePreview(s: WeddingSettings): Promise<Blob> {
   ctx.moveTo(mid + 14, cy + 300)
   ctx.lineTo(mid + 90, cy + 300)
   ctx.stroke()
+  // a four-point twinkle
   ctx.beginPath()
-  ctx.moveTo(mid, cy + 293)
-  ctx.lineTo(mid + 7, cy + 300)
-  ctx.lineTo(mid, cy + 307)
-  ctx.lineTo(mid - 7, cy + 300)
+  ctx.moveTo(mid, cy + 290)
+  ctx.quadraticCurveTo(mid + 1.5, cy + 298.5, mid + 10, cy + 300)
+  ctx.quadraticCurveTo(mid + 1.5, cy + 301.5, mid, cy + 310)
+  ctx.quadraticCurveTo(mid - 1.5, cy + 301.5, mid - 10, cy + 300)
+  ctx.quadraticCurveTo(mid - 1.5, cy + 298.5, mid, cy + 290)
   ctx.closePath()
-  ctx.stroke()
+  ctx.fillStyle = p.champagne
+  ctx.fill()
 
   ctx.fillStyle = p.ink
   ctx.font = `500 21px ${sans}`
@@ -152,7 +157,7 @@ export async function renderSharePreview(s: WeddingSettings): Promise<Blob> {
 
 /** What the image depends on — it's only re-made when one of these changes. */
 export function sharePreviewSignature(s: WeddingSettings): string {
-  return JSON.stringify([VERSION, s.coupleNames, s.weddingDate, s.heroImageUrl, s.theme])
+  return JSON.stringify([VERSION, s.coupleNames, s.babyName, s.weddingDate, s.heroImageUrl, s.theme])
 }
 
 interface Saved {

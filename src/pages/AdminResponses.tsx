@@ -35,7 +35,7 @@ export default function AdminResponses() {
   const filter = (['all', 'attending', 'declining', 'pending'].includes(params.get('status') ?? '') ? params.get('status') : 'all') as Filter
 
   useEffect(() => {
-    document.title = 'Responses · Wedding admin'
+    document.title = 'Responses · Baby shower admin'
   }, [])
 
   const list = useMemo(() => data?.invitations ?? [], [data])
@@ -110,7 +110,7 @@ export default function AdminResponses() {
       cell: (r) => (
         <span className="inline-flex flex-wrap items-center gap-1.5">
           <AttendanceBadge status={r.status} />
-          {r.response?.recordedByAdmin && <Badge tone="gold">Confirmed by couple</Badge>}
+          {r.response?.recordedByAdmin && <Badge tone="gold">Confirmed by hosts</Badge>}
         </span>
       ),
     },
@@ -160,7 +160,7 @@ export default function AdminResponses() {
         )
       },
     },
-    { key: 'message', header: 'Message', cell: (r) => attendingOnly(r, clip(r.response?.messageToCouple, 60) === '—' ? 'None' : clip(r.response?.messageToCouple, 60)) },
+    { key: 'message', header: 'Wish for the baby', cell: (r) => attendingOnly(r, clip(r.response?.messageToCouple, 60) === '—' ? 'None' : clip(r.response?.messageToCouple, 60)) },
     { key: 'submitted', header: 'Submitted', cell: (r) => formatDateTime(r.response?.submittedAt), className: 'whitespace-nowrap' },
     { key: 'updated', header: 'Updated', cell: (r) => formatDateTime(r.response?.updatedAt), className: 'whitespace-nowrap' },
     { key: 'actions', header: 'Actions', cell: actions, hideOnMobile: true },

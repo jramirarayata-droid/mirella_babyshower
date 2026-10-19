@@ -8,7 +8,7 @@
  * - Data (Supabase), photos and everything else are NEVER stored here. The
  *   guest's own seat is kept separately by the page itself.
  */
-const VERSION = 'wedding-offline-v1'
+const VERSION = 'shower-offline-v1'
 const MAX_ASSETS = 80
 
 self.addEventListener('install', () => self.skipWaiting())

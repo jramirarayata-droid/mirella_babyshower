@@ -213,7 +213,7 @@ export function DriveSaveButton({ target, folderName, loadItems, noun, disabled 
           {phase.kind === 'idle' && clientId && !editingId && (
             <ul className="list-disc space-y-1 pl-5 text-ink-soft">
               <li>Google will ask you to sign in and allow access. The site can only see files it saves itself — not the rest of your Drive.</li>
-              <li>Photos already in the folder are skipped, so you can run it again after the wedding to add new ones.</li>
+              <li>Photos already in the folder are skipped, so you can run it again after the shower to add new ones.</li>
               <li>
                 <strong className="font-medium text-ink">Keep this page open</strong> until it finishes.
               </li>
