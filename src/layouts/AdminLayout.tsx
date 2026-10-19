@@ -157,9 +157,10 @@ export default function AdminLayout() {
   }, [reload])
 
   // Keep the Messenger link-preview image in step with the website (names, date, hero, design).
+  // (After the shower is known, so the image goes in its own folder.)
   useEffect(() => {
-    if (settings && session) void syncSharePreview(settings)
-  }, [settings, session])
+    if (settings && session && !space.loading) void syncSharePreview(settings)
+  }, [settings, session, space.loading])
 
   useEffect(() => {
     setMenuOpen(false)
