@@ -3,6 +3,9 @@
 {
   "name": "mirella-babyshower",
   "compatibility_date": "2026-06-01",
+  // A small Worker in front of the files: each shower's address (/<slug>/) gets its own
+  // link preview (name, date, image) for Messenger/Viber/Facebook. See worker/index.js.
+  "main": "worker/index.js",
   // Build the site before every upload (branch previews skip the dashboard's build command).
   "build": { "command": "npm run build" },
   // Serve on mirella-babyshower.<account>.workers.dev, and give branch previews their own addresses there.
@@ -10,6 +13,9 @@
   "preview_urls": true,
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    // The Worker sees every request first so it can add each shower's preview; it hands files straight back.
+    "run_worker_first": true,
     // Unknown paths fall back to the app (pages use #/ links, so this is just a safety net).
     "not_found_handling": "single-page-application"
   },
