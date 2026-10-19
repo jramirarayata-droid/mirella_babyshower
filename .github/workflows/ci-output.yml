@@ -1,0 +1,42 @@
+name: Build output for review
+
+# Builds every working branch against a mock backend (nothing live is
+# touched) and keeps the result — the built site plus the type-check and lint
+# output — on the branch ci-output/<branch>, so the site can be opened and
+# tested in a browser without installing anything.
+on:
+  push:
+    branches-ignore: [main, test-results, 'ci-output/**']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Build against a mock backend
+        run: |
+          mkdir -p /tmp/out
+          (npx tsc -b 2>&1; echo "exit $?") > /tmp/out/typecheck.txt
+          (npx eslint . 2>&1; echo "exit $?") > /tmp/out/lint.txt
+          (npx vite build 2>&1; echo "exit $?") > /tmp/out/build.txt
+          [ -d dist ] && cp -r dist /tmp/out/dist || true
+          git rev-parse HEAD > /tmp/out/commit.txt
+        env:
+          VITE_SUPABASE_URL: https://mock.supabase.test
+          VITE_SUPABASE_ANON_KEY: mock-anon-key
+          SITE_URL: http://localhost:4173/
+      - name: Publish to ci-output/<branch>
+        run: |
+          cd /tmp/out
+          git init -q -b out
+          git config user.name ci && git config user.email ci@example.com
+          git add -A && git commit -qm "build output ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" "out:ci-output/${GITHUB_REF_NAME}"
