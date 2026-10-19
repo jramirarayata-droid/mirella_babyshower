@@ -3,7 +3,7 @@ on:
   push:
     branches: ['meta-check-*']
 permissions:
-  contents: read
+  contents: write
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -11,9 +11,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Fetch pages like Messenger does
         run: |
+          exec > >(tee /tmp/out.txt) 2>&1
           for u in $(cat urls.txt); do
             echo "=================== $u"
             curl -s -L -A "facebookexternalhit/1.1" -o /tmp/p.html -w "status %{http_code} type %{content_type} final %{url_effective}\n" "$u" || true
             grep -oE '<title>[^<]*</title>|<meta (property|name)="(og:[a-z:]+|twitter:[a-z]+|description)" content="[^"]*"' /tmp/p.html | head -20
             grep -o 'location.replace([^)]*)' /tmp/p.html | head -2
           done
+      - name: Save the result to the meta-check-results branch
+        if: always()
+        run: |
+          mkdir /tmp/r && cp /tmp/out.txt /tmp/r/out.txt && cd /tmp/r
+          git init -q -b meta-check-results && git config user.name ci && git config user.email ci@example.com
+          git add -A && git commit -qm "meta check" && git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" meta-check-results
