@@ -1,0 +1,388 @@
+/*
+ * Design styles for the guest-facing site (Admin → Look & Feel → Style).
+ * Classic is the base design in index.css and needs no rules here.
+ * The admin pages always run as "classic", so nothing below reaches them.
+ *
+ * These rules are deliberately unlayered so they win over Tailwind utilities.
+ */
+
+/* Woven banig / inabel band (used by the Heritage style). */
+.banig-band {
+  background-color: color-mix(in srgb, var(--color-champagne) 22%, var(--color-ivory));
+  background-image:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-champagne) 85%, transparent) 0 5px, transparent 5px 10px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-gold) 55%, transparent) 0 5px, transparent 5px 10px);
+}
+
+/* ============================================================== Maison Noir */
+
+html[data-style='maison'] body {
+  letter-spacing: 0.01em;
+}
+
+html[data-style='maison'] h1,
+html[data-style='maison'] h2,
+html[data-style='maison'] h3 {
+  font-weight: 300;
+  letter-spacing: -0.012em;
+}
+
+html[data-style='maison'] .eyebrow {
+  letter-spacing: 0.46em;
+  font-size: 0.68rem;
+}
+
+/* Numbered sections: "01 — The Celebration" */
+html[data-style='maison'] main {
+  counter-reset: lux-section;
+}
+html[data-style='maison'] main .section-title .eyebrow::before {
+  counter-increment: lux-section;
+  content: counter(lux-section, decimal-leading-zero) '\2002\2014\2002';
+  color: var(--color-ink-soft);
+}
+html[data-style='maison'] main .section-title h2 {
+  font-size: clamp(2.6rem, 6.4vw, 4.6rem);
+  line-height: 1.02;
+}
+
+html[data-style='maison'] .hero-names {
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+html[data-style='maison'] .lux-lede {
+  font-style: italic;
+}
+
+/* Cards: flat, sharp, hairline gold frame */
+html[data-style='maison'] .fine-frame {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: var(--color-paper);
+  border: 1px solid color-mix(in srgb, var(--color-champagne) 45%, transparent);
+}
+html[data-style='maison'] .fine-frame::after {
+  inset: 7px;
+  border-color: color-mix(in srgb, var(--color-champagne) 22%, transparent);
+}
+html[data-style='maison'] .paper-texture {
+  background-image: none;
+  background-color: var(--color-paper);
+}
+html[data-style='maison'] .hero-paper {
+  background-color: var(--color-ivory);
+}
+
+html[data-style='maison'] .lux-cta,
+html[data-style='maison'] .lux-pill,
+html[data-style='maison'] .lux-link,
+html[data-style='maison'] [data-ui='button'],
+html[data-style='maison'] .input-base {
+  border-radius: 0 !important;
+}
+html[data-style='maison'] .lux-cta {
+  background: transparent;
+  color: var(--color-ink);
+  border: 1px solid var(--color-champagne);
+  box-shadow: none;
+}
+html[data-style='maison'] .lux-cta:hover {
+  background: var(--color-champagne);
+  color: var(--color-ivory);
+}
+html[data-style='maison'] .lux-icon {
+  border-radius: 0;
+  transform: rotate(45deg);
+}
+html[data-style='maison'] .lux-icon > * {
+  transform: rotate(-45deg);
+}
+html[data-style='maison'] .lux-subhead {
+  letter-spacing: 0.42em;
+}
+html[data-style='maison'] .lux-footer {
+  background: var(--color-ivory);
+}
+html[data-style='maison'] .lux-footer p:first-child {
+  font-size: clamp(2.8rem, 8vw, 4.5rem);
+}
+
+/* ============================================================== Gilded Deco */
+
+html[data-style='deco'] h1,
+html[data-style='deco'] h2,
+html[data-style='deco'] h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+}
+html[data-style='deco'] .eyebrow {
+  letter-spacing: 0.5em;
+}
+html[data-style='deco'] main .section-title h2 {
+  font-size: clamp(1.9rem, 5vw, 3.2rem);
+  line-height: 1.15;
+}
+html[data-style='deco'] .hero-names {
+  letter-spacing: 0.08em;
+  font-size: clamp(2.6rem, 10vw, 6.4rem) !important;
+  line-height: 1.02;
+}
+html[data-style='deco'] .lux-lede {
+  text-transform: none;
+}
+
+/* Sunburst behind the names on paper heroes */
+html[data-style='deco'] .hero-paper {
+  background-image: repeating-conic-gradient(
+    from 0deg at 50% 46%,
+    color-mix(in srgb, var(--color-champagne) 9%, transparent) 0deg 3deg,
+    transparent 3deg 12deg
+  );
+}
+
+/* Subtle diamond lattice on alternating sections */
+html[data-style='deco'] main > section:nth-of-type(even) {
+  background-image:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-champagne) 9%, transparent) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-champagne) 9%, transparent) 0 1px, transparent 1px 34px);
+}
+
+/* Cards: stepped (chamfered) corners with a double gold line */
+html[data-style='deco'] .fine-frame {
+  border-radius: 0 !important;
+  background: var(--color-paper);
+  clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px);
+  box-shadow:
+    inset 0 0 0 1px var(--color-champagne),
+    inset 0 0 0 5px var(--color-paper),
+    inset 0 0 0 6px color-mix(in srgb, var(--color-champagne) 55%, transparent) !important;
+}
+html[data-style='deco'] .fine-frame::after {
+  inset: 14px;
+  border-color: color-mix(in srgb, var(--color-champagne) 28%, transparent);
+}
+html[data-style='deco'] .paper-texture:not(.hero-paper) {
+  background-image: none;
+}
+
+html[data-style='deco'] .lux-cta,
+html[data-style='deco'] [data-ui='button'] {
+  border-radius: 0 !important;
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+}
+html[data-style='deco'] .lux-cta {
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+  box-shadow:
+    inset 0 0 0 3px var(--color-ink),
+    inset 0 0 0 4px var(--color-champagne) !important;
+}
+html[data-style='deco'] .lux-pill,
+html[data-style='deco'] .lux-link,
+html[data-style='deco'] .input-base {
+  border-radius: 0 !important;
+}
+html[data-style='deco'] .lux-icon {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  border: none;
+  background: color-mix(in srgb, var(--color-champagne) 16%, transparent);
+}
+html[data-style='deco'] .lux-subhead::before,
+html[data-style='deco'] .lux-subhead::after {
+  content: '';
+  display: inline-block;
+  width: 1.6em;
+  height: 1px;
+  margin: 0 0.7em 0.25em;
+  background: currentColor;
+  vertical-align: middle;
+}
+
+/* ================================================================= Heritage */
+
+html[data-style='heritage'] h1,
+html[data-style='heritage'] h2,
+html[data-style='heritage'] h3 {
+  letter-spacing: 0.01em;
+}
+
+/* Small woven diamonds either side of each section label */
+html[data-style='heritage'] .section-title .eyebrow::before,
+html[data-style='heritage'] .section-title .eyebrow::after,
+html[data-style='heritage'] .lux-subhead::before,
+html[data-style='heritage'] .lux-subhead::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 0.9em 0.18em;
+  background: currentColor;
+  transform: rotate(45deg);
+  vertical-align: middle;
+}
+
+/* Capiz-shell shimmer: overlapping translucent discs */
+html[data-style='heritage'] .paper-texture {
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--color-champagne) 8%, transparent) 0 44%, transparent 45%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, #ffffff 55%, transparent) 0 30%, transparent 31%);
+  background-size: 34px 34px, 34px 34px;
+  background-position: 0 0, 17px 17px;
+}
+
+/* A woven band between sections */
+html[data-style='heritage'] main > section {
+  position: relative;
+}
+html[data-style='heritage'] main > section:nth-of-type(even)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 8px;
+  opacity: 0.7;
+  background-color: color-mix(in srgb, var(--color-champagne) 22%, var(--color-ivory));
+  background-image:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-champagne) 85%, transparent) 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-gold) 55%, transparent) 0 4px, transparent 4px 8px);
+}
+
+/* Cards: soft corners, a woven top edge and "stitched" piña-style inner line */
+html[data-style='heritage'] .fine-frame {
+  border-radius: 18px !important;
+  overflow: hidden;
+  background: var(--color-paper);
+}
+html[data-style='heritage'] .fine-frame::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10px;
+  background-color: color-mix(in srgb, var(--color-champagne) 22%, var(--color-ivory));
+  background-image:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-champagne) 85%, transparent) 0 5px, transparent 5px 10px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-gold) 55%, transparent) 0 5px, transparent 5px 10px);
+}
+html[data-style='heritage'] .fine-frame::after {
+  inset: 18px 10px 10px;
+  border: 1px dashed color-mix(in srgb, var(--color-champagne) 55%, transparent);
+  border-radius: 12px;
+}
+html[data-style='heritage'] .lux-cta {
+  box-shadow:
+    0 0 0 3px var(--color-ivory),
+    0 0 0 4px var(--color-champagne) !important;
+}
+html[data-style='heritage'] .lux-icon {
+  border-style: dashed;
+}
+html[data-style='heritage'] .lux-footer {
+  border-top: 0;
+  position: relative;
+}
+html[data-style='heritage'] .lux-footer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10px;
+  background-color: color-mix(in srgb, var(--color-champagne) 22%, var(--color-ivory));
+  background-image:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-champagne) 85%, transparent) 0 5px, transparent 5px 10px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-gold) 55%, transparent) 0 5px, transparent 5px 10px);
+}
+
+/* ======================================================= dark pages (any style) */
+
+html[data-dark='true'] .shadow-card,
+html[data-dark='true'] .shadow-soft {
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.03), 0 18px 40px -24px rgb(0 0 0 / 0.6);
+}
+html[data-dark='true'] ::selection {
+  background: color-mix(in srgb, var(--color-champagne) 45%, transparent);
+}
+
+/* ===================================================== gallery layout helpers */
+
+@keyframes lux-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.lux-marquee {
+  animation: lux-marquee var(--lux-marquee-duration, 40s) linear infinite;
+}
+.lux-marquee-reverse {
+  animation-direction: reverse;
+}
+.lux-marquee-paused .lux-marquee {
+  animation-play-state: paused;
+}
+.film-perf::before,
+.film-perf::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  z-index: 1;
+  background: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.55) 0 8px, transparent 8px 20px);
+  pointer-events: none;
+}
+.film-perf::before {
+  top: 5px;
+}
+.film-perf::after {
+  bottom: 5px;
+}
+
+@keyframes lux-fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+.lux-story-fill {
+  width: 0;
+  animation: lux-fill var(--lux-story-ms, 5s) linear forwards;
+}
+
+/* ============================== menu band above the hero frame (photo heroes) */
+/* Maison & Deco draw a frame over the photo; the menu sits above it on a faint tinted band. */
+html[data-style='maison'] .hero-photo > nav,
+html[data-style='deco'] .hero-photo > nav {
+  padding-bottom: 0.85rem;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-champagne) 26%, rgb(12 10 9 / 0.7)),
+    color-mix(in srgb, var(--color-champagne) 12%, rgb(12 10 9 / 0.38))
+  );
+  border-bottom: 1px solid color-mix(in srgb, var(--color-champagne) 45%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* Arched hero flowers: a slow, gentle sway. */
+@keyframes lux-sway {
+  from {
+    transform: rotate(-2.5deg);
+  }
+  to {
+    transform: rotate(2.5deg);
+  }
+}
+.lux-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: lux-sway 6.5s ease-in-out infinite alternate;
+}

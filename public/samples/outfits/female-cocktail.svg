@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" width="600" height="800">
+<rect width="300" height="400" fill="#f3ede3"/>
+<path d="M40 380 V120 A110 110 0 0 1 260 120 V380 Z" fill="#fbf8f2"/>
+<path d="M40 380 V120 A110 110 0 0 1 260 120 V380" fill="none" stroke="#b89b6a" stroke-opacity=".55" stroke-width="1"/>
+<ellipse cx="150" cy="372" rx="62" ry="6" fill="#2b2a28" fill-opacity=".08"/>
+<rect x="143" y="84" width="14" height="18" rx="4" fill="#caa98a"/><ellipse cx="150" cy="70" rx="17" ry="20" fill="#caa98a"/><path d="M132 72 C128 42 172 42 168 72 L170 100 C164 92 166 70 160 60 C150 58 140 62 136 72 L130 100 C128 92 132 80 132 72 Z" fill="#3a322c"/><path d="M126 112 C118 118 112 170 108 222 L116 224 C121 180 128 140 132 124 Z" fill="#caa98a"/><path d="M174 112 C182 118 188 170 192 222 L184 224 C179 180 172 140 168 124 Z" fill="#caa98a"/><path d="M128 108 Q150 118 172 108 L166 190 L134 190 Z" fill="#c9a19a"/>
+<path d="M134 188 L166 188 C176 230 184 270 188 300 L112 300 C116 270 124 230 134 188 Z" fill="#c9a19a"/>
+<path d="M136 300 L140 358 L146 358 L146 300 Z M154 300 L154 358 L160 358 L164 300 Z" fill="#caa98a"/>
+<path d="M136 356 L148 356 L150 364 L134 364 Z M152 356 L164 356 L166 364 L150 364 Z" fill="#2b2a28"/>
+<path d="M134 190 L166 190" stroke="#8a6e45" stroke-width="1.5"/>
+</svg>

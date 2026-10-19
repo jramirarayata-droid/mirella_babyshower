@@ -1,0 +1,25 @@
+name: Daily link-preview refresh
+
+# Cloudflare builds and deploys the site from main by itself (Worker
+# "mirella-babyshower"). Once a day this asks Cloudflare to rebuild, so the
+# Messenger/Viber link preview follows Website Settings. Needs the repository
+# secret CF_DEPLOY_HOOK (a deploy hook of the mirella-babyshower Worker);
+# without it the run just says so and passes.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * *' # 02:00 Philippine time
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask Cloudflare to rebuild
+        env:
+          CF_DEPLOY_HOOK: ${{ secrets.CF_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$CF_DEPLOY_HOOK" ]; then curl -fsS -X POST "$CF_DEPLOY_HOOK" > /dev/null && echo "Cloudflare rebuild started"; else echo "No CF_DEPLOY_HOOK secret yet"; fi
