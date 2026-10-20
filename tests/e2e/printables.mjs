@@ -60,6 +60,7 @@ async function handle(route) {
     const fn = p.slice('/rest/v1/rpc/'.length)
     const a = JSON.parse(req.postData() || '{}')
     if (fn === 'is_admin') return json(true)
+    if (fn === 'attire_list') return json({ private: false, allowed: true, items: outfits })
     if (fn === 'public_display_prefs') return json({ card: {}, website: {}, sharePreviewUrl: null, raffleVisible: false, monogram: null })
     if (fn === 'open_invitation') {
       const i = invitations.find((x) => x.invitation_code === a.invite_code)

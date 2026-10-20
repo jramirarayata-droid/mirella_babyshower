@@ -97,3 +97,36 @@ export function SignedInAs({ name, onSwitch }: { name: string; onSwitch: () => v
     </p>
   )
 }
+
+/**
+ * Shown when the hosts keep a page for guests who are coming (Website Settings
+ * → Privacy): RSVP first — or, already said yes, type your name to open it.
+ */
+export function ForAttending({ what, onReady }: { what: string; onReady: (g: ShowerGuest) => void }) {
+  const [asking, setAsking] = useState(false)
+  return (
+    <div className="mx-auto max-w-md text-center">
+      <p className="leading-relaxed text-ink-soft">
+        {what} is shared with the guests who are joining us. Let us know you’re coming, and it opens right away on your confirmation.
+      </p>
+      <Link
+        to="/rsvp"
+        className="lux-cta mt-6 inline-flex min-h-12 items-center justify-center rounded-full bg-ink px-8 text-sm font-medium uppercase tracking-[0.2em] text-ivory transition hover:bg-ink/90"
+      >
+        RSVP
+      </Link>
+      {asking ? (
+        <div className="mt-8">
+          <GuestGate why="Type your name as on your invitation — if you’ve said you’re coming, it opens." onReady={onReady} />
+        </div>
+      ) : (
+        <p className="mt-6 text-sm text-muted">
+          Already said yes?{' '}
+          <button type="button" onClick={() => setAsking(true)} className="text-gold underline-offset-4 hover:underline">
+            Open it with your name
+          </button>
+        </p>
+      )}
+    </div>
+  )
+}

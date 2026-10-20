@@ -28,6 +28,16 @@ let revealed = false
 let prediction = null
 let ideas = []
 let revealSettings
+// Website Settings → Privacy: wishlist / What to Wear for attending guests only.
+let wishlistPrivate = false
+let attirePrivate = false
+let attending = false
+const PIC = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200"><rect width="900" height="1200" fill="#DCEAF7"/><circle cx="450" cy="500" r="200" fill="#F6D3DC"/></svg>')
+const outfitRows = [
+  { id: 'o1', gender: 'female', image_url: PIC, caption: 'Pastel pink sundress', label: 'Team Pink', sort_order: 1, is_visible: true },
+  { id: 'o2', gender: 'male', image_url: PIC, caption: 'Light blue polo', label: 'Team Blue', sort_order: 1, is_visible: true },
+]
+const canSee = (token, isPrivate) => !isPrivate || (token === TOKEN && attending)
 const reset = () => {
   items = [
     { id: 'r1', title: 'Diapers (newborn)', note: 'Any brand', quantity: 10, claimed: 4, mine: 0, price: '' },
@@ -42,7 +52,12 @@ reset()
 
 const rpc = {
   shower_guest_start: (a) => (/santos/i.test(a.p_name) ? { ok: true, token: TOKEN, name: 'Ana Santos' } : { ok: false }),
-  registry_list: (a) => ({ visible: true, title: 'Gift Wishlist', intro: 'A few things our little one needs.', me: a.p_token === TOKEN ? 'Ana Santos' : null, items }),
+  registry_list: (a) =>
+    canSee(a.p_token, wishlistPrivate)
+      ? { visible: true, private: false, title: 'Gift Wishlist', intro: 'A few things our little one needs.', me: a.p_token === TOKEN ? 'Ana Santos' : null, items }
+      : { visible: true, private: true, title: 'Gift Wishlist', intro: '', me: a.p_token === TOKEN ? 'Ana Santos' : null, items: [] },
+  attire_list: (a) => ({ private: attirePrivate, allowed: canSee(a.p_token, attirePrivate), items: canSee(a.p_token, attirePrivate) ? outfitRows : [] }),
+  guest_access: (a) => ({ wishlistPrivate, attirePrivate, attending: a.p_token === TOKEN && attending }),
   registry_claim: (a) => {
     const it = items.find((i) => i.id === a.p_item)
     if (a.p_item === 'r2') {
@@ -197,6 +212,46 @@ try {
   ok('no page errors (guest)', errors.length === 0, errors.join(' | '))
   await ctx.close()
 
+  // ---------------------------------------------------------------- wishlist & What to Wear for attending guests only
+  wishlistPrivate = true
+  attirePrivate = true
+  attending = false
+  items.push({ id: 'r3', kind: 'idea', title: 'A cloud nursery', note: 'Soft clouds and little stars', image: PIC, quantity: 1, claimed: 0, mine: 0, price: '' })
+  const pctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })
+  await pctx.route(`${API}/**`, handle)
+  const g = await pctx.newPage()
+  current = g
+  const gerr = []
+  g.on('pageerror', (e) => gerr.push(String(e)))
+  await g.goto(`${BASE}#/`)
+  await g.locator('section[aria-labelledby="reveal-heading"]').waitFor({ timeout: 20000 })
+  await g.waitForTimeout(1500)
+  ok('private: no wishlist card or attire on the home page', (await g.getByRole('link', { name: /see the wishlist/i }).count()) === 0 && (await g.locator('#outfits-heading').count()) === 0)
+  await g.goto(`${BASE}#/registry`)
+  await g.getByText(/shared with the guests who are joining us/).waitFor({ timeout: 20000 })
+  ok('private wishlist: asks to RSVP, shows no items', (await g.getByRole('link', { name: 'RSVP', exact: true }).count()) >= 1 && (await g.getByText('Diapers (newborn)').count()) === 0)
+  shots.push(['wishlist-private', await g.screenshot({ fullPage: true })])
+  await g.goto(`${BASE}#/attire`)
+  await g.getByText(/shared with the guests who are joining us/).waitFor({ timeout: 20000 })
+  ok('private What to Wear: asks to RSVP', (await g.getByRole('heading', { name: 'What to Wear' }).count()) >= 1 && (await g.locator('img').count()) === 0)
+  // A guest who has said yes opens it with their name.
+  attending = true
+  await g.goto(`${BASE}#/registry`)
+  await g.getByRole('button', { name: 'Open it with your name' }).click()
+  await g.getByLabel('Your full name').fill('Ana Santos')
+  await g.getByRole('button', { name: 'Continue' }).click()
+  await g.getByText('Diapers (newborn)').waitFor({ timeout: 10000 })
+  ok('attending guest: the wishlist opens', true)
+  const idea = g.locator('li', { hasText: 'A cloud nursery' })
+  ok('idea: photo, title and caption, nothing to claim', (await idea.locator('img').count()) === 1 && (await idea.getByText('Soft clouds and little stars').count()) === 1 && (await idea.getByRole('button').count()) === 0)
+  ok('ideas sit in their own section', (await g.getByRole('heading', { name: /ideas/i }).count()) === 1)
+  shots.push(['wishlist-ideas', await g.screenshot({ fullPage: true })])
+  await g.goto(`${BASE}#/attire`)
+  await g.locator('#outfits-heading').waitFor({ timeout: 20000 })
+  ok('attending guest: What to Wear opens', (await g.locator('img').count()) >= 1)
+  ok('no page errors (guest-only)', gerr.length === 0, gerr.join(' | '))
+  await pctx.close()
+
   // ---------------------------------------------------------------- admin: the answer stays masked
   revealed = false
   const actx = await browser.newContext({ viewport: { width: 1280, height: 900 } })
@@ -218,6 +273,14 @@ try {
   ok('admin: Show lets you see and change it', (await a.locator('button[aria-pressed="true"]').count()) === 1)
   await a.getByRole('button', { name: 'Hide', exact: true }).click()
   ok('admin: and hide it again', (await a.getByText(/••••••/).count()) === 1)
+  // Admin → Gift Registry: a gift or an idea (photo, title, caption).
+  await a.goto(`${BASE}#/admin/registry`)
+  await a.getByRole('button', { name: 'Add an idea' }).click()
+  const dlg = a.getByRole('dialog')
+  ok('admin: an idea has a photo upload and a caption', (await dlg.getByText('Upload a photo').count()) === 1 && (await dlg.getByLabel('Caption').count()) === 1 && (await dlg.getByLabel('How many do you need?').count()) === 0)
+  await dlg.getByRole('radio', { name: 'Gift to bring' }).click()
+  ok('admin: a gift has a quantity', (await dlg.getByLabel('How many do you need?').count()) === 1)
+  shots.push(['admin-registry-idea', await dlg.screenshot()])
   ok('no page errors (admin)', aerr.length === 0, aerr.join(' | '))
   await actx.close()
 } catch (e) {

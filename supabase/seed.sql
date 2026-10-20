@@ -50,7 +50,7 @@ values
   ('Noel Salazar', 'sample-38', 0, true, 'groom', 'none', null),
   ('Mika Javier', 'sample-39', 0, true, 'bride', 'none', null),
   ('Luis Javier', 'sample-40', 0, false, 'groom', 'none', null)  -- the last one is inactive: must NOT be found by the name search
-on conflict (invitation_code) do nothing;
+on conflict (space_id, invitation_code) do nothing;
 
 -- A few test replies so the dashboard has something to show.
 insert into public.rsvp_responses (invitation_id, attendance_status, recorded_by_admin)

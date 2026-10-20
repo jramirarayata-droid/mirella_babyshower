@@ -78,6 +78,7 @@ const AdminMusic = page(() => import('./pages/AdminMusic'))
 const AdminRaffle = page(() => import('./pages/AdminRaffle'))
 const AdminSchedule = page(() => import('./pages/AdminSchedule'))
 const Registry = page(() => import('./pages/Registry'))
+const Attire = page(() => import('./pages/Attire'))
 const Predictions = page(() => import('./pages/Predictions'))
 const NameIdeas = page(() => import('./pages/NameIdeas'))
 const ShowerScreen = page(() => import('./pages/ShowerScreen'))
@@ -157,6 +158,7 @@ export default function App() {
               <Route path="/photos/show" element={<Navigate to="/present/guests" replace />} />
               <Route path="/present/:source" element={gated('slideshow', <Present />)} />
               <Route path="/registry" element={<Registry />} />
+              <Route path="/attire" element={<Attire />} />
               <Route path="/predict" element={gated('predictions', <Predictions />)} />
               <Route path="/names" element={gated('names', <NameIdeas />)} />
               <Route path="/show/:what" element={gated('big_screen', <ShowerScreen />)} />

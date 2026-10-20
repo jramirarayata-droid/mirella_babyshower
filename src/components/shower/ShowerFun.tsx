@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Baby, Gift, PenLine, type LucideIcon } from 'lucide-react'
-import { getNameIdeasInfo, getPredictionsInfo, getRegistry } from '../../services/showerService'
+import { currentShowerGuest, getNameIdeasInfo, getPredictionsInfo, getRegistry } from '../../services/showerService'
+import { listAttire } from '../../services/outfitService'
 import { Reveal } from '../wedding/Reveal'
 import { Ornament } from '../ui/Ornament'
 import { useSpace } from '../../hooks/useSpace'
@@ -16,6 +17,8 @@ interface Card {
 
 export interface ShowerActivities {
   registry: boolean
+  /** What to Wear is kept for attending guests and this guest may see it (it isn't on the home page then). */
+  attirePage: boolean
   predict: boolean
   predictOpen: boolean
   names: boolean
@@ -23,14 +26,27 @@ export interface ShowerActivities {
 
 let activities: Promise<ShowerActivities> | null = null
 
+/** Ask again (e.g. right after a guest RSVPs "attending" and may now see the wishlist). */
+export function refreshShowerActivities() {
+  activities = null
+}
+
 /** Which shower activities are on (for the home page and the guest menu; asked once per visit). */
 export function useShowerActivities(): ShowerActivities | null {
   const { has } = useSpace()
   const [on, setOn] = useState<ShowerActivities | null>(null)
   useEffect(() => {
     let alive = true
-    activities ??= Promise.all([getRegistry().catch(() => null), getPredictionsInfo().catch(() => null), getNameIdeasInfo().catch(() => null)]).then(([r, p, n]) => ({
-      registry: Boolean(r?.visible),
+    const token = currentShowerGuest()?.token
+    activities ??= Promise.all([
+      getRegistry(token).catch(() => null),
+      getPredictionsInfo().catch(() => null),
+      getNameIdeasInfo().catch(() => null),
+      listAttire(token).catch(() => null),
+    ]).then(([r, p, n, a]) => ({
+      // A wishlist kept for attending guests only shows for them.
+      registry: Boolean(r?.visible && !r.private),
+      attirePage: Boolean(a?.private && a.allowed && a.images.length > 0),
       predict: Boolean(p?.visible),
       predictOpen: Boolean(p?.open),
       names: Boolean(n?.visible),
