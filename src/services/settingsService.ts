@@ -467,7 +467,7 @@ export async function updateOutfitSectionSettings(id: string, input: OutfitSecti
  * Admin: uploads an image to the public `wedding-assets` bucket and returns its
  * public URL. `name` is the logical file name, e.g. "hero".
  */
-export async function uploadWeddingAsset(file: File, name: 'hero' | 'logo' | 'background' | 'outfits/male' | 'outfits/female' = 'hero'): Promise<string> {
+export async function uploadWeddingAsset(file: File, name: 'hero' | 'logo' | 'background' | 'outfits/male' | 'outfits/female' | 'registry' = 'hero'): Promise<string> {
   const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
   if (!allowed.includes(file.type)) throw new FriendlyError('Please choose a JPG, PNG, WebP or AVIF image.')
   if (file.size > 10 * 1024 * 1024) throw new FriendlyError('Please choose an image smaller than 10 MB.')

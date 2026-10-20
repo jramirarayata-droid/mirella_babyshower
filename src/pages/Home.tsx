@@ -35,7 +35,7 @@ import { useSpace } from '../hooks/useSpace'
 
 export default function Home() {
   const { settings, loading, error, refresh } = useWeddingSettings()
-  const outfits = useOutfits()
+  const attire = useOutfits()
   const gallery = useGallery()
   const display = useDisplayPrefs()
   const program = useProgram(Boolean(settings?.programVisible))
@@ -58,7 +58,8 @@ export default function Home() {
   if (loading && !settings) return <PageLoader />
   if (error || !settings) return <PublicError message={error ?? undefined} onRetry={() => refresh()} />
 
-  const showOutfits = settings.outfitSectionVisible && outfits.length > 0
+  // What to Wear may be kept for attending guests (Website Settings → Privacy): then only they get the photos.
+  const showOutfits = settings.outfitSectionVisible && attire.allowed && attire.images.length > 0
   // Inside the admin's preview, "&gallery=polaroid" tries a layout without saving it.
   const previewLayout = isThemePreviewFrame() ? (/[?&]gallery=([a-z]+)/.exec(window.location.hash)?.[1] as GalleryLayout | undefined) : undefined
   const galleryLayout = GALLERY_LAYOUTS.some((g) => g.id === previewLayout) ? previewLayout! : settings.galleryLayout
@@ -109,7 +110,7 @@ export default function Home() {
           <OutfitGallery
             title={settings.outfitTitle}
             subtitle={settings.outfitSubtitle}
-            images={outfits}
+            images={attire.images}
             layout={settings.outfitLayout}
             motifTitle={settings.motifTitle}
             motifColors={settings.motifColors}

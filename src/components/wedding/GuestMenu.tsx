@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { Armchair, Baby, Camera, Clapperboard, Gift, Images, Info, KeyRound, LogOut, Mail, Menu, PenLine, Sparkles, Trophy, X } from 'lucide-react'
+import { Armchair, Baby, Camera, Clapperboard, Gift, Images, Info, KeyRound, LogOut, Mail, Menu, PenLine, Shirt, Sparkles, Trophy, X } from 'lucide-react'
 import { useHost } from '../../hooks/hostContext'
 import { useWeddingSettings } from '../../hooks/useWeddingSettings'
 import { useDisplayPrefs } from '../../hooks/useDisplayPrefs'
@@ -58,6 +58,7 @@ export function useGuestLinks(): Item[] {
   if (has('seating') && isFinderOpen(settings.seatingConfig, display?.revealAt)) items.push({ to: '/seat', label: 'Find my seat', hint: 'Your table at the shower', icon: Armchair })
   if (photos && has('guest_photos')) items.push({ to: '/photos', label: 'Photos', hint: 'See and share photos from the shower', icon: Camera })
   if (fun?.registry) items.push({ to: '/registry', label: 'Gift wishlist', hint: 'What the baby still needs', icon: Gift })
+  if (fun?.attirePage) items.push({ to: '/attire', label: 'What to wear', hint: 'Outfit ideas for the shower', icon: Shirt })
   if (fun?.predict) items.push({ to: '/predict', label: 'Baby predictions', hint: fun.predictOpen ? 'Guess the birthday, weight and boy or girl' : 'See the guesses', icon: Baby })
   if (fun?.names) items.push({ to: '/names', label: 'Name ideas', hint: 'Suggest a name for the baby', icon: PenLine })
   return items

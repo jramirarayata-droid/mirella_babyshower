@@ -1,0 +1,54 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Gift, Shirt, type LucideIcon } from 'lucide-react'
+import { getRegistry } from '../../services/showerService'
+import { listAttire } from '../../services/outfitService'
+
+/**
+ * On the RSVP confirmation (and for guests who already said yes): the gift
+ * wishlist and What to Wear — including when the hosts keep them for attending
+ * guests only. Shows nothing until the guest's pass is ready.
+ */
+export function AttendingExtras({ token, className = '' }: { token: string | null; className?: string }) {
+  const [links, setLinks] = useState<{ to: string; title: string; text: string; icon: LucideIcon }[] | null>(null)
+
+  useEffect(() => {
+    if (!token) return
+    let alive = true
+    Promise.all([getRegistry(token).catch(() => null), listAttire(token).catch(() => null)]).then(([r, a]) => {
+      if (!alive) return
+      const next: { to: string; title: string; text: string; icon: LucideIcon }[] = []
+      if (r?.visible && !r.private && r.items.length > 0) next.push({ to: '/registry', title: r.title || 'Gift Wishlist', text: 'What our little one still needs — mark what you’ll bring.', icon: Gift })
+      if (a?.allowed && a.images.length > 0) next.push({ to: '/attire', title: 'What to Wear', text: 'Outfit ideas and our colours for the day.', icon: Shirt })
+      setLinks(next)
+    })
+    return () => {
+      alive = false
+    }
+  }, [token])
+
+  if (!links || links.length === 0) return null
+  return (
+    <nav aria-label="For our guests" className={`mx-auto w-full max-w-xl ${className}`}>
+      <p className="eyebrow text-center">Just for you</p>
+      <ul className={`mt-4 grid gap-3 ${links.length > 1 ? 'sm:grid-cols-2' : ''}`}>
+        {links.map((l) => (
+          <li key={l.to}>
+            <Link
+              to={l.to}
+              className="flex h-full items-start gap-3 rounded-2xl border border-line bg-paper p-4 text-left shadow-soft transition hover:border-champagne"
+            >
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-champagne-light/50 text-gold">
+                <l.icon aria-hidden="true" className="size-5" strokeWidth={1.5} />
+              </span>
+              <span>
+                <span className="block font-serif text-xl text-ink">{l.title}</span>
+                <span className="mt-0.5 block text-sm text-ink-soft">{l.text}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}

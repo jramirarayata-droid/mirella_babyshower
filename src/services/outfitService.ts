@@ -28,7 +28,23 @@ async function list(context: string): Promise<OutfitImage[]> {
   return ((data ?? []) as Tables<'outfit_images'>[]).map(fromRow)
 }
 
-/** Public: visible outfit images only (enforced by RLS for visitors). */
+/**
+ * What to Wear for the website. When the hosts keep it for attending guests
+ * (Website Settings → Privacy), the database only sends the photos to a guest
+ * pass whose invitation said "attending".
+ */
+export async function listAttire(token?: string | null): Promise<{ private: boolean; allowed: boolean; images: OutfitImage[] }> {
+  const { data, error } = await supabase.rpc('attire_list', { p_token: token ?? null })
+  if (error) {
+    logError('listAttire', error)
+    throw new FriendlyError(FRIENDLY_ERRORS.generic)
+  }
+  const o = (data ?? {}) as { private?: unknown; allowed?: unknown; items?: unknown }
+  const rows = Array.isArray(o.items) ? (o.items as Tables<'outfit_images'>[]) : []
+  return { private: o.private === true, allowed: o.allowed !== false, images: rows.map(fromRow).filter((x) => x.isVisible) }
+}
+
+/** Admin: visible outfit images only. */
 export async function listVisibleOutfits(): Promise<OutfitImage[]> {
   const all = await list('listVisibleOutfits')
   return all.filter((o) => o.isVisible)

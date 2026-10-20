@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ArrowDown, ArrowUp, Eye, EyeOff, ExternalLink, Gift, Pencil, Plus, Trash2, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Eye, EyeOff, ExternalLink, Gift, ImagePlus, Lightbulb, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { PageHeader } from '../components/admin/PageHeader'
 import { SavedText, useAutoSaved, VisibilityField } from '../components/admin/ShowerAdminBits'
 import { Button } from '../components/ui/Button'
@@ -25,8 +25,12 @@ import { toFriendlyMessage } from '../utils/errors'
 import { isValidHttpUrl } from '../utils/validation'
 import { formatShortDate } from '../utils/formatting'
 import { siteLinks } from '../utils/share'
+import { cn } from '../components/ui/cn'
+import { uploadWeddingAsset } from '../services/settingsService'
+import { getWebsitePrivacy } from '../services/adminDisplayService'
+import { Link } from 'react-router-dom'
 
-const EMPTY: RegistryItemInput = { title: '', note: '', link: '', imageUrl: '', priceHint: '', quantity: 1, isVisible: true }
+const EMPTY: RegistryItemInput = { kind: 'gift', title: '', note: '', link: '', imageUrl: '', priceHint: '', quantity: 1, isVisible: true }
 
 /** Ideas to start a wishlist with (every one can be changed or removed). */
 const STARTERS: RegistryItemInput[] = [
@@ -49,6 +53,27 @@ export default function AdminRegistry() {
   const [editing, setEditing] = useState<{ id: string | null; v: RegistryItemInput } | null>(null)
   const [saving, setSaving] = useState(false)
   const [removing, setRemoving] = useState<AdminRegistryItem | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [guestOnly, setGuestOnly] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    getWebsitePrivacy()
+      .then((p) => setGuestOnly(p.hideWishlist))
+      .catch(() => undefined)
+  }, [])
+
+  const upload = async (file: File | undefined) => {
+    if (!file || !editing) return
+    setUploading(true)
+    try {
+      const url = await uploadWeddingAsset(file, 'registry')
+      setEditing((e) => (e ? { ...e, v: { ...e.v, imageUrl: url } } : e))
+    } catch (e) {
+      toast.error(toFriendlyMessage(e))
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const reload = useCallback(async () => {
     try {
@@ -67,7 +92,8 @@ export default function AdminRegistry() {
   const save = async () => {
     if (!editing) return
     const v = editing.v
-    if (!v.title.trim()) return toast.error('Give the item a name.')
+    if (!v.title.trim()) return toast.error(v.kind === 'idea' ? 'Give the idea a title.' : 'Give the item a name.')
+    if (v.kind === 'idea' && !v.imageUrl.trim()) return toast.error('Add a photo for the idea.')
     if (!isValidHttpUrl(v.link) || !isValidHttpUrl(v.imageUrl)) return toast.error('Links must start with https://')
     setSaving(true)
     try {
@@ -126,11 +152,16 @@ export default function AdminRegistry() {
     <>
       <PageHeader
         title="Gift Registry"
-        description="A wishlist on the website: guests tap “I’ll bring this” so gifts aren’t doubled. Only you see who is bringing what."
+        description="Gifts guests can bring (they tap “I’ll bring this” so nothing is doubled — only you see who) and ideas: a photo with a title and caption, just for inspiration."
         actions={
-          <Button icon={<Plus aria-hidden="true" className="size-4" />} onClick={() => setEditing({ id: null, v: { ...EMPTY } })}>
-            Add an item
-          </Button>
+          <>
+            <Button variant="outline" icon={<Lightbulb aria-hidden="true" className="size-4" />} onClick={() => setEditing({ id: null, v: { ...EMPTY, kind: 'idea' } })}>
+              Add an idea
+            </Button>
+            <Button icon={<Plus aria-hidden="true" className="size-4" />} onClick={() => setEditing({ id: null, v: { ...EMPTY } })}>
+              Add a gift
+            </Button>
+          </>
         }
       />
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -163,10 +194,16 @@ export default function AdminRegistry() {
                       <p className="flex flex-wrap items-center gap-2">
                         <span className="font-serif text-xl text-ink">{item.title}</span>
                         {!item.isVisible && <Badge tone="gray">Hidden</Badge>}
-                        {taken >= item.quantity ? <Badge tone="green">All taken</Badge> : <Badge tone="gold">{item.quantity - taken} still needed</Badge>}
+                        {item.kind === 'idea' ? (
+                          <Badge tone="ink">Idea</Badge>
+                        ) : taken >= item.quantity ? (
+                          <Badge tone="green">All taken</Badge>
+                        ) : (
+                          <Badge tone="gold">{item.quantity - taken} still needed</Badge>
+                        )}
                       </p>
                       <p className="text-sm text-muted">
-                        {taken} of {item.quantity} promised{item.priceHint ? ` · ${item.priceHint}` : ''}
+                        {item.kind === 'idea' ? item.note || 'Inspiration only — guests don’t claim it.' : `${taken} of ${item.quantity} promised${item.priceHint ? ` · ${item.priceHint}` : ''}`}
                         {item.link && (
                           <a href={item.link} target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-gold hover:underline">
                             link <ExternalLink aria-hidden="true" className="size-3" />
@@ -204,7 +241,7 @@ export default function AdminRegistry() {
                         size="sm"
                         variant="ghost"
                         aria-label="Edit"
-                        onClick={() => setEditing({ id: item.id, v: { title: item.title, note: item.note, link: item.link, imageUrl: item.imageUrl, priceHint: item.priceHint, quantity: item.quantity, isVisible: item.isVisible } })}
+                        onClick={() => setEditing({ id: item.id, v: { kind: item.kind, title: item.title, note: item.note, link: item.link, imageUrl: item.imageUrl, priceHint: item.priceHint, quantity: item.quantity, isVisible: item.isVisible } })}
                         icon={<Pencil aria-hidden="true" className="size-4" />}
                       />
                       <Button size="sm" variant="danger-quiet" aria-label="Delete" onClick={() => setRemoving(item)} icon={<Trash2 aria-hidden="true" className="size-4" />} />
@@ -225,6 +262,14 @@ export default function AdminRegistry() {
           ) : (
             <>
               <VisibilityField label="Wishlist page" mode={s.mode} from={s.from} onChange={settings.update} />
+              {guestOnly !== null && (
+                <p className="rounded-lg border border-line bg-cream px-3 py-2 text-sm text-ink-soft">
+                  {guestOnly ? 'Only guests who RSVP “attending” can open it — it’s on their confirmation.' : 'Anyone with the website link can open it.'}{' '}
+                  <Link to="/admin/settings" className="text-gold underline-offset-4 hover:underline">
+                    Change in Website Settings → Privacy
+                  </Link>
+                </p>
+              )}
               <TextField label="Title" value={s.title} onChange={(title) => settings.update({ title })} maxLength={60} />
               <TextAreaField label="A short note for guests" value={s.intro} onChange={(intro) => settings.update({ intro })} maxLength={300} rows={3} />
             </>
@@ -241,14 +286,14 @@ export default function AdminRegistry() {
       <Modal
         open={Boolean(editing)}
         onClose={() => setEditing(null)}
-        title={editing?.id ? 'Edit item' : 'Add an item'}
+        title={editing?.id ? (editing.v.kind === 'idea' ? 'Edit idea' : 'Edit gift') : editing?.v.kind === 'idea' ? 'Add an idea' : 'Add a gift'}
         locked={saving}
         footer={
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setEditing(null)}>
               Cancel
             </Button>
-            <Button loading={saving} loadingText="Saving…" onClick={() => void save()}>
+            <Button loading={saving} loadingText="Saving…" disabled={uploading} onClick={() => void save()}>
               Save
             </Button>
           </div>
@@ -256,21 +301,91 @@ export default function AdminRegistry() {
       >
         {editing && (
           <div className="space-y-4">
-            <TextField label="What is it?" value={editing.v.title} onChange={(title) => setEditing({ ...editing, v: { ...editing.v, title } })} maxLength={120} placeholder="e.g. Baby monitor" />
-            <TextAreaField label="Note (optional)" value={editing.v.note} onChange={(note) => setEditing({ ...editing, v: { ...editing.v, note } })} maxLength={300} rows={2} placeholder="Colour, size or brand you prefer" />
-            <div className="grid gap-4 sm:grid-cols-2">
-              <TextField
-                label="How many do you need?"
-                type="number"
-                min={1}
-                max={99}
-                value={String(editing.v.quantity)}
-                onChange={(q) => setEditing({ ...editing, v: { ...editing.v, quantity: Math.max(1, Math.min(99, Number(q) || 1)) } })}
-              />
-              <TextField label="Price idea (optional)" value={editing.v.priceHint} onChange={(priceHint) => setEditing({ ...editing, v: { ...editing.v, priceHint } })} maxLength={40} placeholder="e.g. around ₱1,500" />
+            <div role="radiogroup" aria-label="Type" className="grid grid-cols-2 gap-1 rounded-lg bg-cream p-1">
+              {(
+                [
+                  ['gift', 'Gift to bring', Gift],
+                  ['idea', 'Idea only', Lightbulb],
+                ] as const
+              ).map(([k, label, Icon]) => (
+                <button
+                  key={k}
+                  type="button"
+                  role="radio"
+                  aria-checked={editing.v.kind === k}
+                  onClick={() => setEditing({ ...editing, v: { ...editing.v, kind: k } })}
+                  className={cn('flex min-h-11 items-center justify-center gap-2 rounded-md px-3 text-sm transition', editing.v.kind === k ? 'bg-paper text-ink shadow-soft' : 'text-muted hover:text-ink')}
+                >
+                  <Icon aria-hidden="true" className="size-4" /> {label}
+                </button>
+              ))}
             </div>
-            <TextField label="Link to an example (optional)" type="url" value={editing.v.link} onChange={(link) => setEditing({ ...editing, v: { ...editing.v, link } })} placeholder="https://…" />
-            <TextField label="Picture link (optional)" type="url" value={editing.v.imageUrl} onChange={(imageUrl) => setEditing({ ...editing, v: { ...editing.v, imageUrl } })} placeholder="https://…" hint="A link to a photo of the item." />
+            <p className="-mt-2 text-xs text-muted">
+              {editing.v.kind === 'idea'
+                ? 'A photo with a title and caption, just for inspiration. Guests don’t claim it.'
+                : 'Guests tap “I’ll bring this” so it isn’t doubled. Only you see who is bringing it.'}
+            </p>
+
+            <div>
+              <p className="mb-1.5 text-sm font-medium text-ink">Photo{editing.v.kind === 'idea' ? '' : ' (optional)'}</p>
+              <div className="flex items-center gap-3">
+                {editing.v.imageUrl ? (
+                  <img src={editing.v.imageUrl} alt="" className="size-20 shrink-0 rounded-lg border border-line object-cover" />
+                ) : (
+                  <span className="grid size-20 shrink-0 place-items-center rounded-lg border border-dashed border-line bg-cream text-champagne">
+                    <ImagePlus aria-hidden="true" className="size-6" strokeWidth={1.3} />
+                  </span>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <label className={cn('inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border border-line px-4 text-sm text-ink transition hover:border-champagne', uploading && 'pointer-events-none opacity-60')}>
+                    <ImagePlus aria-hidden="true" className="size-4 text-gold" />
+                    {uploading ? 'Uploading…' : editing.v.imageUrl ? 'Change photo' : 'Upload a photo'}
+                    <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only" onChange={(e) => void upload(e.target.files?.[0])} />
+                  </label>
+                  {editing.v.imageUrl && (
+                    <Button size="sm" variant="ghost" onClick={() => setEditing({ ...editing, v: { ...editing.v, imageUrl: '' } })}>
+                      Remove
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <TextField
+              label={editing.v.kind === 'idea' ? 'Title' : 'What is it?'}
+              value={editing.v.title}
+              onChange={(title) => setEditing({ ...editing, v: { ...editing.v, title } })}
+              maxLength={120}
+              placeholder={editing.v.kind === 'idea' ? 'e.g. A cozy reading corner' : 'e.g. Baby monitor'}
+            />
+            <TextAreaField
+              label={editing.v.kind === 'idea' ? 'Caption' : 'Note (optional)'}
+              value={editing.v.note}
+              onChange={(note) => setEditing({ ...editing, v: { ...editing.v, note } })}
+              maxLength={300}
+              rows={2}
+              placeholder={editing.v.kind === 'idea' ? 'A few words about the idea' : 'Colour, size or brand you prefer'}
+            />
+            {editing.v.kind === 'gift' && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextField
+                  label="How many do you need?"
+                  type="number"
+                  min={1}
+                  max={99}
+                  value={String(editing.v.quantity)}
+                  onChange={(q) => setEditing({ ...editing, v: { ...editing.v, quantity: Math.max(1, Math.min(99, Number(q) || 1)) } })}
+                />
+                <TextField label="Price idea (optional)" value={editing.v.priceHint} onChange={(priceHint) => setEditing({ ...editing, v: { ...editing.v, priceHint } })} maxLength={40} placeholder="e.g. around ₱1,500" />
+              </div>
+            )}
+            <TextField
+              label={editing.v.kind === 'idea' ? 'Where to find it (optional)' : 'Link to an example (optional)'}
+              type="url"
+              value={editing.v.link}
+              onChange={(link) => setEditing({ ...editing, v: { ...editing.v, link } })}
+              placeholder="https://…"
+            />
           </div>
         )}
       </Modal>

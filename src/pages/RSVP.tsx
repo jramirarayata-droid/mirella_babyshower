@@ -30,6 +30,9 @@ import { RSVPForm } from '../components/rsvp/RSVPForm'
 import { EMPTY_RSVP } from '../components/rsvp/rsvpDefaults'
 import { SuccessState } from '../components/rsvp/SuccessState'
 import { EventDetails } from '../components/rsvp/EventDetails'
+import { AttendingExtras } from '../components/rsvp/AttendingExtras'
+import { currentShowerGuest, startShowerGuest } from '../services/showerService'
+import { refreshShowerActivities } from '../components/shower/ShowerFun'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { Ornament } from '../components/ui/Ornament'
 import { PublicHeader } from '../components/wedding/PublicHeader'
@@ -58,6 +61,8 @@ export default function RSVP() {
   const [closedByServer, setClosedByServer] = useState(false)
   const [gift, setGift] = useState<PublicGift | null>(null)
   const [tableName, setTableName] = useState<string | null>(null)
+  // The guest pass (wishlist, What to Wear, games) for a guest who said yes.
+  const [pass, setPass] = useState<string | null>(null)
   // Chair number — only when the seat was pre-assigned.
   const [seatNo, setSeatNo] = useState<number | null>(null)
   const submittingRef = useRef(false)
@@ -139,6 +144,24 @@ export default function RSVP() {
     window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })
   }, [step, reduce])
 
+  // A guest who said yes gets their pass, so the wishlist and What to Wear open
+  // for them even when the hosts keep those for attending guests only.
+  const openPass = async (name: string) => {
+    const mine = currentShowerGuest()
+    if (mine && mine.name.trim().toLowerCase() === name.trim().toLowerCase()) {
+      setPass(mine.token)
+    } else {
+      const r = await startShowerGuest(name).catch(() => null)
+      setPass(r?.ok ? r.guest.token : null)
+    }
+    refreshShowerActivities()
+  }
+  const alreadyAttending = Boolean(invitation && details?.id === invitation.invitationId && details.d?.attendanceStatus === 'attending')
+  useEffect(() => {
+    if (alreadyAttending && invitation && !pass) void openPass(invitation.inviteeName)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alreadyAttending, invitation])
+
   const handleConfirm = async () => {
     if (!invitation || submittingRef.current) return
     submittingRef.current = true
@@ -153,6 +176,7 @@ export default function RSVP() {
       setTableName(seat?.tableName ?? null)
       setSeatNo(seat?.preassign ? seat.seat : null)
       setConfirmOpen(false)
+      if (saved.attendanceStatus === 'attending') await openPass(invitation.inviteeName)
       setResult({ status: saved.attendanceStatus, guests: payload.additionalGuests.length })
       setStep('success')
       getInvitationGift(invitation.invitationId).then(setGift)
@@ -249,6 +273,7 @@ export default function RSVP() {
             <motion.section key="card" {...pageMotion} className="flex flex-1 flex-col items-center">
               <FlipCard frontHtml={card.frontHtml} backHtml={card.backHtml} width={cardW} />
               {settings && details?.id === invitation.invitationId && details.d?.attendanceStatus === 'attending' && <EventDetails venues={settings} className="mt-6" />}
+              {alreadyAttending && <AttendingExtras token={pass} className="mt-6" />}
               <Button size="lg" className="mt-6" onClick={() => setStep('form')} icon={<MailOpen aria-hidden="true" className="size-5" strokeWidth={1.5} />} autoFocus>
                 Continue to RSVP
               </Button>
@@ -286,6 +311,7 @@ export default function RSVP() {
                 requestedGuests={result.guests}
                 venues={settings ?? undefined}
               />
+              {result.status === 'attending' && <AttendingExtras token={pass} />}
               {gift && <GiftCard gift={gift} />}
             </motion.section>
           )}

@@ -52,8 +52,12 @@ export async function startShowerGuest(name: string): Promise<{ ok: true; guest:
 
 // ---------------------------------------------------------------- gift wishlist
 
+/** gift = something to bring ("I'll bring this"); idea = inspiration only (photo, title, caption). */
+export type RegistryKind = 'gift' | 'idea'
+
 export interface RegistryItem {
   id: string
+  kind: RegistryKind
   title: string
   note: string
   link: string
@@ -66,6 +70,8 @@ export interface RegistryItem {
 
 export interface RegistryView {
   visible: boolean
+  /** Kept for attending guests: true until this guest has RSVP'd "attending". */
+  private: boolean
   title: string
   intro: string
   me: string | null
@@ -76,6 +82,7 @@ const toItem = (x: unknown): RegistryItem => {
   const r = obj(x)
   return {
     id: str(r.id),
+    kind: r.kind === 'idea' ? 'idea' : 'gift',
     title: str(r.title),
     note: str(r.note),
     link: str(r.link),
@@ -91,23 +98,40 @@ export async function getRegistry(token?: string | null): Promise<RegistryView> 
   const { data, error } = await supabase.rpc('registry_list', { p_token: token ?? null })
   if (error) fail('getRegistry', error, 'The wishlist couldn’t be loaded. Please try again.')
   const o = obj(data)
-  return { visible: o.visible === true, title: str(o.title) || 'Gift Wishlist', intro: str(o.intro), me: str(o.me) || null, items: arr(o.items).map(toItem) }
+  return { visible: o.visible === true, private: o.private === true, title: str(o.title) || 'Gift Wishlist', intro: str(o.intro), me: str(o.me) || null, items: arr(o.items).map(toItem) }
 }
 
-export type ClaimResult = { ok: true } | { ok: false; reason: 'taken' | 'closed' | 'who' | 'gone'; left?: number }
+export type ClaimResult = { ok: true } | { ok: false; reason: 'taken' | 'closed' | 'who' | 'gone' | 'private'; left?: number }
 
 export async function claimRegistryItem(token: string, itemId: string, qty = 1): Promise<ClaimResult> {
   const { data, error } = await supabase.rpc('registry_claim', { p_token: token, p_item: itemId, p_qty: qty })
   if (error) fail('claimRegistryItem', error, 'That didn’t save. Please try again.')
   const o = obj(data)
   if (o.ok === true) return { ok: true }
-  const reason = o.reason === 'taken' || o.reason === 'closed' || o.reason === 'who' ? o.reason : 'gone'
+  const reason = o.reason === 'taken' || o.reason === 'closed' || o.reason === 'who' || o.reason === 'private' ? o.reason : 'gone'
   return { ok: false, reason, left: num(o.left) ?? undefined }
 }
 
 export async function unclaimRegistryItem(token: string, itemId: string): Promise<void> {
   const { error } = await supabase.rpc('registry_unclaim', { p_token: token, p_item: itemId })
   if (error) fail('unclaimRegistryItem', error, 'That didn’t save. Please try again.')
+}
+
+/** What this visitor may see: parts kept for attending guests, and whether they are one. */
+export interface GuestAccess {
+  wishlistPrivate: boolean
+  attirePrivate: boolean
+  attending: boolean
+}
+
+export async function getGuestAccess(token?: string | null): Promise<GuestAccess> {
+  const { data, error } = await supabase.rpc('guest_access', { p_token: token ?? null })
+  if (error) {
+    logError('getGuestAccess', error)
+    return { wishlistPrivate: false, attirePrivate: false, attending: false }
+  }
+  const o = obj(data)
+  return { wishlistPrivate: o.wishlistPrivate === true, attirePrivate: o.attirePrivate === true, attending: o.attending === true }
 }
 
 // admin
@@ -128,6 +152,7 @@ export const saveRegistrySettings = (s: RegistrySettings) => saveAdminPreference
 
 export interface AdminRegistryItem {
   id: string
+  kind: RegistryKind
   title: string
   note: string
   link: string
@@ -154,6 +179,7 @@ export async function listRegistryAdmin(): Promise<AdminRegistryItem[]> {
   }
   return ((items.data ?? []) as Record<string, unknown>[]).map((r) => ({
     id: str(r.id),
+    kind: r.kind === 'idea' ? 'idea' : 'gift',
     title: str(r.title),
     note: str(r.note),
     link: str(r.link),
@@ -166,9 +192,10 @@ export async function listRegistryAdmin(): Promise<AdminRegistryItem[]> {
   }))
 }
 
-export type RegistryItemInput = Pick<AdminRegistryItem, 'title' | 'note' | 'link' | 'imageUrl' | 'priceHint' | 'quantity' | 'isVisible'>
+export type RegistryItemInput = Pick<AdminRegistryItem, 'kind' | 'title' | 'note' | 'link' | 'imageUrl' | 'priceHint' | 'quantity' | 'isVisible'>
 
 const itemRow = (i: RegistryItemInput) => ({
+  kind: i.kind,
   title: i.title.trim().slice(0, 120),
   note: i.note.trim().slice(0, 300) || null,
   link: i.link.trim() || null,
