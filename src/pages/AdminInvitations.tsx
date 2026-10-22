@@ -41,7 +41,7 @@ import {
 import { clearInvitationOpen, getInvitationOpens, type InvitationOpen } from '../services/virtualInviteService'
 import { getAdminPreference, saveAdminPreference } from '../services/preferencesService'
 import { DEFAULT_INVITE_MESSAGE, buildInviteMessage, virtualInviteUrl } from '../utils/inviteMessage'
-import { copyText } from '../utils/share'
+import { copyText, siteLinks } from '../utils/share'
 
 const MESSAGE_KEY = 'invite_message'
 
@@ -536,8 +536,10 @@ export default function AdminInvitations() {
           name: rows[0]?.inviteeName ?? 'Tita Lorna',
           date: settings ? formatWeddingDate(settings.weddingDate) : '',
           couple: settings?.coupleNames ?? '',
-          link: virtualInviteUrl(rows[0]?.invitationCode ?? 'abc123'),
+          // Open RSVP link: everyone gets the same website link (there are no personal links to send).
+          link: openMode ? siteLinks().home : virtualInviteUrl(rows[0]?.invitationCode ?? 'abc123'),
         }}
+        openMode={openMode}
         onClose={() => !savingMessage && setMessageOpen(false)}
         onSave={saveMessage}
       />
