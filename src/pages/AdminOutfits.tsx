@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { GuestOnlySwitch } from '../components/admin/GuestOnlySwitch'
 import { ArrowDown, ArrowUp, Eye, EyeOff, ImagePlus, Save, Trash2 } from 'lucide-react'
 import { useToast } from '../hooks/useToast'
 import { setCachedWeddingSettings } from '../hooks/useWeddingSettings'
@@ -167,6 +168,7 @@ export default function AdminOutfits() {
                 : 'Guests switch between the looks for him and for her; each photo shows its own label.'}
             </p>
           </div>
+          <GuestOnlySwitch what="attire" className="mt-5" />
           <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <label className="flex cursor-pointer items-center gap-3 text-sm text-ink-soft">
               <input

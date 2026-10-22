@@ -281,6 +281,18 @@ try {
   await dlg.getByRole('radio', { name: 'Gift to bring' }).click()
   ok('admin: a gift has a quantity', (await dlg.getByLabel('How many do you need?').count()) === 1)
   shots.push(['admin-registry-idea', await dlg.screenshot()])
+  await dlg.getByRole('button', { name: 'Cancel' }).click()
+  // Who can see it — right on the page (same setting as Website Settings → Privacy).
+  const who = a.getByRole('radiogroup', { name: 'Who can see the wishlist' })
+  ok('admin: the wishlist page has the “who can see it” choice', (await who.getByRole('radio', { name: /Everyone/ }).getAttribute('aria-checked')) === 'true')
+  await who.getByRole('radio', { name: /Only guests who RSVP/ }).click()
+  await a.waitForTimeout(800)
+  ok('admin: choosing “attending only” saves it', (await who.getByRole('radio', { name: /Only guests who RSVP/ }).getAttribute('aria-checked')) === 'true')
+  await a.goto(`${BASE}#/admin/outfits`)
+  const whoAttire = a.getByRole('radiogroup', { name: 'Who can see the outfit photos' })
+  await whoAttire.waitFor({ timeout: 15000 })
+  ok('admin: What to Wear has the same choice', (await whoAttire.getByRole('radio').count()) === 2)
+  shots.push(['admin-attire-who', await a.screenshot()])
   ok('no page errors (admin)', aerr.length === 0, aerr.join(' | '))
   await actx.close()
 } catch (e) {
