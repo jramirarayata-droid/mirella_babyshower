@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Eye, Pencil, Settings2, Plus, Printer, RotateCcw, Send, Trash2, UserPlus } from 'lucide-react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { Eye, Link2, Pencil, Settings2, Plus, Printer, RotateCcw, Send, Trash2, UserPlus } from 'lucide-react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAdminData } from '../hooks/useAdminData'
 import { useToast } from '../hooks/useToast'
 import { createInvitation, deleteInvitation, includeInvitation, recordRsvpForGuest, separateGuest, setIncludedGuests, updateInvitation } from '../services/adminService'
@@ -70,6 +70,8 @@ export default function AdminInvitations() {
   const [separating, setSeparating] = useState(false)
   const [newTables, setNewTables] = useState<SeatingTable[]>([])
   const { settings } = useWeddingSettings()
+  // Open link (Website Settings → How guests RSVP): guests sign up themselves, no names are added here.
+  const openMode = settings?.rsvpMode === 'open'
   // Positions are typed per invitation (there is no entourage).
   const autoPositions = useMemo(() => new Map<string, string>(), [])
   const tables = useMemo(() => {
@@ -330,7 +332,17 @@ export default function AdminInvitations() {
   )
 
   const columns: Column<InvitationWithRSVP>[] = [
-    { key: 'name', header: 'Invitee', cell: (r) => <span className="font-medium text-ink">{r.inviteeName}</span>, hideOnMobile: true },
+    {
+      key: 'name',
+      header: 'Invitee',
+      cell: (r) => (
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="font-medium text-ink">{r.inviteeName}</span>
+          {r.source === 'link' && <Badge tone="gold">Signed up via link</Badge>}
+        </span>
+      ),
+      hideOnMobile: true,
+    },
     { key: 'side', header: 'Side', cell: (r) => <Badge tone={r.side === 'bride' ? 'rose' : 'gold'}>{r.side === 'bride' ? 'Mom' : 'Dad'}</Badge>, className: 'whitespace-nowrap' },
     { key: 'table', header: 'Table', cell: (r) => r.tableNumber || '—' },
     {
@@ -388,12 +400,25 @@ export default function AdminInvitations() {
             <Button variant="outline" onClick={() => toPrint({ side })} icon={<Printer aria-hidden="true" className="size-4" />}>
               Print invitations
             </Button>
-            <Button onClick={openCreate} icon={<Plus aria-hidden="true" className="size-4" />}>
-              Add Invitation
-            </Button>
+            {!openMode && (
+              <Button onClick={openCreate} icon={<Plus aria-hidden="true" className="size-4" />}>
+                Add Invitation
+              </Button>
+            )}
           </>
         }
       />
+      {openMode && (
+        <p className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-champagne/60 bg-champagne-light/30 px-4 py-3 text-sm text-ink-soft">
+          <Link2 aria-hidden="true" className="size-4 text-gold" />
+          <span>
+            <strong className="font-medium text-ink">Open link in use.</strong> Everyone who signs up appears here; their companions wait in Extra guests for your approval.
+          </span>
+          <Link to="/admin/settings" className="text-gold underline-offset-4 hover:underline">
+            Change how guests RSVP
+          </Link>
+        </p>
+      )}
       {data && <HeadcountSummary invitations={data.invitations} side={side} />}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <FilterTabs

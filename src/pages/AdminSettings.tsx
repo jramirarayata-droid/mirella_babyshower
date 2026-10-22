@@ -15,6 +15,7 @@ import { cn } from '../components/ui/cn'
 import { SectionIcon } from '../components/wedding/SectionIcon'
 import { PageHeader } from '../components/admin/PageHeader'
 import { RsvpSettingsCard } from '../components/admin/RsvpSettingsCard'
+import { RsvpModeCard } from '../components/admin/RsvpModeCard'
 import { RsvpTeaserCard } from '../components/admin/RsvpTeaserCard'
 import { GiftSettingsCard } from '../components/admin/GiftSettingsCard'
 import { WebsitePrivacyCard } from '../components/admin/WebsitePrivacyCard'
@@ -189,6 +190,7 @@ export default function AdminSettings() {
       />
 
       <div className="space-y-6">
+        <RsvpModeCard />
         <Card title="General">
           <div className="grid gap-5 sm:grid-cols-2">
             <TextField

@@ -12,9 +12,11 @@ interface SearchFormProps {
   initialName?: string
   /** After a miss, offer one close match ("Did you mean …?"). */
   suggest?: boolean
+  /** The line under the box (the open link says "first and last name" instead of "as on your invitation"). */
+  help?: string
 }
 
-export function SearchForm({ onSearch, searching, error, initialName = '', suggest = true }: SearchFormProps) {
+export function SearchForm({ onSearch, searching, error, initialName = '', suggest = true, help = 'Please type your name as it appears on your invitation.' }: SearchFormProps) {
   const [name, setName] = useState(initialName)
   const [touched, setTouched] = useState(false)
   const [asked, setAsked] = useState('')
@@ -68,7 +70,7 @@ export function SearchForm({ onSearch, searching, error, initialName = '', sugge
         />
       </div>
       <p id="search-help" className="mt-3 text-center text-sm text-muted">
-        Please type your name as it appears on your invitation.
+        {help}
       </p>
       <FieldError id="search-error">{touched && empty ? 'Please enter your full name.' : error}</FieldError>
       {suggestion && error && !searching && (

@@ -70,6 +70,8 @@ export function validateRSVP(
   maxAdditionalGuests: number,
   config?: RsvpConfig,
   questions: RsvpQuestion[] = [],
+  /** Open-link sign-ups always leave a mobile number, even when declining. */
+  mobileAlways = false,
 ): RSVPErrors {
   const errors: RSVPErrors = {}
   const on = (k: Parameters<typeof builtinEnabled>[1]) => builtinEnabled(config, k)
@@ -79,7 +81,7 @@ export function validateRSVP(
     return errors
   }
   if (!form.mobileNumber.trim()) {
-    if (form.attendance === 'attending') errors.mobileNumber = 'Please enter your mobile number.'
+    if (form.attendance === 'attending' || mobileAlways) errors.mobileNumber = 'Please enter your mobile number.'
   } else if (!normalizePhMobile(form.mobileNumber)) errors.mobileNumber = 'Please enter a valid Philippine mobile number, e.g. 0917 123 4567.'
   const custom = validateCustomAnswers(visibleQuestions(questions, form.attendance, form.customAnswers), form.customAnswers)
   if (Object.keys(custom).length) errors.custom = custom

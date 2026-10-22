@@ -72,6 +72,10 @@ export interface WeddingSettings {
   rsvpClosedMessage: string
   rsvpShowDeadline: boolean
   rsvpButtonLabel: string
+  /** How guests RSVP: the customer's guest list, or one open link for everyone. */
+  rsvpMode: RsvpMode
+  /** Open link: how many companions each guest may add (names required; they wait for approval). */
+  openRsvpCompanions: number
   entourage: EntourageGroup[]
   entourageVisible: boolean
   entourageTitle: string
@@ -180,6 +184,9 @@ export interface RsvpSettings {
   rsvpButtonLabel: string
 }
 
+/** list = only the names the customer added; open = anyone with the link signs up. */
+export type RsvpMode = 'list' | 'open'
+
 export interface EntourageSettings {
   entourage: EntourageGroup[]
   entourageVisible: boolean
@@ -228,6 +235,8 @@ export type WeddingSettingsInput = Omit<
   | 'outfitSectionVisible'
   | 'outfitLayout'
   | keyof RsvpSettings
+  | 'rsvpMode'
+  | 'openRsvpCompanions'
   | keyof EntourageSettings
   | keyof MotifSettings
   | keyof GallerySettings

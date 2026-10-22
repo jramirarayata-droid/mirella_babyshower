@@ -6,7 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useInvitation } from '../hooks/useInvitation'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
 import { useRsvpQuestions } from '../hooks/useRsvpQuestions'
-import { submitRSVP } from '../services/rsvpService'
+import { submitOpenRSVP, submitRSVP } from '../services/rsvpService'
 import type { AttendanceStatus, RSVPFormState } from '../types/rsvp'
 import type { PublicGift } from '../types/wedding'
 import { isRsvpOpen } from '../services/settingsService'
@@ -46,7 +46,14 @@ const FALLBACK = { babyName: 'Baby', weddingDate: '' }
 export default function RSVP() {
   const { settings, loading: settingsLoading } = useWeddingSettings()
   const { questions } = useRsvpQuestions()
-  const { status, invitation, included, error, searchByName, searchByCode } = useInvitation()
+  const { status, invitation, included, error, searchByName, searchByCode, startNew, settle } = useInvitation()
+  // Open link (Website Settings → How guests RSVP): anyone with the link can sign up.
+  const openMode = settings?.rsvpMode === 'open'
+  const [asked, setAsked] = useState('')
+  const search = (name: string) => {
+    setAsked(name)
+    return searchByName(name)
+  }
   const [known] = useState(knownGuest)
   const finderOpen = useFinderOpen()
   const [params] = useSearchParams()
@@ -96,7 +103,7 @@ export default function RSVP() {
   const fromCard = params.get('from') === 'card'
   // Remember who's on this phone (menu greeting, Find My Seat, photos).
   useEffect(() => {
-    if (status === 'found' && invitation) rememberGuest({ name: invitation.inviteeName, invitationId: invitation.invitationId })
+    if (status === 'found' && invitation && invitation.invitationId) rememberGuest({ name: invitation.inviteeName, invitationId: invitation.invitationId })
     else if (status === 'included' && included) rememberGuest({ name: included.searchedName })
   }, [status, invitation, included])
 
@@ -106,7 +113,7 @@ export default function RSVP() {
 
   // The invitee's details for the card (e.g. "Ninang"), once their invitation is found.
   useEffect(() => {
-    if (!invitation || details?.id === invitation.invitationId) return
+    if (!invitation || !invitation.invitationId || details?.id === invitation.invitationId) return
     let alive = true
     const id = invitation.invitationId
     getInvitationCard(id).then((d) => alive && setDetails({ id, d }))
@@ -118,7 +125,10 @@ export default function RSVP() {
   const respondBy =
     settings && isRsvpOpen(settings) && settings.rsvpShowDeadline && settings.rsvpDeadline && !invitation?.hasExistingResponse ? formatDeadlineDate(settings.rsvpDeadline) : null
   const guest = useMemo<CardGuest | null>(() => {
-    if (!invitation || !settings || details?.id !== invitation.invitationId) return null
+    if (!invitation || !settings) return null
+    // Someone signing up through the open link: their card, with the name they typed.
+    if (invitation.isNew) return { inviteeName: invitation.inviteeName, includedGuests: [], position: '', respondBy, confirmed: false, addressedAs: '' }
+    if (details?.id !== invitation.invitationId) return null
     return {
       inviteeName: invitation.inviteeName,
       includedGuests: invitation.includedGuests,
@@ -131,7 +141,7 @@ export default function RSVP() {
   const card = useInvitationCard(step === 'found' || step === 'card' ? guest : null)
 
   const openEnvelope = () => {
-    if (invitation) void recordInvitationOpen(invitation.invitationId)
+    if (invitation?.invitationId) void recordInvitationOpen(invitation.invitationId)
     if (reduce) setStep('card')
     else setOpening(true)
   }
@@ -169,17 +179,19 @@ export default function RSVP() {
     setSubmitError(null)
     try {
       const payload = toSubmission(invitation.invitationId, form, invitation.maxAdditionalGuests, settings?.rsvpConfig, questions)
-      const saved = await submitRSVP(payload)
+      // An open-link sign-up creates the invitation as the reply is saved.
+      const saved = invitation.isNew ? await submitOpenRSVP(invitation.inviteeName, payload) : { ...(await submitRSVP(payload)), invitationId: invitation.invitationId }
+      if (invitation.isNew) settle(saved.invitationId)
       // This phone now belongs to the guest who just answered (photos, seat, menu follow).
-      rememberGuest({ name: invitation.inviteeName, invitationId: invitation.invitationId })
-      const seat = saved.attendanceStatus === 'attending' ? await getInvitationSeat(invitation.invitationId) : null
+      rememberGuest({ name: invitation.inviteeName, invitationId: saved.invitationId })
+      const seat = saved.attendanceStatus === 'attending' ? await getInvitationSeat(saved.invitationId) : null
       setTableName(seat?.tableName ?? null)
       setSeatNo(seat?.preassign ? seat.seat : null)
       setConfirmOpen(false)
       if (saved.attendanceStatus === 'attending') await openPass(invitation.inviteeName)
       setResult({ status: saved.attendanceStatus, guests: payload.additionalGuests.length })
       setStep('success')
-      getInvitationGift(invitation.invitationId).then(setGift)
+      getInvitationGift(saved.invitationId).then(setGift)
     } catch (e) {
       setConfirmOpen(false)
       if (e instanceof RsvpClosedError) setClosedByServer(true)
@@ -232,8 +244,9 @@ export default function RSVP() {
                 <p className="mt-1 text-xs uppercase tracking-[0.34em] text-muted">{formatWeddingDate(weddingDate)}</p>
                 <Ornament className="mt-7" />
                 <h1 id="search-heading" className="mt-7 text-[2.5rem] leading-tight text-ink sm:text-5xl">
-                  Search Your Invitation
+                  {openMode ? 'Your RSVP' : 'Search Your Invitation'}
                 </h1>
+                {openMode && <p className="mx-auto mt-4 max-w-sm text-ink-soft">Type your full name to reply — or to change a reply you’ve already sent.</p>}
                 {deadline && (
                   <p className="mx-auto mt-5 inline-flex items-center gap-2 text-sm text-ink-soft">
                     <CalendarClock aria-hidden="true" className="size-4 text-gold" strokeWidth={1.5} />
@@ -242,7 +255,17 @@ export default function RSVP() {
                 )}
               </div>
               {settings?.rsvpConfig.teaser && <RaffleTeaser teaser={settings.rsvpConfig.teaser} className="-mt-3 mb-9" />}
-              <SearchForm onSearch={searchByName} searching={status === 'searching'} error={status === 'not_found' || status === 'error' ? error : null} initialName={known?.name ?? ''} suggest={status === 'not_found'} />
+              <SearchForm
+                onSearch={search}
+                searching={status === 'searching'}
+                error={status === 'error' ? error : status === 'not_found' ? (openMode ? 'We don’t have a reply under this name yet.' : error) : null}
+                initialName={known?.name ?? ''}
+                suggest={status === 'not_found'}
+                help={openMode ? 'Please type your first and last name.' : undefined}
+              />
+              {openMode && status === 'not_found' && settings && (
+                <NewGuest name={asked} onContinue={(n) => startNew(n, settings.openRsvpCompanions)} />
+              )}
               {status === 'included' && included && (
                 <IncludedNotice included={included} showSeat={finderOpen} />
               )}
@@ -333,6 +356,27 @@ export default function RSVP() {
         onCancel={() => !submitting && setConfirmOpen(false)}
         onConfirm={handleConfirm}
       />
+    </div>
+  )
+}
+
+/** Open link: someone not here yet — continue as a new guest (first and last name needed). */
+function NewGuest({ name, onContinue }: { name: string; onContinue: (name: string) => void }) {
+  const clean = name.replace(/\s+/g, ' ').trim()
+  const full = /\S+ \S+/.test(clean)
+  return (
+    <div className="mx-auto mt-6 w-full max-w-md rounded-2xl border border-champagne/60 bg-paper p-5 text-center shadow-soft">
+      {full ? (
+        <>
+          <p className="font-serif text-xl text-ink">Nice to meet you, {clean.split(' ')[0]}!</p>
+          <p className="mt-1 text-sm text-ink-soft">If you haven’t replied before, continue as a new guest.</p>
+          <Button className="mt-4" fullWidth onClick={() => onContinue(clean)}>
+            Continue as {clean}
+          </Button>
+        </>
+      ) : (
+        <p className="text-sm text-ink-soft">Please type your first and last name.</p>
+      )}
     </div>
   )
 }

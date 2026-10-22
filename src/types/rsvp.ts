@@ -23,6 +23,8 @@ export interface InvitationLookup {
   hasExistingResponse: boolean
   /** Guests the couple included in this invitation (already confirmed). */
   includedGuests: string[]
+  /** Open link: someone signing up now (no invitation yet — created when they send their reply). */
+  isNew?: boolean
 }
 
 /** Client-side form state (strings/unions, before conversion for the RPC). */
@@ -80,6 +82,8 @@ export interface Invitation {
   side: GuestSide
   maxAdditionalGuests: number
   isActive: boolean
+  /** Added by the customer ('list') or signed up through the open RSVP link ('link'). */
+  source?: 'list' | 'link'
   createdAt: string
   updatedAt: string
 }
