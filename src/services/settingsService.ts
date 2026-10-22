@@ -138,6 +138,8 @@ export function isRsvpOpen(s: Pick<WeddingSettings, 'rsvpOpen' | 'rsvpDeadline'>
   return now < new Date(s.rsvpDeadline).getTime()
 }
 
+const stringList = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [])
+
 function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
   return {
     id: row.id,
@@ -177,7 +179,7 @@ function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
     motifTitle: row.motif_title ?? 'Our Motif',
     motifColors: parseMotif(row.motif_colors),
     galleryVisible: row.gallery_visible !== false,
-    pageOrder: Array.isArray((row as { page_order?: unknown }).page_order) ? ((row as { page_order: unknown[] }).page_order.filter((x) => typeof x === 'string') as string[]) : [],
+    pageOrder: stringList((row as unknown as { page_order?: unknown }).page_order),
     mediaOrder: Array.isArray((row as { media_order?: unknown }).media_order) ? ((row as { media_order: unknown[] }).media_order.filter((x) => typeof x === 'string') as string[]) : [],
     galleryTitle: row.gallery_title ?? 'Waiting for You, Little One',
     gallerySubtitle: row.gallery_subtitle ?? '',
