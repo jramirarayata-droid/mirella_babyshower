@@ -168,6 +168,8 @@ function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
     rsvpClosedMessage: row.rsvp_closed_message ?? '',
     rsvpShowDeadline: row.rsvp_show_deadline ?? true,
     rsvpButtonLabel: row.rsvp_button_label?.trim() || 'RSVP',
+    rsvpMode: (row as { rsvp_mode?: string | null }).rsvp_mode === 'open' ? 'open' : 'list',
+    openRsvpCompanions: Math.max(0, Math.min(10, Number((row as { open_rsvp_companions?: number | null }).open_rsvp_companions ?? 1) || 0)),
     entourage: parseEntourage(row.entourage),
     entourageVisible: false,
     entourageTitle: row.entourage_title ?? 'The Entourage',
@@ -486,4 +488,33 @@ export async function uploadWeddingAsset(file: File, name: 'hero' | 'logo' | 'ba
   }
   const { data } = supabase.storage.from(WEDDING_ASSETS_BUCKET).getPublicUrl(path)
   return data.publicUrl
+}
+
+/**
+ * How guests RSVP (Website Settings, top). Switching to the open link is
+ * refused by the database while the customer's guest list still has names.
+ */
+export async function updateRsvpMode(id: string, mode: 'list' | 'open', companions: number): Promise<WeddingSettings> {
+  const { data, error } = await supabase
+    .from('wedding_settings')
+    .update({ rsvp_mode: mode, open_rsvp_companions: Math.max(0, Math.min(10, Math.round(companions) || 0)) })
+    .eq('id', id)
+    .select('*')
+    .single()
+  if (error || !data) {
+    logError('updateRsvpMode', error)
+    if (error?.hint === 'rsvp_mode_list_not_empty') throw new FriendlyError('Remove the guests on your list first — an open link can’t mix with a guest list.')
+    throw new FriendlyError('We couldn’t save how guests RSVP. Please try again.')
+  }
+  return fromRow(data as Tables<'wedding_settings'>)
+}
+
+/** Removes every name the customer added (and their replies). Sign-ups from the open link stay. */
+export async function clearGuestList(): Promise<number> {
+  const { data, error } = await supabase.rpc('admin_clear_guest_list')
+  if (error) {
+    logError('clearGuestList', error)
+    throw new FriendlyError('The guest list couldn’t be cleared. Please try again.')
+  }
+  return Number(data) || 0
 }

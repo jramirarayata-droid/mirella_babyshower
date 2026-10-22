@@ -72,6 +72,7 @@ const mapInvitation = (r: Tables<'invitations'>): Invitation => ({
   side: r.side === 'bride' ? 'bride' : 'groom',
   maxAdditionalGuests: r.max_additional_guests,
   isActive: r.is_active,
+  source: (r as { source?: string | null }).source === 'link' ? 'link' : 'list',
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 })

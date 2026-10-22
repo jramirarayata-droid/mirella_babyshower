@@ -46,6 +46,28 @@ export function useInvitation() {
   const searchByName = useCallback((name: string) => run(() => findInvitationByName(name), name), [run])
   const searchByCode = useCallback((code: string) => run(() => findInvitationByCode(code)), [run])
 
+  /** Open link: a guest who isn't here yet signs up under the name they typed. */
+  const startNew = useCallback((name: string, maxAdditionalGuests: number) => {
+    requestId.current++
+    setIncluded(null)
+    setError(null)
+    setInvitation({
+      invitationId: '',
+      inviteeName: name.replace(/\s+/g, ' ').trim(),
+      tableNumber: null,
+      maxAdditionalGuests,
+      hasExistingResponse: false,
+      includedGuests: [],
+      isNew: true,
+    })
+    setStatus('found')
+  }, [])
+
+  /** After an open sign-up is saved, the invitation exists: keep its id. */
+  const settle = useCallback((invitationId: string) => {
+    setInvitation((i) => (i ? { ...i, invitationId, isNew: false } : i))
+  }, [])
+
   const reset = useCallback(() => {
     requestId.current++
     setStatus('idle')
@@ -54,5 +76,5 @@ export function useInvitation() {
     setError(null)
   }, [])
 
-  return { status, invitation, included, error, searchByName, searchByCode, reset }
+  return { status, invitation, included, error, searchByName, searchByCode, startNew, settle, reset }
 }

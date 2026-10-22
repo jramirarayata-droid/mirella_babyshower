@@ -14,7 +14,7 @@ import { PageHeader } from '../components/admin/PageHeader'
 import { SharePreviewCard } from '../components/admin/SharePreviewCard'
 
 type Target = 'home' | 'rsvp' | 'seat'
-const CARD_TITLE: Record<Target, string> = { rsvp: 'KINDLY RSVP', home: 'OUR WEDDING', seat: 'FIND YOUR SEAT' }
+const CARD_TITLE: Record<Target, string> = { rsvp: 'KINDLY RSVP', home: 'OUR BABY SHOWER', seat: 'FIND YOUR SEAT' }
 const CARD_TEXT: Record<Target, string> = {
   rsvp: 'Scan to open your invitation & RSVP',
   home: 'Scan to visit our baby shower website',

@@ -45,11 +45,13 @@ export function RSVPForm({ invitation, form, onChange, onRequestConfirm, submitt
   const [attempted, setAttempted] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const maxGuests = invitation.maxAdditionalGuests
+  // Someone signing up through the open link: we may not know them, so the mobile number is always asked.
+  const mobileAlways = invitation.isNew === true
 
   const update = (patch: Partial<RSVPFormState>) => {
     const next = { ...form, ...patch }
     onChange(next)
-    if (attempted) setErrors(validateRSVP(next, maxGuests, config, questions))
+    if (attempted) setErrors(validateRSVP(next, maxGuests, config, questions, mobileAlways))
   }
 
   const toggleFood = (value: FoodOption) => {
@@ -90,7 +92,7 @@ export function RSVPForm({ invitation, form, onChange, onRequestConfirm, submitt
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     setAttempted(true)
-    const found = validateRSVP(form, maxGuests, config, questions)
+    const found = validateRSVP(form, maxGuests, config, questions, mobileAlways)
     setErrors(found)
     if (hasErrors(found)) {
       window.setTimeout(() => {
@@ -173,7 +175,7 @@ export function RSVPForm({ invitation, form, onChange, onRequestConfirm, submitt
             autoComplete="tel-national"
             label={
               <span className="text-[1.05rem] text-ink">
-                Your mobile number {!attending && <span className="text-sm font-normal text-muted">(optional)</span>}
+                Your mobile number {!attending && !mobileAlways && <span className="text-sm font-normal text-muted">(optional)</span>}
               </span>
             }
             value={form.mobileNumber}
@@ -377,8 +379,9 @@ export function RSVPForm({ invitation, form, onChange, onRequestConfirm, submitt
                 }
                 description={
                   <p className="-mt-1 mb-4 text-sm italic leading-relaxed text-muted">
-                    If you would like to bring someone with you, please let us know below. We’ll review your request and get in touch
-                    with you soon to confirm availability and arrange the payment details. ❤️
+                    {guestPrice(config) > 0
+                      ? 'If you would like to bring someone with you, please let us know below. We’ll review your request and get in touch with you soon to confirm availability and arrange the payment details. ❤️'
+                      : `If you would like to bring someone with you, please add their full name below${maxGuests > 1 ? ` (up to ${maxGuests})` : ''}. We’ll confirm your request soon. ❤️`}
                   </p>
                 }
                 name="bringing-guest"

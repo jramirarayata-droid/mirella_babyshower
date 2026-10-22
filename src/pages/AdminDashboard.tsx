@@ -142,6 +142,16 @@ export default function AdminDashboard() {
       />
 
       <PlanSummary />
+      {settings && (
+        <p className="mb-4 flex flex-wrap items-center gap-2 text-sm text-ink-soft">
+          <span className="rounded-full border border-champagne/70 bg-champagne-light/40 px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-ink">
+            RSVP: {settings.rsvpMode === 'open' ? 'Open link' : 'Guest list'}
+          </span>
+          <Link to="/admin/settings" className="text-gold underline-offset-4 hover:underline">
+            Change
+          </Link>
+        </p>
+      )}
 
       {settings && (
         <Link
