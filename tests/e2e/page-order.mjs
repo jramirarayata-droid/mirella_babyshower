@@ -89,6 +89,10 @@ try {
   await page.waitForTimeout(500)
   const box = await layer.boundingBox()
   ok('background: still covers the screen after scrolling', Boolean(box && box.y === 0 && box.height >= 800), JSON.stringify(box))
+  await page.mouse.wheel(0, -3000)
+  await page.waitForTimeout(400)
+  const heroBgs = await page.locator('header.hero, header.hero .hero-paper').evaluateAll((els) => els.map((e) => getComputedStyle(e).backgroundColor))
+  ok('background: shows through the front page when it has no photo', heroBgs.length > 0 && heroBgs.every((c) => c === 'rgba(0, 0, 0, 0)'), heroBgs.join(' | '))
   shots.push(['page-background', await page.screenshot()])
   settings.theme = { template: 'clouds-blue' }
   ok('no page errors (home)', errors.length === 0, errors.join(' | '))

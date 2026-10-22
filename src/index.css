@@ -95,6 +95,11 @@
     font-weight: 500;
   }
 
+  /* Look & Feel → Page background showing through a front page without a photo. */
+  .hero-see-through {
+    background-color: transparent !important;
+  }
+
   .paper-texture {
     background-color: var(--color-paper);
     background-image:
