@@ -5,7 +5,6 @@ import { currentShowerGuest, getNameIdeasInfo, getPredictionsInfo, getRegistry }
 import { listAttire } from '../../services/outfitService'
 import { Reveal } from '../wedding/Reveal'
 import { hasIdeas, loadGiftIdeas } from './GiftIdeas'
-import { Ornament } from '../ui/Ornament'
 import { useSpace } from '../../hooks/useSpace'
 
 interface Card {
@@ -82,16 +81,10 @@ export function ShowerFun() {
   if (on.names) cards.push({ to: '/names', title: 'Name Ideas', text: 'We’re still choosing! Suggest a name you love for the baby.', cta: 'Suggest a name', icon: PenLine })
   if (!cards.length) return null
   return (
-    <section aria-labelledby="fun-heading" className="px-5 py-24 sm:px-8 sm:py-28">
+    // No section heading: just the cards for what's switched on (each card names itself).
+    <section aria-label="For our guests" className="px-5 py-20 sm:px-8 sm:py-24">
       <div className="mx-auto max-w-6xl">
-        <Reveal className="section-title text-center">
-          <p className="eyebrow">Join the Fun</p>
-          <h2 id="fun-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
-            Gifts, Guesses &amp; Names
-          </h2>
-          <Ornament className="mt-8" />
-        </Reveal>
-        <div className={`mx-auto mt-14 grid gap-6 ${cards.length === 1 ? 'max-w-md' : cards.length === 2 ? 'max-w-3xl sm:grid-cols-2' : 'md:grid-cols-3'}`}>
+        <div className={`mx-auto grid gap-6 ${cards.length === 1 ? 'max-w-md' : cards.length === 2 ? 'max-w-3xl sm:grid-cols-2' : 'md:grid-cols-3'}`}>
           {cards.map((c, i) => (
             <Reveal key={c.to} delay={i * 0.1}>
               <Link

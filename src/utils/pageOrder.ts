@@ -19,7 +19,7 @@ export const SECTION_NAMES: Record<FixedSectionKey, string> = {
   info: 'Good to know',
   attire: 'What to Wear',
   ideas: 'Gift ideas',
-  fun: 'Gifts, Guesses & Names',
+  fun: 'Wishlist, predictions & name ideas (cards)',
   gift: 'Gift card',
   rsvp: 'RSVP',
 }
