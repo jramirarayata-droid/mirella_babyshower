@@ -2,6 +2,8 @@ import { supabase } from '../lib/supabase'
 import { getAdminPreference, saveAdminPreference } from './preferencesService'
 import { getDisplayPrefs } from './displayPrefsService'
 import { FriendlyError, logError } from '../utils/errors'
+import { toSide } from '../utils/headcount'
+import type { GuestSide } from '../types/rsvp'
 
 /** Admin → Raffle settings (stored in admin preferences under "raffle"). */
 export interface RaffleSettings {
@@ -69,7 +71,7 @@ export async function saveRaffleSettings(s: RaffleSettings): Promise<void> {
 
 export interface PoolName {
   name: string
-  side: 'groom' | 'bride'
+  side: GuestSide
   attending: boolean
 }
 
@@ -81,7 +83,7 @@ export async function getRafflePool(): Promise<PoolName[]> {
     throw new FriendlyError('We couldn’t load the guest names.')
   }
   const rows = (Array.isArray(data) ? data : []) as { name: string; side: string; attending: boolean }[]
-  return rows.map((r) => ({ name: r.name, side: r.side === 'bride' ? 'bride' : 'groom', attending: Boolean(r.attending) }))
+  return rows.map((r) => ({ name: r.name, side: toSide(r.side), attending: Boolean(r.attending) }))
 }
 
 export interface RaffleDraw {

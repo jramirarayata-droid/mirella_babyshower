@@ -3,6 +3,7 @@ import { ArrowRight, FileText, Search, User } from 'lucide-react'
 import type { AdminData } from '../../services/adminService'
 import { Modal } from '../ui/Modal'
 import { cn } from '../ui/cn'
+import { SIDE_LABEL } from '../../utils/headcount'
 
 export interface QuickPage {
   to: string
@@ -43,7 +44,7 @@ export function QuickSearch({ open, onClose, data, pages, go }: { open: boolean;
     const out: Result[] = []
     for (const inv of data?.invitations ?? []) {
       if (!hit(inv.inviteeName, inv.addressedAs)) continue
-      const bits = [inv.side === 'bride' ? 'Mom’s side' : 'Dad’s side', STATUS[inv.status] ?? inv.status, inv.tableNumber, inv.printedAt ? 'Printed' : '', inv.isActive ? '' : 'Inactive']
+      const bits = [SIDE_LABEL[inv.side], STATUS[inv.status] ?? inv.status, inv.tableNumber, inv.printedAt ? 'Printed' : '', inv.isActive ? '' : 'Inactive']
       out.push({ key: `i:${inv.id}`, kind: 'guest', title: inv.inviteeName, sub: bits.filter(Boolean).join(' · '), to: '/admin/invitations', state: { q: inv.inviteeName } })
     }
     for (const inv of data?.invitations ?? []) {

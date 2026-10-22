@@ -2,7 +2,8 @@ import type { CustomAnswers } from './questions'
 
 export type PositionMode = 'auto' | 'custom' | 'none'
 /** Whose guest list an invitation belongs to. */
-export type GuestSide = 'groom' | 'bride'
+/** Dad's side, Mom's side, or neither (e.g. signed up through the open RSVP link). */
+export type GuestSide = 'groom' | 'bride' | 'none'
 
 export type AttendanceStatus = 'attending' | 'declining'
 export type RSVPStatus = AttendanceStatus | 'pending'

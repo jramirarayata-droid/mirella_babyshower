@@ -8,6 +8,7 @@ import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { Badge } from '../ui/Badge'
 import { cn } from '../ui/cn'
+import { SIDE_SHORT, SIDE_TONE } from '../../utils/headcount'
 
 interface Props {
   /** The invitation whose invitee becomes an included guest elsewhere. */
@@ -70,7 +71,7 @@ export function IncludeInvitationModal({ from, invitations, tables, seatedKeys, 
     if (answer === 'attending' && !into.response) out.push(`${possessive(name)} answer (Attending) becomes the answer for ${possessive(into.inviteeName)} invitation.`)
     else if (answer === 'attending') out.push(`${possessive(into.inviteeName)} invitation already has an answer, so it stays. ${possessive(name)} answer is kept aside.`)
     else if (answer === 'declining') out.push(`${name} answered “can’t come”. That isn’t carried over (it would decline the whole invitation) — remove them from the invitation if they still can’t come.`)
-    if (into.side !== from.side) out.push(`${name} will count on the ${into.side === 'bride' ? 'mom’s' : 'dad’s'} side, like ${into.inviteeName}.`)
+    if (into.side !== from.side) out.push(into.side === 'none' ? `${name} will have no side, like ${into.inviteeName}.` : `${name} will count on the ${into.side === 'bride' ? 'mom’s' : 'dad’s'} side, like ${into.inviteeName}.`)
     return out
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, into, seatedKeys, positions, openCounts, tables])
@@ -129,7 +130,7 @@ export function IncludeInvitationModal({ from, invitations, tables, seatedKeys, 
                     {names.length > 0 && <span className="block truncate text-xs text-muted">with {names.join(', ')}</span>}
                   </span>
                   {tableName(i.tableId) && <span className="hidden text-xs text-muted sm:inline">{tableName(i.tableId)}</span>}
-                  <Badge tone={i.side === 'bride' ? 'rose' : 'gold'}>{i.side === 'bride' ? 'Mom' : 'Dad'}</Badge>
+                  <Badge tone={SIDE_TONE[i.side]}>{SIDE_SHORT[i.side]}</Badge>
                 </button>
               )
             })}
