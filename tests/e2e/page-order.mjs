@@ -23,6 +23,7 @@ const settings = {
   gallery_visible: false, video_visible: false, outfit_section_visible: false, program_visible: false, verse_visible: false,
   seating_config: { finder: { from: null, mode: 'hidden', preassign: false } }, theme: { template: 'clouds-blue' },
   page_order: ['intro', 'rsvp', 'venue'],
+  venue_title: 'The Celebration', venue_eyebrow: 'Join us at',
 }
 const patches = []
 
@@ -74,6 +75,7 @@ try {
   const motifY = await top(page, 'Our Colours')
   ok('home: RSVP moved above the venue', rsvpY < venueY, `${rsvpY} < ${venueY}`)
   ok('home: sections not in the saved list keep their usual place after it', venueY < motifY, `${venueY} < ${motifY}`)
+  ok('home: the venue section uses its own title', (await page.getByRole('heading', { name: 'The Celebration' }).count()) === 1 && (await page.getByText('Join us at', { exact: true }).count()) === 1)
   ok('home: no page background unless switched on', (await page.locator('[data-page-background]').count()) === 0)
   shots.push(['page-order-home', await page.screenshot({ fullPage: true })])
 
@@ -89,6 +91,10 @@ try {
   await page.waitForTimeout(500)
   const box = await layer.boundingBox()
   ok('background: still covers the screen after scrolling', Boolean(box && box.y === 0 && box.height >= 800), JSON.stringify(box))
+  await page.mouse.wheel(0, -3000)
+  await page.waitForTimeout(400)
+  const heroBgs = await page.locator('header.hero, header.hero .hero-paper').evaluateAll((els) => els.map((e) => getComputedStyle(e).backgroundColor))
+  ok('background: shows through the front page when it has no photo', heroBgs.length > 0 && heroBgs.every((c) => c === 'rgba(0, 0, 0, 0)'), heroBgs.join(' | '))
   shots.push(['page-background', await page.screenshot()])
   settings.theme = { template: 'clouds-blue' }
   ok('no page errors (home)', errors.length === 0, errors.join(' | '))

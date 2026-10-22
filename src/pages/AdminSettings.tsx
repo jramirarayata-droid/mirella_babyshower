@@ -38,6 +38,8 @@ function toInput(s: WeddingSettings): WeddingSettingsInput {
     heroSubtitle: s.heroSubtitle,
     heroImageUrl: s.heroImageUrl,
     churchName: s.churchName,
+    venueTitle: s.venueTitle,
+    venueEyebrow: s.venueEyebrow,
     ceremonyTime: s.ceremonyTime,
     receptionTime: s.receptionTime,
     churchMapUrl: s.churchMapUrl,
@@ -302,6 +304,8 @@ export default function AdminSettings() {
 
         <Card title="Venue">
           <div className="grid gap-5 sm:grid-cols-2">
+            <TextField label="Small line above the title" value={values.venueEyebrow} onChange={(v) => set('venueEyebrow', v)} maxLength={40} placeholder="Where" hint="Leave empty for “Where”." />
+            <TextField label="Section title" value={values.venueTitle} onChange={(v) => set('venueTitle', v)} maxLength={60} placeholder="The Shower" hint="Leave empty for “The Shower”." />
             <TextField className="sm:col-span-2" label="Venue name" value={values.churchName} onChange={(v) => set('churchName', v)} maxLength={150} placeholder="e.g. Sample Garden Venue" />
             <TextField label="Start time (optional)" value={values.ceremonyTime} onChange={(v) => set('ceremonyTime', v)} maxLength={40} placeholder="e.g. 2:00 PM" hint="Shown on the website, invitations and envelopes; the countdown uses it." />
             <TextField label="Google Maps URL" type="url" value={values.churchMapUrl} onChange={(v) => set('churchMapUrl', v)} error={errors.churchMapUrl} />

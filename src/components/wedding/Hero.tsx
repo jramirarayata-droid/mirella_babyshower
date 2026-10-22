@@ -34,10 +34,12 @@ const EYEBROW: Partial<Record<string, string>> = {
 
 /** Hero in one of four layouts, chosen in Admin → Look & Feel. */
 export function Hero({ settings }: { settings: WeddingSettings }) {
-  const { heroLayout, look } = useResolvedTheme()
+  const { heroLayout, look, pageBg } = useResolvedTheme()
   const reduce = useReducedMotion()
   const [imageFailed, setImageFailed] = useState(false)
   const hasImage = Boolean(settings.heroImageUrl) && !imageFailed
+  // No front-page photo but an uploaded page background: let it show through the front page too.
+  const seeThrough = !settings.heroImageUrl && pageBg?.mode === 'upload' && Boolean(pageBg.image)
 
   const fade = (delay: number) =>
     reduce
@@ -60,7 +62,7 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
       />
     ) : (
       // No photo yet: a soft sky with a sleeping moon, so the hero still looks finished.
-      <div aria-hidden="true" className={cn('grid place-items-center bg-[linear-gradient(180deg,var(--color-linen),var(--color-cream))]', className)}>
+      <div aria-hidden="true" className={cn('grid place-items-center', !seeThrough && 'bg-[linear-gradient(180deg,var(--color-linen),var(--color-cream))]', className)}>
         <div className="relative w-[38%] max-w-40 text-champagne">
           <MoonShape className="w-full opacity-80" />
           <StarShape className="absolute -right-[30%] -top-[18%] w-[26%] opacity-70" />
@@ -77,11 +79,11 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
   // ---------------------------------------------------------------- split
   if (heroLayout === 'split') {
     return (
-      <header className="hero relative flex min-h-[100svh] flex-col bg-ivory text-ink">
+      <header className={cn('hero relative flex min-h-[100svh] flex-col text-ink', seeThrough ? 'hero-see-through' : 'bg-ivory')}>
         <Nav settings={settings} tone="onPaper" reduce={reduce} />
         <div className="grid flex-1 md:grid-cols-2">
           <div className="relative order-first h-[52svh] overflow-hidden md:order-last md:h-auto">{photo('absolute inset-0 size-full object-cover')}</div>
-          <div className="hero-paper paper-texture relative flex flex-col items-center justify-center px-6 py-16 text-center md:px-12">
+          <div className={cn('hero-paper paper-texture relative flex flex-col items-center justify-center px-6 py-16 text-center md:px-12', seeThrough && 'hero-see-through')}>
             <HeroDecor onPhoto={false} />
             <motion.p {...fade(0.2)} className="hero-eyebrow eyebrow">
               {eyebrow}
@@ -108,7 +110,7 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
   // ---------------------------------------------------------------- framed
   if (heroLayout === 'framed') {
     return (
-      <header className="hero hero-paper paper-texture relative flex min-h-[100svh] flex-col text-ink">
+      <header className={cn('hero hero-paper paper-texture relative flex min-h-[100svh] flex-col text-ink', seeThrough && 'hero-see-through')}>
         {/* Looks that decorate the photo itself skip the page frame (one frame too many). */}
         {!['leaf', 'garden', 'clouds', 'balloons', 'arch'].includes(look) && <HeroDecor onPhoto={false} belowNav />}
         <Nav settings={settings} tone="onPaper" reduce={reduce} />
@@ -161,17 +163,23 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
   // ---------------------------------------------------------------- full photo (center / left)
   const left = heroLayout === 'left'
   return (
-    <header className="hero hero-photo relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-[#141211] text-white">
+    <header className={cn('hero hero-photo relative isolate flex min-h-[100svh] flex-col overflow-hidden text-white', !seeThrough && 'bg-[#141211]')}>
       <HeroDecor onPhoto belowNav />
-      {photo('absolute inset-0 -z-20 size-full object-cover')}
+      {/* With the page background showing through, the photo is that background (no moon placeholder). */}
+      {!seeThrough && photo('absolute inset-0 -z-20 size-full object-cover')}
       {/* Soft veil for legibility — heavier toward the text on the "left" layout */}
       <div
         aria-hidden="true"
         className={cn(
           'absolute inset-0 -z-10',
-          left
-            ? 'bg-[linear-gradient(to_top,rgb(20_19_18/0.72),rgb(20_19_18/0.25)_55%,rgb(20_19_18/0.15))]'
-            : 'bg-[radial-gradient(ellipse_at_center,rgb(20_19_18/0.25),rgb(20_19_18/0.6))]',
+          // A washed (lighter) background needs a deeper veil to keep the white text readable.
+          seeThrough
+            ? left
+              ? 'bg-[linear-gradient(to_top,rgb(20_19_18/0.8),rgb(20_19_18/0.5)_55%,rgb(20_19_18/0.4))]'
+              : 'bg-[radial-gradient(ellipse_at_center,rgb(20_19_18/0.5),rgb(20_19_18/0.72))]'
+            : left
+              ? 'bg-[linear-gradient(to_top,rgb(20_19_18/0.72),rgb(20_19_18/0.25)_55%,rgb(20_19_18/0.15))]'
+              : 'bg-[radial-gradient(ellipse_at_center,rgb(20_19_18/0.25),rgb(20_19_18/0.6))]',
         )}
       />
       <Nav settings={settings} tone="onPhoto" reduce={reduce} />
