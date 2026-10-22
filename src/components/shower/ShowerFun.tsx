@@ -44,8 +44,8 @@ export function useShowerActivities(): ShowerActivities | null {
       getNameIdeasInfo().catch(() => null),
       listAttire(token).catch(() => null),
     ]).then(([r, p, n, a]) => ({
-      // A wishlist kept for attending guests only shows for them.
-      registry: Boolean(r?.visible && !r.private),
+      // What guests see — even for a signed-in admin (who may preview a hidden wishlist on its own page).
+      registry: Boolean(r?.guestVisible),
       attirePage: Boolean(a?.private && a.allowed && a.images.length > 0),
       predict: Boolean(p?.visible),
       predictOpen: Boolean(p?.open),
