@@ -16,7 +16,7 @@ import { listVisibleGallery } from '../services/galleryService'
 import { listProgram } from '../services/programService'
 import { listVisibleOutfits } from '../services/outfitService'
 import { getPublicGift } from '../services/giftService'
-import { getPublicReveal, getRegistry, getPredictionsInfo, getNameIdeasInfo } from '../services/showerService'
+import { getPublicReveal, getRegistry, getPredictionsInfo, getNameIdeasInfo, getGiftIdeasSettings, listRegistryAdmin } from '../services/showerService'
 import { getGuestPhotosInfo } from '../services/guestPhotosService'
 import { getWebsitePrivacy } from '../services/adminDisplayService'
 import type { WeddingSettings } from '../types/wedding'
@@ -55,7 +55,7 @@ export default function AdminPageOrder() {
   const load = useCallback(async () => {
     try {
       const s = await getWeddingSettings()
-      const [media, gallery, program, outfits, gift, reveal, registry, predictions, names, photos, privacy] = await Promise.all([
+      const [media, gallery, program, outfits, gift, reveal, registry, predictions, names, photos, privacy, ideasCfg, regItems] = await Promise.all([
         listMediaSections().catch(() => []),
         listVisibleGallery().catch(() => []),
         listProgram().catch(() => []),
@@ -67,6 +67,8 @@ export default function AdminPageOrder() {
         getNameIdeasInfo().catch(() => null),
         getGuestPhotosInfo().catch(() => null),
         getWebsitePrivacy().catch(() => null),
+        getGiftIdeasSettings().catch(() => null),
+        listRegistryAdmin().catch(() => []),
       ])
 
       // Photo sections in the Photos & Video order (hidden ones too — they keep their place).
@@ -99,6 +101,11 @@ export default function AdminPageOrder() {
             : s.motifColors.length > 0
               ? ON('Motif colours only')
               : OFF(s.outfitSectionVisible ? 'No outfit photos or colours yet' : 'Switched off', '/admin/outfits', 'What to Wear'),
+        ideas: !ideasCfg?.visible
+          ? OFF('Switched off', '/admin/registry', 'Gift Registry')
+          : !regItems.some((i) => i.kind === 'idea' && i.isVisible && i.imageUrl)
+            ? OFF('No ideas with a photo yet', '/admin/registry', 'Add an idea')
+            : (guestOnly(privacy?.hideIdeas, 'Attending guests only') ?? ON()),
         fun: funOn.length ? ON(`Showing: ${funOn.join(', ')}`) : OFF('All three are off', '/admin/registry', 'Shower fun'),
         gift: gift ? ON() : OFF('Not set up', '/admin/settings', 'Website Settings'),
         rsvp: ON(),

@@ -18,24 +18,28 @@ interface Props {
   /** Extra sections use their own heading id and small label. */
   headingId?: string
   eyebrow?: string
+  /** On a page that already has the title (e.g. #/ideas): just the photos. */
+  bare?: boolean
 }
 
 /** "Our Story in Frames" — magazine-style photo grid (or carousel) with a swipeable full-screen view. */
-export function CoupleGallery({ title, subtitle, layout, images, headingId = 'gallery-heading', eyebrow = 'Moments' }: Props) {
+export function CoupleGallery({ title, subtitle, layout, images, headingId = 'gallery-heading', eyebrow = 'Moments', bare = false }: Props) {
   const [open, setOpen] = useState<number | null>(null)
   if (!images.length) return null
 
   return (
-    <section aria-labelledby={headingId} className="px-4 py-24 sm:px-8 sm:py-28">
+    <section aria-labelledby={bare ? undefined : headingId} aria-label={bare ? title : undefined} className={bare ? '-mt-12' : 'px-4 py-24 sm:px-8 sm:py-28'}>
       <div className="mx-auto max-w-6xl">
-        <Reveal className="section-title text-center">
-          <p className="eyebrow">{eyebrow}</p>
-          <h2 id={headingId} className="mt-4 text-4xl text-ink sm:text-5xl">
-            {title}
-          </h2>
-          {subtitle && <p className="mx-auto mt-4 max-w-lg text-ink-soft">{subtitle}</p>}
-          <Ornament className="mt-8" />
-        </Reveal>
+        {!bare && (
+          <Reveal className="section-title text-center">
+            <p className="eyebrow">{eyebrow}</p>
+            <h2 id={headingId} className="mt-4 text-4xl text-ink sm:text-5xl">
+              {title}
+            </h2>
+            {subtitle && <p className="mx-auto mt-4 max-w-lg text-ink-soft">{subtitle}</p>}
+            <Ornament className="mt-8" />
+          </Reveal>
+        )}
 
         {layout === 'carousel' ? (
           <Carousel title={title} images={images} onOpen={setOpen} />

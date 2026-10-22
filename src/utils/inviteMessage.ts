@@ -27,7 +27,10 @@ export function virtualInviteUrl(code: string): string {
   return `${siteBaseUrl().replace(/index\.html$/, '')}i/?c=${encodeURIComponent(code)}`
 }
 
-/** Fills in the message template. The link is always included, even if {link} was removed. */
+/**
+ * Fills in the message template. The link is always included, even if {link}
+ * was removed — unless the message already contains it (e.g. typed in by hand).
+ */
 export function buildInviteMessage(template: string, v: { name: string; date: string; couple: string; link: string }): string {
   const base = template.trim() ? template : DEFAULT_INVITE_MESSAGE
   const filled = base
@@ -35,5 +38,6 @@ export function buildInviteMessage(template: string, v: { name: string; date: st
     .replace(/\{date\}/gi, v.date)
     .replace(/\{couple\}/gi, v.couple)
     .replace(/\{link\}/gi, v.link)
-  return /\{link\}/i.test(base) ? filled.trim() : `${filled.trim()}\n\n${v.link}`
+  if (/\{link\}/i.test(base) || !v.link || filled.includes(v.link)) return filled.trim()
+  return `${filled.trim()}\n\n${v.link}`
 }

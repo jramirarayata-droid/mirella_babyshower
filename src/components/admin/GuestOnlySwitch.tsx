@@ -10,9 +10,9 @@ import { cn } from '../ui/cn'
  * "attending". The same setting as Website Settings → Privacy (one place
  * changes both); the database enforces it. Saves as soon as it changes.
  */
-export function GuestOnlySwitch({ what, className, stacked = false }: { what: 'attire' | 'wishlist'; className?: string; /** One option per row (narrow side panels). */ stacked?: boolean }) {
+export function GuestOnlySwitch({ what, className, stacked = false }: { what: 'attire' | 'wishlist' | 'ideas'; className?: string; /** One option per row (narrow side panels). */ stacked?: boolean }) {
   const toast = useToast()
-  const key: keyof WebsitePrivacy = what === 'attire' ? 'hideAttire' : 'hideWishlist'
+  const key: keyof WebsitePrivacy = what === 'attire' ? 'hideAttire' : what === 'ideas' ? 'hideIdeas' : 'hideWishlist'
   const [privacy, setPrivacy] = useState<WebsitePrivacy | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -39,7 +39,7 @@ export function GuestOnlySwitch({ what, className, stacked = false }: { what: 'a
     }
   }
 
-  const label = what === 'attire' ? 'Who can see the outfit photos' : 'Who can see the wishlist'
+  const label = what === 'attire' ? 'Who can see the outfit photos' : what === 'ideas' ? 'Who can see the gift ideas' : 'Who can see the wishlist'
   const current = privacy?.[key]
   return (
     <fieldset className={cn('text-sm', className)} disabled={!privacy || saving}>

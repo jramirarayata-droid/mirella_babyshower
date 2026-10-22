@@ -23,6 +23,8 @@ interface Props {
   hidingOnWebsite: boolean
   /** Used for the message preview. */
   sample: { name: string; date: string; couple: string; link: string }
+  /** Open RSVP link: {link} is the website link (the same for everyone), not a personal invitation. */
+  openMode?: boolean
   onClose: () => void
   onSave: (text: string, settings: VirtualInviteSettings) => void
   onHideOnWebsite: (patch: Partial<WebsitePrivacy>) => void
@@ -117,11 +119,15 @@ export function VirtualInviteSettingsModal(p: Props) {
                   onClick={() => insert(x.key)}
                   className="rounded-full border border-line bg-paper px-3 py-1 text-xs text-ink-soft transition hover:border-champagne hover:text-ink"
                 >
-                  {x.label} <span className="text-muted">{x.key}</span>
+                  {p.openMode && x.key === '{link}' ? 'The website link' : x.label} <span className="text-muted">{x.key}</span>
                 </button>
               ))}
             </div>
-            {!/\{link\}/i.test(text) && <p className="mt-3 text-sm text-muted">The link will be added at the end.</p>}
+            {p.openMode ? (
+              <p className="mt-3 text-sm text-muted">Open RSVP link: everyone gets the same website link, so there are no personal links. {'{link}'} is the website link.</p>
+            ) : (
+              !/\{link\}/i.test(text) && <p className="mt-3 text-sm text-muted">The link will be added at the end.</p>
+            )}
             <button type="button" onClick={() => setText(DEFAULT_INVITE_MESSAGE)} className="mt-4 text-sm text-gold underline-offset-4 hover:underline">
               Use the suggested message
             </button>

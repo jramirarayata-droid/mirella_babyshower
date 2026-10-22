@@ -12,13 +12,17 @@ import { useToast } from '../hooks/useToast'
 import {
   addRegistryItem,
   deleteRegistryItem,
+  getGiftIdeasSettings,
   getRegistrySettings,
+  IDEAS_LAYOUTS,
+  saveGiftIdeasSettings,
   listRegistryAdmin,
   removeRegistryClaim,
   reorderRegistry,
   saveRegistrySettings,
   updateRegistryItem,
   type AdminRegistryItem,
+  type GiftIdeasSettings,
   type RegistryItemInput,
 } from '../services/showerService'
 import { toFriendlyMessage } from '../utils/errors'
@@ -28,6 +32,7 @@ import { siteLinks } from '../utils/share'
 import { cn } from '../components/ui/cn'
 import { uploadWeddingAsset } from '../services/settingsService'
 import { GuestOnlySwitch } from '../components/admin/GuestOnlySwitch'
+import { OnRsvpSwitch } from '../components/admin/OnRsvpSwitch'
 
 const EMPTY: RegistryItemInput = { kind: 'gift', title: '', note: '', link: '', imageUrl: '', priceHint: '', quantity: 1, isVisible: true }
 
@@ -47,6 +52,7 @@ const STARTERS: RegistryItemInput[] = [
 export default function AdminRegistry() {
   const toast = useToast()
   const settings = useAutoSaved(getRegistrySettings, saveRegistrySettings)
+  const ideas = useAutoSaved(getGiftIdeasSettings, saveGiftIdeasSettings)
   const [items, setItems] = useState<AdminRegistryItem[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<{ id: string | null; v: RegistryItemInput } | null>(null)
@@ -144,7 +150,7 @@ export default function AdminRegistry() {
     <>
       <PageHeader
         title="Gift Registry"
-        description="Gifts guests can bring (they tap “I’ll bring this” so nothing is doubled — only you see who) and ideas: a photo with a title and caption, just for inspiration."
+        description="Gifts guests can bring (they tap “I’ll bring this” so nothing is doubled — only you see who) and gift ideas: photos with a title and caption, just for inspiration, shown in their own section of the website."
         actions={
           <>
             <Button variant="outline" icon={<Lightbulb aria-hidden="true" className="size-4" />} onClick={() => setEditing({ id: null, v: { ...EMPTY, kind: 'idea' } })}>
@@ -244,9 +250,10 @@ export default function AdminRegistry() {
             })
           )}
         </section>
+        <div className="space-y-6">
         <aside className="space-y-4 rounded-xl border border-line bg-paper p-5 shadow-soft">
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-xl text-ink">On the website</h2>
+            <h2 className="text-xl text-ink">Wishlist on the website</h2>
             <SavedText state={settings.state} />
           </div>
           {!s ? (
@@ -255,6 +262,7 @@ export default function AdminRegistry() {
             <>
               <VisibilityField label="Wishlist page" mode={s.mode} from={s.from} onChange={settings.update} />
               <GuestOnlySwitch what="wishlist" stacked />
+              <OnRsvpSwitch what="wishlist" />
               <TextField label="Title" value={s.title} onChange={(title) => settings.update({ title })} maxLength={60} />
               <TextAreaField label="A short note for guests" value={s.intro} onChange={(intro) => settings.update({ intro })} maxLength={300} rows={3} />
             </>
@@ -266,6 +274,8 @@ export default function AdminRegistry() {
             </a>
           </p>
         </aside>
+        <IdeasPanel ideas={ideas} count={items?.filter((i) => i.kind === 'idea' && i.isVisible && i.imageUrl).length ?? 0} />
+        </div>
       </div>
 
       <Modal
@@ -392,5 +402,84 @@ export default function AdminRegistry() {
         }}
       />
     </>
+  )
+}
+
+/** Gift ideas: their own section on the home page and their own page, with their own switches. */
+function IdeasPanel({ ideas, count }: { ideas: ReturnType<typeof useAutoSaved<GiftIdeasSettings>>; count: number }) {
+  const v = ideas.value
+  return (
+    <aside aria-labelledby="ideas-panel-heading" className="space-y-4 rounded-xl border border-line bg-paper p-5 shadow-soft">
+      <div className="flex items-baseline justify-between gap-2">
+        <h2 id="ideas-panel-heading" className="flex items-center gap-2 text-xl text-ink">
+          <Lightbulb aria-hidden="true" className="size-5 text-gold" strokeWidth={1.6} /> Gift ideas section
+        </h2>
+        <SavedText state={ideas.state} />
+      </div>
+      {!v ? (
+        <Skeleton className="h-40" />
+      ) : (
+        <>
+          <div role="radiogroup" aria-label="Gift ideas section" className="grid grid-cols-2 gap-1 rounded-lg bg-cream p-1 text-sm">
+            {(
+              [
+                [true, 'Show'],
+                [false, 'Hide'],
+              ] as const
+            ).map(([on, label]) => (
+              <button
+                key={label}
+                type="button"
+                role="radio"
+                aria-checked={v.visible === on}
+                onClick={() => ideas.update({ visible: on })}
+                className={cn('min-h-10 rounded-md px-2 py-1.5 transition', v.visible === on ? 'bg-paper font-medium text-ink shadow-soft' : 'text-muted hover:text-ink')}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="text-sm text-muted">
+            {!v.visible
+              ? 'Hidden from the website. Your ideas stay saved.'
+              : count === 0
+                ? 'Shows on the website once you add an idea with a photo.'
+                : `${count} ${count === 1 ? 'idea' : 'ideas'} on the website, in their own section (move it in Page Order).`}
+          </p>
+          <GuestOnlySwitch what="ideas" stacked />
+          <OnRsvpSwitch what="ideas" />
+          <TextField label="Title" value={v.title} onChange={(title) => ideas.update({ title })} maxLength={80} />
+          <TextAreaField label="A short note (optional)" value={v.intro} onChange={(intro) => ideas.update({ intro })} maxLength={300} rows={2} placeholder="Just ideas we love — no need to tell us if you choose one." />
+          <fieldset>
+            <legend className="mb-2 text-sm font-medium text-ink">Design</legend>
+            <div role="radiogroup" aria-label="Gift ideas design" className="grid gap-1.5">
+              {IDEAS_LAYOUTS.map((l) => (
+                <button
+                  key={l.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={v.layout === l.id}
+                  onClick={() => ideas.update({ layout: l.id })}
+                  className={cn(
+                    'rounded-lg border px-3 py-2 text-left text-sm transition',
+                    v.layout === l.id ? 'border-ink bg-ink/[0.03]' : 'border-line hover:border-champagne',
+                  )}
+                >
+                  <span className="block font-medium text-ink">{l.name}</span>
+                  <span className="block text-xs text-muted">{l.description}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <p className="text-sm text-muted">
+            See it:{' '}
+            <a href={`${siteLinks().home}#/ideas`} target="_blank" rel="noopener noreferrer" className="break-all text-gold hover:underline">
+              /#/ideas
+            </a>{' '}
+            or on the home page.
+          </p>
+        </>
+      )}
+    </aside>
   )
 }

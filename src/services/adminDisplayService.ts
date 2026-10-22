@@ -21,10 +21,12 @@ export interface WebsitePrivacy {
   hideWishlist: boolean
   /** What to Wear only for guests who RSVP'd "attending" (enforced by the database). */
   hideAttire: boolean
+  /** Gift ideas only for guests who RSVP'd "attending" (enforced by the database; until set, follows the wishlist). */
+  hideIdeas: boolean
 }
 
 export const DEFAULT_VIRTUAL_INVITE: VirtualInviteSettings = { backMode: 'printables', backIds: [], boldIds: [], hideVenues: false, hideInfo: false, hideLinks: false }
-export const DEFAULT_WEBSITE_PRIVACY: WebsitePrivacy = { hideVenues: false, hideInfo: false, hideWishlist: false, hideAttire: false }
+export const DEFAULT_WEBSITE_PRIVACY: WebsitePrivacy = { hideVenues: false, hideInfo: false, hideWishlist: false, hideAttire: false, hideIdeas: false }
 
 const strings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [])
 
@@ -47,7 +49,13 @@ export async function saveVirtualInviteSettings(s: VirtualInviteSettings): Promi
 
 export async function getWebsitePrivacy(): Promise<WebsitePrivacy> {
   const v = (await getAdminPreference<Record<string, unknown>>('website_privacy')) ?? {}
-  return { hideVenues: v.hideVenues === true, hideInfo: v.hideInfo === true, hideWishlist: v.hideWishlist === true, hideAttire: v.hideAttire === true }
+  return {
+    hideVenues: v.hideVenues === true,
+    hideInfo: v.hideInfo === true,
+    hideWishlist: v.hideWishlist === true,
+    hideAttire: v.hideAttire === true,
+    hideIdeas: typeof v.hideIdeas === 'boolean' ? v.hideIdeas : v.hideWishlist === true,
+  }
 }
 
 export async function saveWebsitePrivacy(s: WebsitePrivacy): Promise<void> {

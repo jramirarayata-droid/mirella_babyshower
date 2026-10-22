@@ -63,6 +63,7 @@ export function WebsitePrivacyCard() {
             ['hideInfo', 'Keep “Good to know” private', 'Hides the information sections below.'],
             ['hideWishlist', 'Gift wishlist for attending guests only', 'Hidden from the website. Guests who RSVP “attending” get it on their confirmation.'],
             ['hideAttire', 'What to Wear for attending guests only', 'Hidden from the website. Guests who RSVP “attending” get it on their confirmation.'],
+            ['hideIdeas', 'Gift ideas for attending guests only', 'Hidden from the website. Guests who RSVP “attending” get it on their confirmation.'],
           ] as const
         ).map(([key, label, hint]) => (
           <label key={key} className="flex cursor-pointer items-start gap-3 rounded-lg border border-line p-3 text-sm has-[:checked]:border-champagne has-[:checked]:bg-champagne-light/30">
