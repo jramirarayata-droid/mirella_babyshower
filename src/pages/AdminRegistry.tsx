@@ -27,8 +27,7 @@ import { formatShortDate } from '../utils/formatting'
 import { siteLinks } from '../utils/share'
 import { cn } from '../components/ui/cn'
 import { uploadWeddingAsset } from '../services/settingsService'
-import { getWebsitePrivacy } from '../services/adminDisplayService'
-import { Link } from 'react-router-dom'
+import { GuestOnlySwitch } from '../components/admin/GuestOnlySwitch'
 
 const EMPTY: RegistryItemInput = { kind: 'gift', title: '', note: '', link: '', imageUrl: '', priceHint: '', quantity: 1, isVisible: true }
 
@@ -54,13 +53,6 @@ export default function AdminRegistry() {
   const [saving, setSaving] = useState(false)
   const [removing, setRemoving] = useState<AdminRegistryItem | null>(null)
   const [uploading, setUploading] = useState(false)
-  const [guestOnly, setGuestOnly] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    getWebsitePrivacy()
-      .then((p) => setGuestOnly(p.hideWishlist))
-      .catch(() => undefined)
-  }, [])
 
   const upload = async (file: File | undefined) => {
     if (!file || !editing) return
@@ -262,14 +254,7 @@ export default function AdminRegistry() {
           ) : (
             <>
               <VisibilityField label="Wishlist page" mode={s.mode} from={s.from} onChange={settings.update} />
-              {guestOnly !== null && (
-                <p className="rounded-lg border border-line bg-cream px-3 py-2 text-sm text-ink-soft">
-                  {guestOnly ? 'Only guests who RSVP “attending” can open it — it’s on their confirmation.' : 'Anyone with the website link can open it.'}{' '}
-                  <Link to="/admin/settings" className="text-gold underline-offset-4 hover:underline">
-                    Change in Website Settings → Privacy
-                  </Link>
-                </p>
-              )}
+              <GuestOnlySwitch what="wishlist" stacked />
               <TextField label="Title" value={s.title} onChange={(title) => settings.update({ title })} maxLength={60} />
               <TextAreaField label="A short note for guests" value={s.intro} onChange={(intro) => settings.update({ intro })} maxLength={300} rows={3} />
             </>
