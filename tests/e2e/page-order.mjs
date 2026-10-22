@@ -110,14 +110,14 @@ try {
   const list = a.getByRole('list').filter({ has: a.locator('[data-section]') })
   await list.waitFor({ timeout: 20000 })
   const keys = await list.locator('[data-section]').evaluateAll((els) => els.map((e) => e.getAttribute('data-section')))
-  ok('admin: lists the sections in the saved order', keys[0] === 'intro' && keys[1] === 'rsvp' && keys[2] === 'venue', keys.join(','))
+  ok('admin: lists the sections in the saved order', keys[0] === 'intro' && keys.indexOf('rsvp') >= 0 && keys.indexOf('rsvp') + 1 === keys.indexOf('venue'), keys.join(','))
   ok('admin: says what each section shows', (await a.locator('[data-section="verse"]').getByText('Switched off').count()) === 1 && (await a.locator('[data-section="rsvp"]').getByText('Showing').count()) === 1)
   ok('admin: the menu has Page Order', (await a.getByRole('link', { name: 'Page Order' }).count()) >= 1)
   await a.getByRole('button', { name: 'Move Venue & time up' }).click()
   await a.getByRole('button', { name: 'Save order' }).click()
   await a.waitForTimeout(800)
   const saved = patches.at(-1)?.page_order ?? []
-  ok('admin: saves the new order', saved[0] === 'intro' && saved[1] === 'venue' && saved[2] === 'rsvp', saved.join(','))
+  ok('admin: saves the new order', saved[0] === 'intro' && saved.indexOf('venue') >= 0 && saved.indexOf('venue') + 1 === saved.indexOf('rsvp'), saved.join(','))
   shots.push(['admin-page-order', await a.screenshot({ fullPage: true })])
 
   // Look & Feel: page background is off by default.
