@@ -30,6 +30,8 @@ let ideas = []
 let revealSettings
 // Website Settings → Privacy: wishlist / What to Wear for attending guests only.
 let wishlistPrivate = false
+// Admin → Gift Registry set to Hidden: admins still get the list (to test it), guests don't.
+let wishlistHidden = false
 let attirePrivate = false
 let attending = false
 const PIC = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200"><rect width="900" height="1200" fill="#DCEAF7"/><circle cx="450" cy="500" r="200" fill="#F6D3DC"/></svg>')
@@ -54,8 +56,8 @@ const rpc = {
   shower_guest_start: (a) => (/santos/i.test(a.p_name) ? { ok: true, token: TOKEN, name: 'Ana Santos' } : { ok: false }),
   registry_list: (a) =>
     canSee(a.p_token, wishlistPrivate)
-      ? { visible: true, private: false, title: 'Gift Wishlist', intro: 'A few things our little one needs.', me: a.p_token === TOKEN ? 'Ana Santos' : null, items }
-      : { visible: true, private: true, title: 'Gift Wishlist', intro: '', me: a.p_token === TOKEN ? 'Ana Santos' : null, items: [] },
+      ? { visible: true, private: false, guestVisible: !wishlistHidden, title: 'Gift Wishlist', intro: 'A few things our little one needs.', me: a.p_token === TOKEN ? 'Ana Santos' : null, items }
+      : { visible: true, private: true, guestVisible: false, title: 'Gift Wishlist', intro: '', me: a.p_token === TOKEN ? 'Ana Santos' : null, items: [] },
   attire_list: (a) => ({ private: attirePrivate, allowed: canSee(a.p_token, attirePrivate), items: canSee(a.p_token, attirePrivate) ? outfitRows : [] }),
   guest_access: (a) => ({ wishlistPrivate, attirePrivate, attending: a.p_token === TOKEN && attending }),
   registry_claim: (a) => {
@@ -293,6 +295,14 @@ try {
   await whoAttire.waitFor({ timeout: 15000 })
   ok('admin: What to Wear has the same choice', (await whoAttire.getByRole('radio').count()) === 2)
   shots.push(['admin-attire-who', await a.screenshot()])
+  // The home page shows what guests see, even for a signed-in admin.
+  wishlistPrivate = false
+  wishlistHidden = true
+  await a.goto(`${BASE}#/`)
+  await a.locator('section[aria-labelledby="reveal-heading"]').waitFor({ timeout: 20000 })
+  await a.waitForTimeout(1500)
+  ok('admin on the home page: a hidden wishlist doesn’t show there', (await a.getByRole('link', { name: /see the wishlist/i }).count()) === 0)
+  wishlistHidden = false
   ok('no page errors (admin)', aerr.length === 0, aerr.join(' | '))
   await actx.close()
 } catch (e) {

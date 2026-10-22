@@ -72,6 +72,8 @@ export interface RegistryView {
   visible: boolean
   /** Kept for attending guests: true until this guest has RSVP'd "attending". */
   private: boolean
+  /** What this visitor would see as a guest — the home page and menu follow this, even for signed-in admins. */
+  guestVisible: boolean
   title: string
   intro: string
   me: string | null
@@ -98,7 +100,16 @@ export async function getRegistry(token?: string | null): Promise<RegistryView> 
   const { data, error } = await supabase.rpc('registry_list', { p_token: token ?? null })
   if (error) fail('getRegistry', error, 'The wishlist couldn’t be loaded. Please try again.')
   const o = obj(data)
-  return { visible: o.visible === true, private: o.private === true, title: str(o.title) || 'Gift Wishlist', intro: str(o.intro), me: str(o.me) || null, items: arr(o.items).map(toItem) }
+  return {
+    visible: o.visible === true,
+    private: o.private === true,
+    // Before database update 050 there is no guestVisible: fall back to the old reading.
+    guestVisible: typeof o.guestVisible === 'boolean' ? o.guestVisible : o.visible === true && o.private !== true,
+    title: str(o.title) || 'Gift Wishlist',
+    intro: str(o.intro),
+    me: str(o.me) || null,
+    items: arr(o.items).map(toItem),
+  }
 }
 
 export type ClaimResult = { ok: true } | { ok: false; reason: 'taken' | 'closed' | 'who' | 'gone' | 'private'; left?: number }
