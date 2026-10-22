@@ -21,9 +21,9 @@ export function Venues({ settings }: { settings: WeddingSettings }) {
     <section aria-labelledby="venues-heading" className="bg-cream/60 px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-5xl">
         <Reveal className="section-title text-center">
-          <p className="eyebrow">Where</p>
+          <p className="eyebrow">{settings.venueEyebrow.trim() || 'Where'}</p>
           <h2 id="venues-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
-            The Shower
+            {settings.venueTitle.trim() || 'The Shower'}
           </h2>
         </Reveal>
         <div className="mx-auto mt-14 grid max-w-xl gap-6 md:gap-8">

@@ -171,6 +171,8 @@ export type Database = {
           hero_subtitle: string | null
           hero_image_url: string | null
           church_name: string | null
+          venue_title: string | null
+          venue_eyebrow: string | null
           ceremony_time: string | null
           reception_time: string | null
           church_map_url: string | null
@@ -228,6 +230,8 @@ export type Database = {
           hero_subtitle?: string | null
           hero_image_url?: string | null
           church_name?: string | null
+          venue_title?: string | null
+          venue_eyebrow?: string | null
           ceremony_time?: string | null
           reception_time?: string | null
           church_map_url?: string | null
@@ -285,6 +289,8 @@ export type Database = {
           hero_subtitle?: string | null
           hero_image_url?: string | null
           church_name?: string | null
+          venue_title?: string | null
+          venue_eyebrow?: string | null
           ceremony_time?: string | null
           reception_time?: string | null
           church_map_url?: string | null

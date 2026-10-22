@@ -50,6 +50,10 @@ export interface WeddingSettings {
   heroImageUrl: string
   /** The venue. */
   churchName: string
+  /** Venue section heading on the home page ('' = "The Shower"). */
+  venueTitle: string
+  /** The small line above it ('' = "Where"). */
+  venueEyebrow: string
   /** Optional start time, e.g. "2:00 PM". */
   ceremonyTime: string
   /** Not used by the baby shower (one venue). */
