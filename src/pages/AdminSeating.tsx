@@ -70,6 +70,8 @@ import { PageHeader } from '../components/admin/PageHeader'
 import { GuestExport } from '../components/admin/GuestExport'
 import { SeatingImageExport } from '../components/seating/SeatingImageExport'
 import { useUnsavedChanges } from '../hooks/unsavedChanges'
+import { SIDE_LABEL, SIDE_SHORT } from '../utils/headcount'
+import type { GuestSide } from '../types/rsvp'
 
 type Selection = { kind: ObjectKind; id: string } | null
 interface Snapshot {
@@ -1284,25 +1286,26 @@ function UnseatedCard({
   tableName: (id: string | null) => string | undefined
 }) {
   const [q, setQ] = useState('')
-  const [side, setSide] = useState<'all' | 'groom' | 'bride'>('all')
+  const [side, setSide] = useState<'all' | GuestSide>('all')
   const planned = new Map(invitations.map((i) => [i.id, i.tableId]))
   const list = people
     .filter((p) => side === 'all' || p.side === side)
     .filter((p) => !q || normalizeName(p.name).includes(normalizeName(q)) || normalizeName(p.partyName).includes(normalizeName(q)))
-  const count = (s: 'groom' | 'bride') => people.filter((p) => p.side === s).length
+  const count = (s: GuestSide) => people.filter((p) => p.side === s).length
   return (
     <Card title={`Not yet seated (${people.length})`}>
       {people.length === 0 ? (
         <p className="text-sm text-muted">Everyone who’s attending has a seat. 🎉</p>
       ) : (
         <>
-          <div role="group" aria-label="Guest side" className="mb-2 grid grid-cols-3 gap-1 rounded-lg bg-cream p-1 text-xs">
+          <div role="group" aria-label="Guest side" className={cn('mb-2 grid gap-1 rounded-lg bg-cream p-1 text-xs', count('none') > 0 ? 'grid-cols-4' : 'grid-cols-3')}>
             {(
               [
                 { v: 'all', l: `All ${people.length}` },
                 { v: 'groom', l: `Dad ${count('groom')}` },
                 { v: 'bride', l: `Mom ${count('bride')}` },
-              ] as const
+                ...(count('none') > 0 ? [{ v: 'none', l: `No side ${count('none')}` }] : []),
+              ] as { v: 'all' | GuestSide; l: string }[]
             ).map((o) => (
               <button
                 key={o.v}
@@ -1326,7 +1329,7 @@ function UnseatedCard({
                 <li key={`${p.invitationId}:${p.guestId ?? ''}`} className="rounded-md px-2 py-1.5 hover:bg-cream">
                   <span className="text-ink">{p.name}</span>
                   {!p.isInvitee && <span className="text-muted"> · with {p.partyName}</span>}
-                  <span className="text-muted"> · {p.side === 'bride' ? 'Mom' : 'Dad'}</span>
+                  <span className="text-muted"> · {SIDE_SHORT[p.side]}</span>
                   {plan && <span className="ml-1 rounded bg-champagne-light/50 px-1.5 py-0.5 text-[0.7rem] text-ink-soft">{plan}</span>}
                 </li>
               )
@@ -1407,7 +1410,7 @@ function SeatPicker({
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-ink">{p.name}</span>
                     <span className="block truncate text-xs text-muted">
-                      {p.side === 'bride' ? 'Mom’s side' : 'Dad’s side'} · {p.isInvitee ? 'Invitee' : `With ${p.partyName}`}
+                      {SIDE_LABEL[p.side]} · {p.isInvitee ? 'Invitee' : `With ${p.partyName}`}
                       {p.pending ? ' · no RSVP yet' : ''}
                       {seat ? ` · now at ${tableName(seat.tableId)}, chair ${seat.seatIndex + 1} (will move)` : ' · not seated'}
                     </span>

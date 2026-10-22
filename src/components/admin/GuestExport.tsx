@@ -12,6 +12,7 @@ import { toFriendlyMessage } from '../../utils/errors'
 import { Button } from '../ui/Button'
 import { Modal } from '../ui/Modal'
 import { cn } from '../ui/cn'
+import { SIDE_SHORT } from '../../utils/headcount'
 
 type Who = 'all' | 'attending' | 'seated'
 
@@ -56,7 +57,7 @@ export function GuestExport({ className }: { className?: string }) {
           rows.push({
             name: p.name,
             party: p.isInvitee ? '' : p.partyName,
-            side: p.side === 'bride' ? 'Mom' : 'Dad',
+            side: SIDE_SHORT[p.side],
             rsvp: RSVP_LABEL[inv.status] ?? inv.status,
             tableId,
             table: tableId ? (tableById.get(tableId)?.name ?? '') : '',
