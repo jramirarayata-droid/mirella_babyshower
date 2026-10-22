@@ -14,13 +14,27 @@ interface SearchFormProps {
   suggest?: boolean
   /** The line under the box (the open link says "first and last name" instead of "as on your invitation"). */
   help?: string
+  /** Button text ("Continue" for the open link). */
+  buttonLabel?: string
+  /** Checks the name before searching; returns a message to show, or null when it's fine. */
+  check?: (name: string) => string | null
 }
 
-export function SearchForm({ onSearch, searching, error, initialName = '', suggest = true, help = 'Please type your name as it appears on your invitation.' }: SearchFormProps) {
+export function SearchForm({
+  onSearch,
+  searching,
+  error,
+  initialName = '',
+  suggest = true,
+  help = 'Please type your name as it appears on your invitation.',
+  buttonLabel = 'Search',
+  check,
+}: SearchFormProps) {
   const [name, setName] = useState(initialName)
   const [touched, setTouched] = useState(false)
   const [asked, setAsked] = useState('')
   const [suggestion, setSuggestion] = useState<string | null>(null)
+  const [problem, setProblem] = useState<string | null>(null)
 
   // A miss: look for one close spelling of the name that was searched.
   useEffect(() => {
@@ -43,6 +57,9 @@ export function SearchForm({ onSearch, searching, error, initialName = '', sugge
     e.preventDefault()
     setTouched(true)
     if (empty || searching) return
+    const p = check?.(name) ?? null
+    setProblem(p)
+    if (p) return
     run(name)
   }
 
@@ -72,7 +89,7 @@ export function SearchForm({ onSearch, searching, error, initialName = '', sugge
       <p id="search-help" className="mt-3 text-center text-sm text-muted">
         {help}
       </p>
-      <FieldError id="search-error">{touched && empty ? 'Please enter your full name.' : error}</FieldError>
+      <FieldError id="search-error">{touched && empty ? 'Please enter your full name.' : (problem ?? error)}</FieldError>
       {suggestion && error && !searching && (
         <p className="mt-3 text-center text-sm text-ink-soft" aria-live="polite">
           Did you mean{' '}
@@ -90,8 +107,8 @@ export function SearchForm({ onSearch, searching, error, initialName = '', sugge
           ?
         </p>
       )}
-      <Button type="submit" size="lg" fullWidth loading={searching} loadingText="Searching…" className="mt-6">
-        Search
+      <Button type="submit" size="lg" fullWidth loading={searching} loadingText={buttonLabel === 'Search' ? 'Searching…' : 'One moment…'} className="mt-6">
+        {buttonLabel}
       </Button>
     </form>
   )

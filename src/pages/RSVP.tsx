@@ -7,6 +7,7 @@ import { useInvitation } from '../hooks/useInvitation'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
 import { useRsvpQuestions } from '../hooks/useRsvpQuestions'
 import { submitOpenRSVP, submitRSVP } from '../services/rsvpService'
+import { suggestGuestName } from '../services/invitationService'
 import type { AttendanceStatus, RSVPFormState } from '../types/rsvp'
 import type { PublicGift } from '../types/wedding'
 import { isRsvpOpen } from '../services/settingsService'
@@ -50,8 +51,12 @@ export default function RSVP() {
   // Open link (Website Settings → How guests RSVP): anyone with the link can sign up.
   const openMode = settings?.rsvpMode === 'open'
   const [asked, setAsked] = useState('')
+  // Open link: a close spelling of a name already here ("Did you mean …?") — asked once, so no second entry.
+  const [maybe, setMaybe] = useState<{ typed: string; suggestion: string } | null>(null)
+  const [resolving, setResolving] = useState(false)
   const search = (name: string) => {
     setAsked(name)
+    setMaybe(null)
     return searchByName(name)
   }
   const [known] = useState(knownGuest)
@@ -100,6 +105,25 @@ export default function RSVP() {
   // Move to the "found" state whenever a lookup succeeds. Guests arriving from
   // their virtual invitation (/#/i/<code>) have just opened an envelope, so they
   // go straight to the form.
+  // Open link: a name that isn't here yet goes straight to their invitation —
+  // unless it's a close spelling of someone already here, then we ask once.
+  useEffect(() => {
+    if (!openMode || status !== 'not_found' || !asked || !settings) return
+    let alive = true
+    const typed = asked.replace(/\s+/g, ' ').trim()
+    setResolving(true)
+    suggestGuestName(typed)
+      .then((s) => {
+        if (!alive) return
+        if (s && s.toLowerCase() !== typed.toLowerCase()) setMaybe({ typed, suggestion: s })
+        else startNew(typed, settings.openRsvpCompanions)
+      })
+      .finally(() => alive && setResolving(false))
+    return () => {
+      alive = false
+    }
+  }, [openMode, status, asked, settings, startNew])
+
   const fromCard = params.get('from') === 'card'
   // Remember who's on this phone (menu greeting, Find My Seat, photos).
   useEffect(() => {
@@ -257,14 +281,27 @@ export default function RSVP() {
               {settings?.rsvpConfig.teaser && <RaffleTeaser teaser={settings.rsvpConfig.teaser} className="-mt-3 mb-9" />}
               <SearchForm
                 onSearch={search}
-                searching={status === 'searching'}
-                error={status === 'error' ? error : status === 'not_found' ? (openMode ? 'We don’t have a reply under this name yet.' : error) : null}
+                searching={status === 'searching' || resolving}
+                error={status === 'error' ? error : status === 'not_found' && !openMode ? error : null}
                 initialName={known?.name ?? ''}
-                suggest={status === 'not_found'}
+                suggest={status === 'not_found' && !openMode}
                 help={openMode ? 'Please type your first and last name.' : undefined}
+                buttonLabel={openMode ? 'Continue' : 'Search'}
+                check={openMode ? (n) => (/\S+\s+\S+/.test(n.trim()) ? null : 'Please add your last name too.') : undefined}
               />
-              {openMode && status === 'not_found' && settings && (
-                <NewGuest name={asked} onContinue={(n) => startNew(n, settings.openRsvpCompanions)} />
+              {openMode && maybe && (
+                <MaybeYou
+                  typed={maybe.typed}
+                  suggestion={maybe.suggestion}
+                  onYes={() => {
+                    setMaybe(null)
+                    void searchByName(maybe.suggestion)
+                  }}
+                  onNew={() => {
+                    setMaybe(null)
+                    if (settings) startNew(maybe.typed, settings.openRsvpCompanions)
+                  }}
+                />
               )}
               {status === 'included' && included && (
                 <IncludedNotice included={included} showSeat={finderOpen} />
@@ -360,23 +397,20 @@ export default function RSVP() {
   )
 }
 
-/** Open link: someone not here yet — continue as a new guest (first and last name needed). */
-function NewGuest({ name, onContinue }: { name: string; onContinue: (name: string) => void }) {
-  const clean = name.replace(/\s+/g, ' ').trim()
-  const full = /\S+ \S+/.test(clean)
+/** Open link: the typed name is close to someone already here — ask once, so nobody ends up twice. */
+function MaybeYou({ typed, suggestion, onYes, onNew }: { typed: string; suggestion: string; onYes: () => void; onNew: () => void }) {
   return (
-    <div className="mx-auto mt-6 w-full max-w-md rounded-2xl border border-champagne/60 bg-paper p-5 text-center shadow-soft">
-      {full ? (
-        <>
-          <p className="font-serif text-xl text-ink">Nice to meet you, {clean.split(' ')[0]}!</p>
-          <p className="mt-1 text-sm text-ink-soft">If you haven’t replied before, continue as a new guest.</p>
-          <Button className="mt-4" fullWidth onClick={() => onContinue(clean)}>
-            Continue as {clean}
-          </Button>
-        </>
-      ) : (
-        <p className="text-sm text-ink-soft">Please type your first and last name.</p>
-      )}
+    <div className="mx-auto mt-6 w-full max-w-md rounded-2xl border border-champagne/60 bg-paper p-5 text-center shadow-soft" aria-live="polite">
+      <p className="font-serif text-xl text-ink">Is this you — {suggestion}?</p>
+      <p className="mt-1 text-sm text-ink-soft">We have a reply under a similar name.</p>
+      <div className="mt-4 grid gap-2">
+        <Button fullWidth onClick={onYes}>
+          Yes, that’s me
+        </Button>
+        <Button fullWidth variant="outline" onClick={onNew}>
+          No, I’m new — continue as {typed}
+        </Button>
+      </div>
     </div>
   )
 }
