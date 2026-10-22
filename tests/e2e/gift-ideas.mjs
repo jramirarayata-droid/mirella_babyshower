@@ -85,6 +85,7 @@ try {
   ideas = { ...ideas, layout: 'polaroid' }
   await page.reload()
   await page.getByRole('heading', { name: 'Gift Ideas' }).waitFor({ timeout: 20000 })
+  await page.getByRole('list', { name: 'Gift Ideas' }).locator('img').first().waitFor({ timeout: 20000 })
   ok('home: a gallery design shows the photos', (await page.getByRole('list', { name: 'Gift Ideas' }).locator('img').count()) === 2)
   await page.getByRole('heading', { name: 'Gift Ideas' }).scrollIntoViewIfNeeded()
   shots.push(['ideas-polaroid', await page.screenshot()])

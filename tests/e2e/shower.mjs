@@ -244,9 +244,8 @@ try {
   await g.getByRole('button', { name: 'Continue' }).click()
   await g.getByText('Diapers (newborn)').waitFor({ timeout: 10000 })
   ok('attending guest: the wishlist opens', true)
-  const idea = g.locator('li', { hasText: 'A cloud nursery' })
-  ok('idea: photo, title and caption, nothing to claim', (await idea.locator('img').count()) === 1 && (await idea.getByText('Soft clouds and little stars').count()) === 1 && (await idea.getByRole('button').count()) === 0)
-  ok('ideas sit in their own section', (await g.getByRole('heading', { name: /ideas/i }).count()) === 1)
+  // Ideas now have their own section on the home page (tests/e2e/gift-ideas.mjs): the wishlist lists gifts only.
+  ok('wishlist page: gifts only, no ideas', (await g.getByText('A cloud nursery').count()) === 0 && (await g.getByRole('heading', { name: /ideas/i }).count()) === 0)
   shots.push(['wishlist-ideas', await g.screenshot({ fullPage: true })])
   await g.goto(`${BASE}#/attire`)
   await g.locator('#outfits-heading').waitFor({ timeout: 20000 })
