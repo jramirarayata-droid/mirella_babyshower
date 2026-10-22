@@ -4,6 +4,7 @@ import { Baby, Gift, PenLine, type LucideIcon } from 'lucide-react'
 import { currentShowerGuest, getNameIdeasInfo, getPredictionsInfo, getRegistry } from '../../services/showerService'
 import { listAttire } from '../../services/outfitService'
 import { Reveal } from '../wedding/Reveal'
+import { hasIdeas, loadGiftIdeas } from './GiftIdeas'
 import { Ornament } from '../ui/Ornament'
 import { useSpace } from '../../hooks/useSpace'
 
@@ -22,6 +23,8 @@ export interface ShowerActivities {
   predict: boolean
   predictOpen: boolean
   names: boolean
+  /** Gift ideas this visitor may see (their own section and page). */
+  ideas: boolean
 }
 
 let activities: Promise<ShowerActivities> | null = null
@@ -43,13 +46,15 @@ export function useShowerActivities(): ShowerActivities | null {
       getPredictionsInfo().catch(() => null),
       getNameIdeasInfo().catch(() => null),
       listAttire(token).catch(() => null),
-    ]).then(([r, p, n, a]) => ({
+      loadGiftIdeas(),
+    ]).then(([r, p, n, a, i]) => ({
       // What guests see — even for a signed-in admin (who may preview a hidden wishlist on its own page).
       registry: Boolean(r?.guestVisible),
       attirePage: Boolean(a?.private && a.allowed && a.images.length > 0),
       predict: Boolean(p?.visible),
       predictOpen: Boolean(p?.open),
       names: Boolean(n?.visible),
+      ideas: hasIdeas(i),
     }))
     void activities.then((a) => alive && setOn(a))
     return () => {

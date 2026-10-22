@@ -53,6 +53,7 @@ jobs:
           node tests/e2e/spaces.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
           node tests/e2e/open-rsvp.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
           node tests/e2e/page-order.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
+          node tests/e2e/gift-ideas.mjs http://localhost:4173/ /tmp/e2e-out 2>&1 | tee -a /tmp/e2e-out/results.txt || status=1
           exit $status
       - name: Publish results to the test-results branch
         if: always()

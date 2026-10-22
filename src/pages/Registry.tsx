@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Check, ExternalLink, Gift, Lightbulb, Minus, Plus } from 'lucide-react'
+import { Check, ExternalLink, Gift, Minus, Plus } from 'lucide-react'
 import { ShowerShell, GuestGate, NotYet, SignedInAs, ForAttending } from '../components/shower/ShowerShell'
 import { PageLoader } from '../components/ui/Spinner'
 import { Button } from '../components/ui/Button'
@@ -118,38 +118,16 @@ export default function Registry() {
           ) : (
             <p className="text-center text-sm text-muted">Tap “I’ll bring this” on anything you’d like to give.</p>
           )}
-          {view.items.length === 0 ? (
+          {view.items.filter((i) => i.kind === 'gift').length === 0 ? (
             <p className="mt-10 text-center text-muted">The wishlist is being put together — please check back soon.</p>
           ) : (
-            (() => {
-              const gifts = view.items.filter((i) => i.kind === 'gift')
-              const ideas = view.items.filter((i) => i.kind === 'idea')
-              return (
-                <>
-                  {gifts.length > 0 && (
-                    <ul className="mt-8 grid gap-5 sm:grid-cols-2" aria-label="Gifts to bring">
-                      {gifts.map((item) => (
-                        <ItemCard key={item.id} item={item} busy={busy === item.id} onClaim={(q) => void claim(item, q)} onUnclaim={() => void unclaim(item)} />
-                      ))}
-                    </ul>
-                  )}
-                  {ideas.length > 0 && (
-                    <section aria-labelledby="ideas-heading" className="mt-14">
-                      <p className="eyebrow text-center">Ideas &amp; inspiration</p>
-                      <h2 id="ideas-heading" className="mt-3 text-center text-3xl text-ink">
-                        {gifts.length > 0 ? 'A few more ideas' : 'Gift ideas'}
-                      </h2>
-                      <p className="mx-auto mt-2 max-w-md text-center text-sm text-muted">Just ideas we love — no need to tell us if you choose one.</p>
-                      <ul className="mt-8 grid gap-5 sm:grid-cols-2">
-                        {ideas.map((item) => (
-                          <IdeaCard key={item.id} item={item} />
-                        ))}
-                      </ul>
-                    </section>
-                  )}
-                </>
-              )
-            })()
+            <ul className="mt-8 grid gap-5 sm:grid-cols-2" aria-label="Gifts to bring">
+              {view.items
+                .filter((i) => i.kind === 'gift')
+                .map((item) => (
+                  <ItemCard key={item.id} item={item} busy={busy === item.id} onClaim={(q) => void claim(item, q)} onUnclaim={() => void unclaim(item)} />
+                ))}
+            </ul>
           )}
         </>
       ) : null}
@@ -237,33 +215,6 @@ function ItemCard({ item, busy, onClaim, onUnclaim }: { item: RegistryItem; busy
             </div>
           )}
         </div>
-      </div>
-    </li>
-  )
-}
-
-/** An idea: a photo, a title and a caption. Nothing to claim. */
-function IdeaCard({ item }: { item: RegistryItem }) {
-  return (
-    <li className="fine-frame flex flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-soft">
-      {item.image ? (
-        <img src={item.image} alt={item.title} loading="lazy" className="aspect-[4/3] w-full object-cover" />
-      ) : (
-        <div aria-hidden="true" className="grid h-24 w-full place-items-center bg-[linear-gradient(160deg,var(--color-linen),var(--color-cream))]">
-          <Lightbulb className="size-9 text-champagne" strokeWidth={1.2} />
-        </div>
-      )}
-      <div className="relative z-[2] flex flex-1 flex-col p-5">
-        <p className="inline-flex items-center gap-1.5 text-[0.7rem] font-medium uppercase tracking-[0.24em] text-gold">
-          <Lightbulb aria-hidden="true" className="size-3.5" /> Idea
-        </p>
-        <h3 className="mt-2 font-serif text-2xl leading-tight text-ink">{item.title}</h3>
-        {item.note && <p className="mt-2 text-sm leading-relaxed text-ink-soft">{item.note}</p>}
-        {item.link && (
-          <a href={item.link} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm text-gold underline-offset-4 hover:underline">
-            See where to find it <ExternalLink aria-hidden="true" className="size-3.5" />
-          </a>
-        )}
       </div>
     </li>
   )

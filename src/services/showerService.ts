@@ -3,6 +3,7 @@ import { FriendlyError, logError } from '../utils/errors'
 import { rememberGuest } from '../utils/guestIdentity'
 import { getAdminPreference, saveAdminPreference } from './preferencesService'
 import { savedGuest, type PhotoGuest } from './guestPhotosService'
+import { GALLERY_LAYOUTS, type GalleryLayout } from '../types/wedding'
 
 /*
  * The baby shower's own features: the gift wishlist ("I'll bring this"), the
@@ -144,6 +145,102 @@ export async function getGuestAccess(token?: string | null): Promise<GuestAccess
   const o = obj(data)
   return { wishlistPrivate: o.wishlistPrivate === true, attirePrivate: o.attirePrivate === true, attending: o.attending === true }
 }
+
+// gift ideas (their own section on the home page)
+
+/** 'cards' = photo cards with title and caption; the rest are the photo gallery designs. */
+export type IdeasLayout = 'cards' | GalleryLayout
+export const IDEAS_LAYOUTS: { id: IdeasLayout; name: string; description: string }[] = [
+  { id: 'cards', name: 'Idea cards', description: 'Photo, title and caption on soft cards' },
+  ...GALLERY_LAYOUTS,
+]
+const ideasLayout = (v: unknown): IdeasLayout => (IDEAS_LAYOUTS.some((l) => l.id === v) ? (v as IdeasLayout) : 'cards')
+
+export interface GiftIdea {
+  id: string
+  title: string
+  note: string
+  link: string
+  image: string
+}
+export interface GiftIdeasView {
+  visible: boolean
+  /** Kept for attending guests and this visitor isn't one (yet). */
+  private: boolean
+  title: string
+  intro: string
+  layout: IdeasLayout
+  items: GiftIdea[]
+}
+const NO_IDEAS: GiftIdeasView = { visible: false, private: false, title: '', intro: '', layout: 'cards', items: [] }
+
+/** The Gift ideas section, as a guest sees it. Never throws: on any problem the section is simply left out. */
+export async function getGiftIdeas(token?: string | null): Promise<GiftIdeasView> {
+  const { data, error } = await supabase.rpc('gift_ideas_list', { p_token: token ?? null })
+  if (error) {
+    logError('getGiftIdeas', error)
+    return NO_IDEAS
+  }
+  const o = obj(data)
+  return {
+    visible: o.visible === true,
+    private: o.private === true,
+    title: str(o.title) || 'Gift Ideas',
+    intro: str(o.intro),
+    layout: ideasLayout(o.layout),
+    items: arr(o.items)
+      .map((x) => {
+        const r = obj(x)
+        return { id: str(r.id), title: str(r.title), note: str(r.note), link: str(r.link), image: str(r.image) }
+      })
+      .filter((i) => i.id && i.image),
+  }
+}
+
+/** Which "Just for you" links the RSVP confirmation offers (each on unless switched off). */
+export interface RsvpExtras {
+  wishlist: boolean
+  ideas: boolean
+  attire: boolean
+}
+const ALL_EXTRAS: RsvpExtras = { wishlist: true, ideas: true, attire: true }
+const readExtras = (v: unknown): RsvpExtras => {
+  const o = obj(v)
+  return { wishlist: o.wishlist !== false, ideas: o.ideas !== false, attire: o.attire !== false }
+}
+
+/** Guests: never throws (before database update 054 everything stays on, as before). */
+export async function getRsvpExtras(): Promise<RsvpExtras> {
+  const { data, error } = await supabase.rpc('rsvp_extras')
+  if (error) {
+    logError('getRsvpExtras', error)
+    return ALL_EXTRAS
+  }
+  return readExtras(data)
+}
+
+/** Admin: switch one link on or off (reads the latest first, so other switches aren't undone). */
+export async function saveRsvpExtra(what: keyof RsvpExtras, on: boolean): Promise<RsvpExtras> {
+  const next = { ...readExtras(await getAdminPreference('rsvp_extras')), [what]: on }
+  await saveAdminPreference('rsvp_extras', next)
+  return next
+}
+export const getRsvpExtrasAdmin = async (): Promise<RsvpExtras> => readExtras(await getAdminPreference('rsvp_extras'))
+
+export interface GiftIdeasSettings {
+  visible: boolean
+  title: string
+  intro: string
+  layout: IdeasLayout
+}
+export const DEFAULT_GIFT_IDEAS: GiftIdeasSettings = { visible: true, title: 'Gift Ideas', intro: '', layout: 'cards' }
+
+export async function getGiftIdeasSettings(): Promise<GiftIdeasSettings> {
+  const v = obj(await getAdminPreference('gift_ideas'))
+  return { visible: v.visible !== false, title: str(v.title) || DEFAULT_GIFT_IDEAS.title, intro: str(v.intro), layout: ideasLayout(v.layout) }
+}
+export const saveGiftIdeasSettings = (s: GiftIdeasSettings) =>
+  saveAdminPreference('gift_ideas', { visible: s.visible, title: s.title.trim().slice(0, 80), intro: s.intro.trim().slice(0, 300), layout: s.layout })
 
 // admin
 

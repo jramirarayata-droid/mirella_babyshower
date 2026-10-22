@@ -23,6 +23,7 @@ import { RSVPCallout } from '../components/wedding/RSVPCallout'
 import { Footer } from '../components/wedding/Footer'
 import { GenderRevealSection } from '../components/shower/GenderReveal'
 import { ShowerFun } from '../components/shower/ShowerFun'
+import { GiftIdeasSection } from '../components/shower/GiftIdeas'
 import { PageLoader } from '../components/ui/Spinner'
 import { PublicError } from '../components/wedding/PublicError'
 import { isRsvpOpen, orderMedia } from '../services/settingsService'
@@ -121,6 +122,7 @@ export default function Home() {
     ) : (
       <MotifSection title={settings.motifTitle} colors={settings.motifColors} />
     ),
+    ideas: <GiftIdeasSection />,
     fun: <ShowerFun />,
     gift: gift ? (
       <section aria-label={gift.title} className="px-5 pt-8 sm:px-8">

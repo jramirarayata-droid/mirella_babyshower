@@ -5,7 +5,7 @@
  * each one can go anywhere. A saved order of [] means the usual order.
  */
 
-export type FixedSectionKey = 'intro' | 'verse' | 'reveal' | 'guestPhotos' | 'venue' | 'program' | 'info' | 'attire' | 'fun' | 'gift' | 'rsvp'
+export type FixedSectionKey = 'intro' | 'verse' | 'reveal' | 'guestPhotos' | 'venue' | 'program' | 'info' | 'attire' | 'ideas' | 'fun' | 'gift' | 'rsvp'
 export type SectionKey = FixedSectionKey | `media:${string}`
 
 /** Plain names for the admin (photo sections use their own titles). */
@@ -18,6 +18,7 @@ export const SECTION_NAMES: Record<FixedSectionKey, string> = {
   program: 'Program',
   info: 'Good to know',
   attire: 'What to Wear',
+  ideas: 'Gift ideas',
   fun: 'Gifts, Guesses & Names',
   gift: 'Gift card',
   rsvp: 'RSVP',
@@ -25,7 +26,7 @@ export const SECTION_NAMES: Record<FixedSectionKey, string> = {
 
 /** The usual order. mediaKeys are the photo sections in Admin → Photos & Video order (e.g. "media:gallery"). */
 export function defaultSectionKeys(mediaKeys: string[]): SectionKey[] {
-  return ['intro', 'verse', 'reveal', ...(mediaKeys as SectionKey[]), 'guestPhotos', 'venue', 'program', 'info', 'attire', 'fun', 'gift', 'rsvp']
+  return ['intro', 'verse', 'reveal', ...(mediaKeys as SectionKey[]), 'guestPhotos', 'venue', 'program', 'info', 'attire', 'ideas', 'fun', 'gift', 'rsvp']
 }
 
 /**
