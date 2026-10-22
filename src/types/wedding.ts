@@ -85,6 +85,8 @@ export interface WeddingSettings {
   galleryVisible: boolean
   /** Order of the photo & video sections on the home page: 'gallery', 'video' and extra section ids ([] = default). */
   mediaOrder?: string[]
+  /** Admin → Page Order: section keys in order ([] = the usual order). See utils/pageOrder. */
+  pageOrder: string[]
   galleryTitle: string
   gallerySubtitle: string
   galleryLayout: GalleryLayout
@@ -237,6 +239,7 @@ export type WeddingSettingsInput = Omit<
   | keyof RsvpSettings
   | 'rsvpMode'
   | 'openRsvpCompanions'
+  | 'pageOrder'
   | keyof EntourageSettings
   | keyof MotifSettings
   | keyof GallerySettings
