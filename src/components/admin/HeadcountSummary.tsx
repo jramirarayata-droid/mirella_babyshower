@@ -6,6 +6,7 @@ export function HeadcountSummary({ invitations, side }: { invitations: Invitatio
   const h = headcount(bySide(invitations, side))
   const groom = side === 'all' ? headcount(bySide(invitations, 'groom')).expected : 0
   const bride = side === 'all' ? headcount(bySide(invitations, 'bride')).expected : 0
+  const none = side === 'all' ? headcount(bySide(invitations, 'none')).expected : 0
   const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
 
   const parts: [number, string][] = [
@@ -41,10 +42,16 @@ export function HeadcountSummary({ invitations, side }: { invitations: Invitatio
         <span className="rounded-lg bg-ink px-3 py-1.5 text-sm text-ivory">
           <strong className="font-serif text-2xl font-normal tabular-nums">{h.expected}</strong> expected {h.expected === 1 ? 'guest' : 'guests'}
         </span>
-        {side === 'all' && (groom > 0 || bride > 0) && (
+        {side === 'all' && (groom > 0 || bride > 0 || none > 0) && (
           <span className="text-sm text-muted sm:ml-auto">
             Dad’s side <strong className="font-medium tabular-nums text-ink">{groom}</strong> · Mom’s side{' '}
             <strong className="font-medium tabular-nums text-ink">{bride}</strong>
+            {none > 0 && (
+              <>
+                {' '}
+                · No side <strong className="font-medium tabular-nums text-ink">{none}</strong>
+              </>
+            )}
           </span>
         )}
       </div>

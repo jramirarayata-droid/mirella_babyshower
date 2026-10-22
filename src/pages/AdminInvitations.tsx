@@ -24,7 +24,7 @@ import { PageHeader, Panel } from '../components/admin/PageHeader'
 import { GuestExport } from '../components/admin/GuestExport'
 import { FilterTabs, SearchInput } from '../components/admin/FilterTabs'
 import { HeadcountSummary } from '../components/admin/HeadcountSummary'
-import { SIDE_LABEL, bySide, type SideFilter } from '../utils/headcount'
+import { SIDE_LABEL, SIDE_SHORT, SIDE_TONE, bySide, type SideFilter } from '../utils/headcount'
 import type { PrintablesHandoff } from './AdminPrintables'
 import { VirtualInviteSettingsModal } from '../components/admin/VirtualInviteSettingsModal'
 import {
@@ -343,7 +343,7 @@ export default function AdminInvitations() {
       ),
       hideOnMobile: true,
     },
-    { key: 'side', header: 'Side', cell: (r) => <Badge tone={r.side === 'bride' ? 'rose' : 'gold'}>{r.side === 'bride' ? 'Mom' : 'Dad'}</Badge>, className: 'whitespace-nowrap' },
+    { key: 'side', header: 'Side', cell: (r) => <Badge tone={SIDE_TONE[r.side]}>{SIDE_SHORT[r.side]}</Badge>, className: 'whitespace-nowrap' },
     { key: 'table', header: 'Table', cell: (r) => r.tableNumber || '—' },
     {
       key: 'included',
@@ -429,6 +429,7 @@ export default function AdminInvitations() {
             { value: 'all', label: 'All', count: data?.invitations.length },
             { value: 'groom', label: 'Dad’s side', count: data ? bySide(data.invitations, 'groom').length : undefined },
             { value: 'bride', label: 'Mom’s side', count: data ? bySide(data.invitations, 'bride').length : undefined },
+            ...(data && bySide(data.invitations, 'none').length > 0 ? [{ value: 'none' as const, label: 'No side', count: bySide(data.invitations, 'none').length }] : []),
           ]}
         />
         <SearchInput label="Search by invitee name" placeholder="Search by invitee name…" value={query} onChange={setQuery} />

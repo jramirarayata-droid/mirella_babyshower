@@ -127,11 +127,12 @@ export function InvitationFormModal({ open, invitation, saving, onClose, onSave,
         />
         <fieldset>
           <legend className="mb-2 text-[0.95rem] font-medium text-ink-soft">Guest of</legend>
-          <div className="grid grid-cols-2 gap-1 rounded-lg bg-cream p-1" role="radiogroup" aria-label="Guest of">
+          <div className="grid grid-cols-3 gap-1 rounded-lg bg-cream p-1" role="radiogroup" aria-label="Guest of">
             {(
               [
                 { v: 'groom', l: 'Dad’s side' },
                 { v: 'bride', l: 'Mom’s side' },
+                { v: 'none', l: 'No side' },
               ] as const
             ).map((o) => (
               <button

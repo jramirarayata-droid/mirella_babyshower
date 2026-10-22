@@ -14,7 +14,7 @@ import { markInvitationsPrinted, updateInvitationAddressedAs, updateInvitationPo
 import { ADDRESS_TITLES, addressSuggestions, withTitle } from '../utils/addressing'
 import { isRsvpOpen } from '../services/settingsService'
 import type { InvitationWithRSVP, PositionMode } from '../types/rsvp'
-import { bySide, type SideFilter } from '../utils/headcount'
+import { SIDE_LABEL, bySide, type SideFilter } from '../utils/headcount'
 import { FilterTabs } from '../components/admin/FilterTabs'
 import { toFriendlyMessage } from '../utils/errors'
 import { arrivalText, formatDateTime, formatDeadlineDate, formatWeddingDate, babyMonogram } from '../utils/formatting'
@@ -1146,6 +1146,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
                 { value: 'all', label: 'All', count: active.length },
                 { value: 'groom', label: 'Dad', count: bySide(active, 'groom').length },
                 { value: 'bride', label: 'Mom', count: bySide(active, 'bride').length },
+                ...(bySide(active, 'none').length > 0 ? [{ value: 'none' as const, label: 'No side', count: bySide(active, 'none').length }] : []),
               ]}
             />
           </div>
@@ -1178,7 +1179,7 @@ function InvitationsTab({ paper, design, prefs, update }: { paper: Paper; design
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-ink">{i.inviteeName}</span>
                           <span className="block truncate text-xs text-muted">
-                            {[i.side === 'bride' ? 'Mom’s side' : 'Dad’s side', i.tableNumber, withNames.length ? `+ ${withNames.join(', ')}` : ''].filter(Boolean).join(' · ')}
+                            {[SIDE_LABEL[i.side], i.tableNumber, withNames.length ? `+ ${withNames.join(', ')}` : ''].filter(Boolean).join(' · ')}
                           </span>
                           {addressedOf(i) && <span className="block truncate font-serif text-[0.95rem] italic text-gold">“{addressedOf(i)}”</span>}
                         </span>

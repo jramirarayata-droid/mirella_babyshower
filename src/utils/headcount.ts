@@ -4,9 +4,13 @@ import { includedGuests, requestedGuests } from './guests'
 export type SideFilter = 'all' | GuestSide
 
 /** Which family a guest is from (stored as 'groom' / 'bride' internally). */
-export const SIDE_LABEL: Record<GuestSide, string> = { groom: 'Dad’s side', bride: 'Mom’s side' }
+export const SIDE_LABEL: Record<GuestSide, string> = { groom: 'Dad’s side', bride: 'Mom’s side', none: 'No side' }
 /** Short form for badges. */
-export const SIDE_SHORT: Record<GuestSide, string> = { groom: 'Dad', bride: 'Mom' }
+export const SIDE_SHORT: Record<GuestSide, string> = { groom: 'Dad', bride: 'Mom', none: 'No side' }
+/** Badge colour per side. */
+export const SIDE_TONE = { groom: 'gold', bride: 'rose', none: 'gray' } as const
+/** Stored value → side ('groom' when missing or unknown). */
+export const toSide = (v: unknown): GuestSide => (v === 'bride' || v === 'none' ? v : 'groom')
 
 export const bySide = <T extends { side: GuestSide }>(list: T[], side: SideFilter): T[] => (side === 'all' ? list : list.filter((i) => i.side === side))
 

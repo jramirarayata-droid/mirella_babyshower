@@ -21,6 +21,7 @@ import { normalizeSpaces } from '../utils/validation'
 import { mapTable } from './seatingService'
 import { loginEmail } from './spaceService'
 import type { SeatingTable } from '../types/seating'
+import { toSide } from '../utils/headcount'
 
 // ----- Auth ---------------------------------------------------------------------
 
@@ -69,7 +70,7 @@ const mapInvitation = (r: Tables<'invitations'>): Invitation => ({
   positionMode: (['custom', 'none'].includes(r.position_mode) ? r.position_mode : 'auto') as Invitation['positionMode'],
   positionLabel: r.position_label ?? '',
   addressedAs: r.addressed_as ?? '',
-  side: r.side === 'bride' ? 'bride' : 'groom',
+  side: toSide(r.side),
   maxAdditionalGuests: r.max_additional_guests,
   isActive: r.is_active,
   source: (r as { source?: string | null }).source === 'link' ? 'link' : 'list',
