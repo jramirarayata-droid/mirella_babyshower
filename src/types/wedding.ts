@@ -235,6 +235,8 @@ export type WeddingSettingsInput = Omit<
   | 'outfitSectionVisible'
   | 'outfitLayout'
   | keyof RsvpSettings
+  | 'rsvpMode'
+  | 'openRsvpCompanions'
   | keyof EntourageSettings
   | keyof MotifSettings
   | keyof GallerySettings
