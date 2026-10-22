@@ -191,7 +191,7 @@ export function RsvpModeCard() {
                   ))}
                 </select>
               </label>
-              <p>Guests are counted as soon as they reply. Their companions (names required) wait in Guests → requests until you approve them.</p>
+              <p>Guests are counted as soon as they reply. Their companions (names required) wait in Extra guests until you approve them.</p>
               <p>
                 Share this link with everyone:{' '}
                 <a href={rsvpLink} target="_blank" rel="noopener noreferrer" className="break-all text-gold underline-offset-4 hover:underline">
