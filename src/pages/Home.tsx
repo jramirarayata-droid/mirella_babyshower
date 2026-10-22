@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, type ReactNode } from 'react'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
 import { useOutfits } from '../hooks/useOutfits'
 import { useGallery } from '../hooks/useGallery'
@@ -32,6 +32,8 @@ import { formatWeddingDate } from '../utils/formatting'
 import { GALLERY_LAYOUTS, type GalleryLayout } from '../types/wedding'
 import { isThemePreviewFrame } from '../theme/applyTheme'
 import { useSpace } from '../hooks/useSpace'
+import { homeOrder } from '../utils/pageOrder'
+import { PageBackground } from '../components/wedding/PageBackground'
 
 export default function Home() {
   const { settings, loading, error, refresh } = useWeddingSettings()
@@ -64,78 +66,97 @@ export default function Home() {
   const previewLayout = isThemePreviewFrame() ? (/[?&]gallery=([a-z]+)/.exec(window.location.hash)?.[1] as GalleryLayout | undefined) : undefined
   const galleryLayout = GALLERY_LAYOUTS.some((g) => g.id === previewLayout) ? previewLayout! : settings.galleryLayout
 
+  // Every section, by its key (Admin → Page Order decides the order; hidden ones are null).
+  const media = orderMedia(
+    [
+      {
+        key: 'gallery',
+        node: settings.galleryVisible ? <CoupleGallery title={settings.galleryTitle} subtitle={settings.gallerySubtitle} layout={galleryLayout} images={gallery} /> : null,
+      },
+      {
+        key: 'video',
+        node:
+          settings.videoVisible && settings.videoUrl ? (
+            <VideoHighlight title={settings.videoTitle} caption={settings.videoCaption} url={settings.videoUrl} posterUrl={settings.videoPosterUrl} />
+          ) : null,
+      },
+      ...mediaSections.map((x) => ({ key: x.s.id, node: <MediaSectionView section={x} /> })),
+    ],
+    settings.mediaOrder ?? [],
+  )
+  // Details shared only with confirmed guests (Website Settings → Privacy). While the choice
+  // is loading, nothing is shown, so private details never flash up. The short "for confirmed
+  // guests" note sits where the first private part would be.
+  const hideVenues = display ? display.website.hideVenues : true
+  const hideInfo = display ? display.website.hideInfo : true
+  const noteAt = !display ? null : hideVenues ? 'venue' : hideInfo ? 'info' : null
+  const note = noteAt ? <PrivateDetails venues={hideVenues} info={hideInfo} rsvpOpen={isRsvpOpen(settings)} /> : null
+  const nodes: Record<string, ReactNode> = {
+    intro: <Introduction settings={settings} />,
+    verse: settings.verseVisible ? <VerseHighlight text={settings.verseText} reference={settings.verseReference} /> : null,
+    reveal: space.has('reveal') ? <GenderRevealSection /> : null,
+    guestPhotos: <GuestPhotosTeaser />,
+    venue: (
+      <>
+        {display && !hideVenues && <Venues settings={settings} />}
+        {noteAt === 'venue' && note}
+      </>
+    ),
+    program: display && settings.programVisible ? <ProgramFlow title={settings.programTitle} subtitle={settings.programSubtitle} items={program} /> : null,
+    info: (
+      <>
+        {display && !hideInfo && <InfoSections sections={settings.sections} />}
+        {noteAt === 'info' && note}
+      </>
+    ),
+    attire: showOutfits ? (
+      <OutfitGallery
+        title={settings.outfitTitle}
+        subtitle={settings.outfitSubtitle}
+        images={attire.images}
+        layout={settings.outfitLayout}
+        motifTitle={settings.motifTitle}
+        motifColors={settings.motifColors}
+      />
+    ) : (
+      <MotifSection title={settings.motifTitle} colors={settings.motifColors} />
+    ),
+    fun: <ShowerFun />,
+    gift: gift ? (
+      <section aria-label={gift.title} className="px-5 pt-8 sm:px-8">
+        <Reveal>
+          <GiftCard gift={gift} />
+        </Reveal>
+      </section>
+    ) : null,
+    rsvp: (
+      <RSVPCallout
+        weddingDate={settings.weddingDate}
+        open={isRsvpOpen(settings)}
+        deadline={settings.rsvpDeadline}
+        closedMessage={settings.rsvpClosedMessage}
+        showDeadline={settings.rsvpShowDeadline}
+        buttonLabel={settings.rsvpButtonLabel}
+      />
+    ),
+  }
+  for (const m of media) nodes[`media:${m.key}`] = m.node
+  const order = homeOrder(
+    media.map((m) => m.key),
+    settings.pageOrder,
+  )
+
   return (
     <>
+      <PageBackground heroImageUrl={settings.heroImageUrl}>
       <Hero settings={settings} />
       <main>
-        <Introduction settings={settings} />
-        {settings.verseVisible && <VerseHighlight text={settings.verseText} reference={settings.verseReference} />}
-        {space.has('reveal') && <GenderRevealSection />}
-        {/* Photos and videos, in the order set in Admin → Photos & Video. */}
-        {orderMedia(
-          [
-            {
-              key: 'gallery',
-              node: settings.galleryVisible ? <CoupleGallery title={settings.galleryTitle} subtitle={settings.gallerySubtitle} layout={galleryLayout} images={gallery} /> : null,
-            },
-            {
-              key: 'video',
-              node:
-                settings.videoVisible && settings.videoUrl ? (
-                  <VideoHighlight title={settings.videoTitle} caption={settings.videoCaption} url={settings.videoUrl} posterUrl={settings.videoPosterUrl} />
-                ) : null,
-            },
-            ...mediaSections.map((x) => ({ key: x.s.id, node: <MediaSectionView section={x} /> })),
-          ],
-          settings.mediaOrder ?? [],
-        ).map((x) => (
-          <Fragment key={x.key}>{x.node}</Fragment>
+        {order.map((k) => (
+          <Fragment key={k}>{nodes[k] ?? null}</Fragment>
         ))}
-        <GuestPhotosTeaser />
-        {(() => {
-          // Details shared only with confirmed guests (Website Settings → Privacy).
-          // While the choice is loading, nothing is shown, so private details never flash up.
-          if (!display) return null
-          const { hideVenues, hideInfo } = display.website
-          return (
-            <>
-              {!hideVenues && <Venues settings={settings} />}
-              {settings.programVisible && <ProgramFlow title={settings.programTitle} subtitle={settings.programSubtitle} items={program} />}
-              {!hideInfo && <InfoSections sections={settings.sections} />}
-              {(hideVenues || hideInfo) && <PrivateDetails venues={hideVenues} info={hideInfo} rsvpOpen={isRsvpOpen(settings)} />}
-            </>
-          )
-        })()}
-        {showOutfits ? (
-          <OutfitGallery
-            title={settings.outfitTitle}
-            subtitle={settings.outfitSubtitle}
-            images={attire.images}
-            layout={settings.outfitLayout}
-            motifTitle={settings.motifTitle}
-            motifColors={settings.motifColors}
-          />
-        ) : (
-          <MotifSection title={settings.motifTitle} colors={settings.motifColors} />
-        )}
-        <ShowerFun />
-        {gift && (
-          <section aria-label={gift.title} className="px-5 pt-8 sm:px-8">
-            <Reveal>
-              <GiftCard gift={gift} />
-            </Reveal>
-          </section>
-        )}
-        <RSVPCallout
-          weddingDate={settings.weddingDate}
-          open={isRsvpOpen(settings)}
-          deadline={settings.rsvpDeadline}
-          closedMessage={settings.rsvpClosedMessage}
-          showDeadline={settings.rsvpShowDeadline}
-          buttonLabel={settings.rsvpButtonLabel}
-        />
       </main>
       <Footer coupleNames={settings.babyName} hostNames={settings.coupleNames} weddingDate={settings.weddingDate} closingMessage={settings.closingMessage} />
+      </PageBackground>
     </>
   )
 }

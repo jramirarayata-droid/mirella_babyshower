@@ -1,7 +1,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Lock, Crown, Armchair, CalendarClock, Camera, Music, ExternalLink, Search, Gift, Baby, ListChecks, Images, LayoutDashboard, Palette, LogOut, Mail, Menu, MessageSquareHeart, PanelLeftClose, PanelLeftOpen, Pin, PinOff, Printer, QrCode, Settings, Shirt, UserPlus, X, Sparkles, Trophy, PenLine, Ticket } from 'lucide-react'
+import { Lock, Crown, Armchair, CalendarClock, Camera, Music, ExternalLink, Search, Gift, Baby, ListChecks, Images, LayoutDashboard, Palette, LogOut, Mail, Menu, MessageSquareHeart, PanelLeftClose, PanelLeftOpen, Pin, PinOff, Printer, QrCode, Settings, Shirt, UserPlus, X, Sparkles, Trophy, PenLine, Ticket, ListOrdered } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useToast } from '../hooks/useToast'
 import { useWeddingSettings } from '../hooks/useWeddingSettings'
@@ -58,6 +58,7 @@ const NAV_GROUPS: { title: string | null; items: { to: string; label: string; ic
       { to: '/admin/music', label: 'Music', icon: Music },
       { to: '/admin/outfits', label: 'What to Wear', icon: Shirt },
       { to: '/admin/schedule', label: 'Schedule', icon: CalendarClock },
+      { to: '/admin/page-order', label: 'Page Order', icon: ListOrdered },
       { to: '/admin/look', label: 'Look & Feel', icon: Palette },
       { to: '/admin/settings', label: 'Website Settings', icon: Settings },
     ],

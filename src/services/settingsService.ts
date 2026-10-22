@@ -138,6 +138,8 @@ export function isRsvpOpen(s: Pick<WeddingSettings, 'rsvpOpen' | 'rsvpDeadline'>
   return now < new Date(s.rsvpDeadline).getTime()
 }
 
+const stringList = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [])
+
 function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
   return {
     id: row.id,
@@ -177,6 +179,7 @@ function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
     motifTitle: row.motif_title ?? 'Our Motif',
     motifColors: parseMotif(row.motif_colors),
     galleryVisible: row.gallery_visible !== false,
+    pageOrder: stringList((row as unknown as { page_order?: unknown }).page_order),
     mediaOrder: Array.isArray((row as { media_order?: unknown }).media_order) ? ((row as { media_order: unknown[] }).media_order.filter((x) => typeof x === 'string') as string[]) : [],
     galleryTitle: row.gallery_title ?? 'Waiting for You, Little One',
     gallerySubtitle: row.gallery_subtitle ?? '',
@@ -408,11 +411,12 @@ export function updateVideoSettings(id: string, input: VideoSettings): Promise<W
 
 /** Admin: Look & Feel (template, fonts, colours, hero layout). */
 export function updateTheme(id: string, theme: ThemeSettings): Promise<WeddingSettings> {
-  const clean: Record<string, string> = { template: theme.template }
-  for (const k of ['headingFont', 'bodyFont', 'background', 'text', 'accent', 'heroLayout'] as const) {
+  const clean: Record<string, string | number> = { template: theme.template }
+  for (const k of ['headingFont', 'bodyFont', 'background', 'text', 'accent', 'heroLayout', 'bgMode', 'bgImage'] as const) {
     const v = theme[k]
     if (v) clean[k] = v
   }
+  if (theme.bgMode && typeof theme.bgWash === 'number') clean.bgWash = theme.bgWash
   return updatePartial(id, { theme: clean }, 'updateTheme', 'We couldn’t save the new look. Please try again.')
 }
 
@@ -517,4 +521,18 @@ export async function clearGuestList(): Promise<number> {
     throw new FriendlyError('The guest list couldn’t be cleared. Please try again.')
   }
   return Number(data) || 0
+}
+
+/** Admin → Page Order: the order of the home page sections ([] = the usual order). */
+export async function updatePageOrder(id: string, order: string[]): Promise<WeddingSettings> {
+  // Photos & Video keeps its own up/down order of the photo sections: keep it in step with this one.
+  const media = order.filter((k) => k.startsWith('media:')).map((k) => k.slice(6))
+  const patch: Record<string, unknown> = { page_order: order.slice(0, 60) }
+  if (media.length) patch.media_order = media
+  const { data, error } = await supabase.from('wedding_settings').update(patch).eq('id', id).select('*').single()
+  if (error || !data) {
+    logError('updatePageOrder', error)
+    throw new FriendlyError(/page_order/.test(error?.message ?? '') ? 'The order can’t be saved yet — the database update (051) still needs to be run.' : 'The new order couldn’t be saved. Please try again.')
+  }
+  return fromRow(data as Tables<'wedding_settings'>)
 }

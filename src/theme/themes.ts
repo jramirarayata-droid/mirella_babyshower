@@ -103,6 +103,12 @@ export interface ThemeSettings {
   text?: string
   accent?: string
   heroLayout?: HeroLayout
+  /** Page background behind the whole home page (stays still while scrolling). Unset = none. */
+  bgMode?: 'hero' | 'upload'
+  /** The uploaded background photo (bgMode 'upload'). */
+  bgImage?: string
+  /** How strongly the page colour washes over the photo, 30–90 (%), so text stays easy to read. */
+  bgWash?: number
 }
 
 export interface FontOption {
@@ -330,6 +336,8 @@ export interface ResolvedTheme {
   heading: FontOption
   body: FontOption
   heroLayout: HeroLayout
+  /** Page background (null = none): the front-page photo or an uploaded one, with a wash for readability. */
+  pageBg: { mode: 'hero' | 'upload'; image: string | null; wash: number } | null
 }
 
 export const findTemplate = (id: string | undefined) => TEMPLATES.find((t) => t.id === id) ?? TEMPLATES.find((t) => t.id === DEFAULT_THEME.template) ?? TEMPLATES[0]
@@ -351,8 +359,16 @@ export function resolveTheme(s: ThemeSettings | null | undefined): ResolvedTheme
     heading: findHeading(s?.headingFont) ?? findHeading(t.headingFont) ?? HEADING_FONTS[0],
     body: findBody(s?.bodyFont) ?? findBody(t.bodyFont) ?? BODY_FONTS[0],
     heroLayout: (HERO_LAYOUTS.some((h) => h.id === s?.heroLayout) ? s?.heroLayout : t.heroLayout) as HeroLayout,
+    pageBg:
+      s?.bgMode === 'hero' || (s?.bgMode === 'upload' && isHttpsUrl(s.bgImage))
+        ? { mode: s.bgMode, image: s.bgMode === 'upload' ? (s.bgImage ?? null) : null, wash: clampWash(s.bgWash) }
+        : null,
   }
 }
+
+const isHttpsUrl = (v: unknown): v is string => typeof v === 'string' && /^https:\/\/\S+$/.test(v) && v.length <= 1000
+/** 30–90 %, default 70. */
+export const clampWash = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(30, Math.min(90, Math.round(v))) : 70)
 
 export function parseThemeSettings(value: unknown): ThemeSettings {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return DEFAULT_THEME
@@ -366,6 +382,9 @@ export function parseThemeSettings(value: unknown): ThemeSettings {
     text: isHex(o.text) ? o.text : undefined,
     accent: isHex(o.accent) ? o.accent : undefined,
     heroLayout: (['center', 'left', 'split', 'framed'] as const).find((h) => h === o.heroLayout),
+    bgMode: o.bgMode === 'hero' || o.bgMode === 'upload' ? o.bgMode : undefined,
+    bgImage: isHttpsUrl(o.bgImage) ? o.bgImage : undefined,
+    bgWash: typeof o.bgWash === 'number' ? clampWash(o.bgWash) : undefined,
   }
 }
 

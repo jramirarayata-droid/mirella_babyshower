@@ -83,6 +83,7 @@ const Predictions = page(() => import('./pages/Predictions'))
 const NameIdeas = page(() => import('./pages/NameIdeas'))
 const ShowerScreen = page(() => import('./pages/ShowerScreen'))
 const AdminRegistry = page(() => import('./pages/AdminRegistry'))
+const AdminPageOrder = page(() => import('./pages/AdminPageOrder'))
 const AdminReveal = page(() => import('./pages/AdminReveal'))
 const AdminPredictions = page(() => import('./pages/AdminPredictions'))
 const AdminNames = page(() => import('./pages/AdminNames'))
@@ -185,6 +186,7 @@ export default function App() {
                 <Route path="seating" element={gated('seating', <AdminSeating />, true)} />
                 <Route path="raffle" element={gated('raffle', <AdminRaffle />, true)} />
                 <Route path="registry" element={<AdminRegistry />} />
+                <Route path="page-order" element={<AdminPageOrder />} />
                 <Route path="reveal" element={gated('reveal', <AdminReveal />, true)} />
                 <Route path="predictions" element={gated('predictions', <AdminPredictions />, true)} />
                 <Route path="names" element={gated('names', <AdminNames />, true)} />

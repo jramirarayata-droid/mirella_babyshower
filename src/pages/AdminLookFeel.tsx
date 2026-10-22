@@ -3,7 +3,7 @@ import { Check, CheckCircle2, ExternalLink, Lock, Monitor, RotateCcw, Save, Smar
 import { useSpace } from '../hooks/useSpace'
 import { useToast } from '../hooks/useToast'
 import { setCachedWeddingSettings, useWeddingSettings } from '../hooks/useWeddingSettings'
-import { updateTheme } from '../services/settingsService'
+import { updateTheme, uploadWeddingAsset } from '../services/settingsService'
 import { writePreviewTheme } from '../theme/applyTheme'
 import {
   BODY_FONTS,
@@ -15,6 +15,7 @@ import {
   HERO_LAYOUTS,
   findStyle,
   isHex,
+  clampWash,
   resolveTheme,
   ALL_STYLES,
   TEMPLATES,
@@ -119,7 +120,8 @@ export default function AdminLookFeel() {
   // Dark pages are only designed for in styles made for them (Twinkle Little Star).
   const bgTooDark = !currentStyle.allowsDark && !isLightEnough(bg)
 
-  const pickTemplate = (t: Template) => setValues({ template: t.id })
+  // A new look keeps the page background (it isn't part of the look).
+  const pickTemplate = (t: Template) => setValues({ template: t.id, bgMode: values.bgMode, bgImage: values.bgImage, bgWash: values.bgWash })
   // Little Sprout: the Clouds look (any colour) and the classic style; the rest can be previewed, not published.
   const lookLocked = (id: string) => !space.has('looks_all') && !/^(classic|clouds-)/.test(id)
   const pickedLocked = lookLocked(values.template)
@@ -333,6 +335,16 @@ export default function AdminLookFeel() {
               </div>
             </fieldset>
 
+            <PageBackgroundField
+              values={values}
+              heroImageUrl={settings?.heroImageUrl ?? ''}
+              onChange={(patch) => {
+                const next = { ...values, ...patch }
+                for (const k of ['bgMode', 'bgImage', 'bgWash'] as const) if (next[k] === undefined) delete next[k]
+                setValues(next)
+              }}
+            />
+
             <div className="mt-6 rounded-lg border border-line bg-ivory/60 p-4">
               <p className="text-sm font-medium text-ink-soft">Readability check</p>
               <ul className="mt-2 space-y-1.5 text-sm">
@@ -499,5 +511,108 @@ function HeroThumb({ layout }: { layout: HeroLayout }) {
         </span>
       )}
     </span>
+  )
+}
+
+/**
+ * Page background: off (default), the front-page photo, or an uploaded photo,
+ * staying still behind the home page while it scrolls. A wash of the page
+ * colour keeps text readable.
+ */
+function PageBackgroundField({
+  values,
+  heroImageUrl,
+  onChange,
+}: {
+  values: ThemeSettings
+  heroImageUrl: string
+  onChange: (patch: Partial<Pick<ThemeSettings, 'bgMode' | 'bgImage' | 'bgWash'>>) => void
+}) {
+  const toast = useToast()
+  const [uploading, setUploading] = useState(false)
+  const mode = values.bgMode ?? 'none'
+  const wash = clampWash(values.bgWash)
+
+  const upload = async (file: File | undefined) => {
+    if (!file) return
+    setUploading(true)
+    try {
+      const url = await uploadWeddingAsset(file, 'background')
+      onChange({ bgMode: 'upload', bgImage: url, bgWash: wash })
+    } catch (e) {
+      toast.error(toFriendlyMessage(e))
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <fieldset className="mt-6">
+      <legend className="mb-1 text-[0.95rem] font-medium text-ink-soft">Page background</legend>
+      <p className="mb-3 text-xs text-muted">A photo that stays still behind the home page while guests scroll. A calm photo works best — soft clouds, flowers, a nursery.</p>
+      <div role="radiogroup" aria-label="Page background" className="grid gap-2 sm:grid-cols-3">
+        {(
+          [
+            ['none', 'None', 'The usual page colour.'],
+            ['hero', 'Front-page photo', heroImageUrl ? 'The photo at the top of the website.' : 'Add a front-page photo in Website Settings first.'],
+            ['upload', 'Upload a photo', 'A separate, calm background photo.'],
+          ] as const
+        ).map(([v, title, hint]) => {
+          const active = mode === v
+          const disabled = v === 'hero' && !heroImageUrl
+          return (
+            <button
+              key={v}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              disabled={disabled}
+              onClick={() => {
+                if (v === 'none') onChange({ bgMode: undefined, bgImage: undefined, bgWash: undefined })
+                else if (v === 'hero') onChange({ bgMode: 'hero', bgImage: undefined, bgWash: wash })
+                else if (values.bgImage) onChange({ bgMode: 'upload', bgWash: wash })
+                else document.getElementById('page-bg-file')?.click()
+              }}
+              className={cn(
+                'rounded-lg border px-3 py-2.5 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-50',
+                active ? 'border-ink bg-ink/[0.03]' : 'border-line hover:border-champagne',
+              )}
+            >
+              <span className="block font-medium text-ink">{title}</span>
+              <span className="block text-xs text-muted">{hint}</span>
+            </button>
+          )
+        })}
+      </div>
+      <input id="page-bg-file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only" onChange={(e) => void upload(e.target.files?.[0])} />
+      {mode === 'upload' && (
+        <div className="mt-3 flex items-center gap-3">
+          {values.bgImage && <img src={values.bgImage} alt="" className="size-16 rounded-lg border border-line object-cover" />}
+          <Button type="button" size="sm" variant="outline" loading={uploading} loadingText="Uploading…" onClick={() => document.getElementById('page-bg-file')?.click()}>
+            {values.bgImage ? 'Change photo' : 'Choose a photo'}
+          </Button>
+        </div>
+      )}
+      {uploading && mode !== 'upload' && <p className="mt-2 text-xs text-muted">Uploading…</p>}
+      {mode !== 'none' && (
+        <label className="mt-4 block text-sm text-ink-soft">
+          <span className="flex items-center justify-between">
+            <span>Soften the photo</span>
+            <span className="tabular-nums text-muted">{wash}%</span>
+          </span>
+          <input
+            type="range"
+            min={30}
+            max={90}
+            step={5}
+            value={wash}
+            onChange={(e) => onChange({ bgWash: Number(e.target.value) })}
+            className="mt-2 w-full accent-ink"
+            aria-label="Soften the photo"
+          />
+          <span className="mt-1 block text-xs text-muted">Higher keeps text easier to read. The preview shows the result.</span>
+        </label>
+      )}
+    </fieldset>
   )
 }
