@@ -25,6 +25,7 @@ const settings = {
   page_order: ['intro', 'rsvp', 'venue'],
   venue_title: 'The Celebration', venue_eyebrow: 'Join us at',
   section_text: { intro: { eyebrow: 'Welcome, friends' }, info: { title: 'Little Things to Know' }, venue: { mapButton: 'Open the map' } },
+  church_map_url: 'https://maps.google.com/?q=garden',
 }
 const patches = []
 
@@ -133,7 +134,7 @@ try {
   await a.goto(`${BASE}#/admin/settings`)
   const words = a.locator('[data-section-words="info"]')
   await words.waitFor({ timeout: 20000 })
-  ok('admin: the section’s words show what is saved', (await words.getByLabel('Title').inputValue()) === 'Little Things to Know')
+  ok('admin: the section’s words show what is saved', (await words.getByLabel('Title', { exact: true }).inputValue()) === 'Little Things to Know')
   ok('admin: empty boxes show the usual words', (await words.getByLabel('Small line above the title').getAttribute('placeholder')) === 'Good to Know')
   await words.getByLabel('Small line above the title').fill('Before you come')
   await words.getByRole('button', { name: 'Save words' }).click()

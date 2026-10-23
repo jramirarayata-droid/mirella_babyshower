@@ -194,18 +194,6 @@ export default function AdminSettings() {
 
       <div className="space-y-6">
         <RsvpModeCard />
-        <Card title="RSVP section" description="The invitation to reply near the end of your home page.">
-          <SectionWords
-            heading="Words"
-            sectionKey="rsvp"
-            fields={[
-              smallLine('Kindly Respond'),
-              { field: 'title', label: 'Title', usual: 'We would be honoured by your presence' },
-              { field: 'subtitle', label: 'Note under the title', usual: 'Please let us know if you can join us on (the date). It only takes a minute.', long: true },
-              { field: 'deadline', label: 'Label above the reply-by date', usual: 'Expiration of the invitation' },
-            ]}
-          />
-        </Card>
         <Card title="General">
           <div className="grid gap-5 sm:grid-cols-2">
             <TextField
@@ -482,6 +470,18 @@ export default function AdminSettings() {
       <ProgramCard />
       <RsvpSettingsCard />
       <RsvpTeaserCard />
+      <Card title="RSVP section" description="The invitation to reply near the end of your home page.">
+        <SectionWords
+          heading="Words"
+          sectionKey="rsvp"
+          fields={[
+            smallLine('Kindly Respond'),
+            { field: 'title', label: 'Title', usual: 'We would be honoured by your presence' },
+            { field: 'subtitle', label: 'Note under the title', usual: 'Please let us know if you can join us on (the date). It only takes a minute.', long: true },
+            { field: 'deadline', label: 'Label above the reply-by date', usual: 'Expiration of the invitation' },
+          ]}
+        />
+      </Card>
       <GiftSettingsCard />
     </div>
     </>
