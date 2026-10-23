@@ -18,7 +18,8 @@ export function AttendingExtras({ token, className = '' }: { token: string | nul
     Promise.all([getRegistry(token).catch(() => null), listAttire(token).catch(() => null), getGiftIdeas(token), getRsvpExtras()]).then(([r, a, i, on]) => {
       if (!alive) return
       const next: { to: string; title: string; text: string; icon: LucideIcon }[] = []
-      if (on.wishlist && r?.visible && !r.private && r.items.length > 0) next.push({ to: '/registry', title: r.title || 'Gift Wishlist', text: 'What our little one still needs — mark what you’ll bring.', icon: Gift })
+      // guestVisible: what a guest sees, even when an admin is signed in on this browser (e.g. testing).
+      if (on.wishlist && r?.guestVisible && !r.private && r.items.length > 0) next.push({ to: '/registry', title: r.title || 'Gift Wishlist', text: 'What our little one still needs — mark what you’ll bring.', icon: Gift })
       if (on.ideas && i.visible && !i.private && i.items.length > 0) next.push({ to: '/ideas', title: i.title || 'Gift Ideas', text: 'Photos of things we love — just for inspiration.', icon: Lightbulb })
       if (on.attire && a?.allowed && a.images.length > 0) next.push({ to: '/attire', title: 'What to Wear', text: 'Outfit ideas and our colours for the day.', icon: Shirt })
       setLinks(next)
