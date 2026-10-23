@@ -19,6 +19,7 @@ import { useFinderOpen } from '../../hooks/useFinderOpen'
 import { GuestMenu } from './GuestMenu'
 import { MusicToggle } from './MusicPlayer'
 import { useResolvedTheme } from '../../theme/themeContext'
+import { useSectionText } from '../../hooks/useSectionText'
 
 type Tone = 'onPhoto' | 'onPaper'
 
@@ -73,7 +74,8 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
 
   const names = settings.heroTitle || settings.babyName
   // Each look has its own opening line; the rest say what the day is.
-  const eyebrow = EYEBROW[look] ?? 'Join us for a baby shower'
+  const hero = useSectionText('hero')
+  const eyebrow = hero('eyebrow', EYEBROW[look] ?? 'Join us for a baby shower')
   const arriving = arrivalText(settings)
 
   // ---------------------------------------------------------------- split
@@ -214,6 +216,7 @@ export function Hero({ settings }: { settings: WeddingSettings }) {
 }
 
 function Nav({ settings, tone, reduce }: { settings: WeddingSettings; tone: Tone; reduce: boolean | null }) {
+  const t = useSectionText('hero')
   const finderOpen = useFinderOpen()
   const onPhoto = tone === 'onPhoto'
   const text = cn('hidden rounded px-2 py-2 uppercase tracking-[0.28em] transition md:inline-block', onPhoto ? 'text-white/85 hover:text-white' : 'text-ink-soft hover:text-ink')
@@ -241,11 +244,11 @@ function Nav({ settings, tone, reduce }: { settings: WeddingSettings; tone: Tone
         <div className="flex min-w-0 items-center justify-end gap-1.5 text-[0.72rem] font-medium uppercase tracking-[0.28em] sm:gap-3">
           {/* Wide screens: the main pages by name. Phones: everything is in the Menu. */}
           <button type="button" onClick={() => scrollToSection('details', reduce)} className={text}>
-            Details
+            {t('details', 'Details')}
           </button>
           {finderOpen && (
             <Link to="/seat" className={cn(text, 'whitespace-nowrap')}>
-              Find My Seat
+              {t('seat', 'Find My Seat')}
             </Link>
           )}
           {isRsvpOpen(settings) && (
@@ -269,6 +272,7 @@ function Nav({ settings, tone, reduce }: { settings: WeddingSettings; tone: Tone
 }
 
 function ScrollCue({ tone, reduce }: { tone: Tone; reduce: boolean | null }) {
+  const t = useSectionText('hero')
   return (
     <button
       type="button"
@@ -279,7 +283,7 @@ function ScrollCue({ tone, reduce }: { tone: Tone; reduce: boolean | null }) {
         tone === 'onPhoto' ? 'text-white/70 hover:text-white' : 'text-muted hover:text-ink',
       )}
     >
-      <span>Scroll</span>
+      <span>{t('scroll', 'Scroll')}</span>
       <ChevronDown aria-hidden="true" className="size-4 motion-safe:animate-bounce" strokeWidth={1.5} />
     </button>
   )

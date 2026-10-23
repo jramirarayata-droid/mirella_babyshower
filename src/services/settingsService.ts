@@ -139,15 +139,17 @@ export function isRsvpOpen(s: Pick<WeddingSettings, 'rsvpOpen' | 'rsvpDeadline'>
   return now < new Date(s.rsvpDeadline).getTime()
 }
 
+/** A section's label names: letters and digits, e.g. "eyebrow", "mapButton". */
+const LABEL_KEY = /^[a-zA-Z][a-zA-Z0-9]{0,30}$/
+
 const sectionTexts = (v: unknown): Record<string, SectionText> => {
   const out: Record<string, SectionText> = {}
   if (!v || typeof v !== 'object' || Array.isArray(v)) return out
   for (const [k, x] of Object.entries(v as Record<string, unknown>)) {
     if (!x || typeof x !== 'object' || Array.isArray(x)) continue
     const t: SectionText = {}
-    for (const f of ['eyebrow', 'title', 'subtitle', 'after'] as const) {
-      const val = (x as Record<string, unknown>)[f]
-      if (typeof val === 'string' && val.trim()) t[f] = val.trim()
+    for (const [f, val] of Object.entries(x as Record<string, unknown>)) {
+      if (LABEL_KEY.test(f) && typeof val === 'string' && val.trim()) t[f] = val.trim().slice(0, 300)
     }
     if (Object.keys(t).length) out[k] = t
   }
@@ -294,7 +296,7 @@ export function updateSectionTexts(id: string, sectionText: Record<string, Secti
   const clean: Record<string, SectionText> = {}
   for (const [k, t] of Object.entries(sectionText)) {
     const c: SectionText = {}
-    for (const f of ['eyebrow', 'title', 'subtitle', 'after'] as const) if (t[f]?.trim()) c[f] = t[f]!.trim().slice(0, f === 'subtitle' ? 300 : 120)
+    for (const [f, val] of Object.entries(t).slice(0, 40)) if (LABEL_KEY.test(f) && val?.trim()) c[f] = val.trim().slice(0, 300)
     if (Object.keys(c).length) clean[k] = c
   }
   return updatePartial(id, { section_text: clean, ...columns }, 'updateSectionTexts', 'We couldn’t save the text. Please try again.')

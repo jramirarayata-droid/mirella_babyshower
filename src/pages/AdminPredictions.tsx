@@ -20,6 +20,7 @@ import {
 } from '../services/showerService'
 import { toFriendlyMessage } from '../utils/errors'
 import { formatShortDate, formatWeddingDate } from '../utils/formatting'
+import { SectionWords, smallLine } from '../components/admin/SectionWords'
 
 /** Admin → Predictions: when guessing is open, every guess, and — after the birth — the real answers. */
 export default function AdminPredictions() {
@@ -108,6 +109,17 @@ export default function AdminPredictions() {
                 hidden={s.mode === 'hidden'}
                 onHiddenChange={(h) => settings.update({ mode: h ? 'hidden' : 'visible' })}
                 timing={<StartField mode={s.mode} from={s.from} onChange={settings.update} />}
+              />
+              <SectionWords
+                heading="Card on the home page"
+                sectionKey="fun"
+                fields={[
+                  { field: 'predictTitle', label: 'Title', usual: 'Baby Predictions' },
+                  { field: 'predictText', label: 'Text', usual: 'Guess the birthday, the weight — and boy or girl. The closest guesses win!', long: true },
+                  { field: 'predictButton', label: 'Button', usual: 'Make your guess' },
+                  { field: 'predictTextClosed', label: 'Text after guessing closes', usual: 'See everyone’s guesses and who came closest.', long: true },
+                  { field: 'predictButtonClosed', label: 'Button after guessing closes', usual: 'See the guesses' },
+                ]}
               />
               <DateTimeField label="Guessing closes (optional)" value={s.closeAt} onChange={(closeAt) => settings.update({ closeAt })} clearable hint="Empty = it closes at the gender reveal (if set)." />
               <div className="border-t border-line pt-4">

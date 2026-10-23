@@ -87,12 +87,12 @@ export function GuestPhotosTeaser() {
             to="/photos"
             className="inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-8 text-sm font-medium uppercase tracking-[0.2em] text-ivory shadow-soft transition hover:bg-ink-soft"
           >
-            <ImagePlus aria-hidden="true" className="size-4" strokeWidth={1.6} /> Add your photos
+            <ImagePlus aria-hidden="true" className="size-4" strokeWidth={1.6} /> {t('addButton', 'Add your photos')}
           </Link>
         )}
         {info.count > 0 && (
           <Link to="/photos" className="text-sm text-gold underline-offset-4 hover:underline">
-            See all {info.count} {info.count === 1 ? 'photo' : 'photos'}
+            {t('seeAll', 'See all photos')} ({info.count})
           </Link>
         )}
       </div>

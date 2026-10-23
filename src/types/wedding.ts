@@ -285,10 +285,6 @@ export const GALLERY_LAYOUTS: { id: GalleryLayout; name: string; description: st
 ]
 
 /** A section's own wording (Admin → Page Order → Edit text). Missing = the usual words. */
-export interface SectionText {
-  eyebrow?: string
-  title?: string
-  subtitle?: string
-  /** Gender reveal: the title after the reveal. */
-  after?: string
-}
+export type SectionText = Partial<Record<string, string>>
+// Common keys: eyebrow (small line above the title), title, subtitle (note under it);
+// each section may have its own labels too (e.g. venue.mapButton, reveal.after).

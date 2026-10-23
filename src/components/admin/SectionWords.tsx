@@ -6,11 +6,10 @@ import { cn } from '../ui/cn'
 import { useToast } from '../../hooks/useToast'
 import { setCachedWeddingSettings, useWeddingSettings } from '../../hooks/useWeddingSettings'
 import { getWeddingSettings, updateSectionTexts } from '../../services/settingsService'
-import type { SectionText } from '../../types/wedding'
 import { toFriendlyMessage } from '../../utils/errors'
 
 export interface WordField {
-  field: keyof SectionText
+  field: string
   label: string
   /** The usual words (shown greyed out; used when the box is empty). */
   usual: string

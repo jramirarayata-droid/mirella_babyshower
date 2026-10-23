@@ -10,6 +10,7 @@ import { Skeleton } from '../ui/Skeleton'
 import { cn } from '../ui/cn'
 import { useUnsavedChanges } from '../../hooks/unsavedChanges'
 import { SaveStatus } from '../../components/ui/SaveStatus'
+import { SectionWords, smallLine } from './SectionWords'
 
 /** Upload / show / hide the couple's gift QR and choose where it appears. */
 export function GiftSettingsCard() {
@@ -87,6 +88,15 @@ export function GiftSettingsCard() {
         <p className="mt-1 text-sm text-muted">Your GCash / Maya / InstaPay QR for guests who wish to send a monetary gift.</p>
       </div>
 
+      <SectionWords
+        className="mb-5"
+        heading="Words on the card"
+        sectionKey="gift"
+        fields={[
+          { field: 'scan', label: 'Line under the QR', usual: 'Scan with GCash, Maya or your banking app' },
+          { field: 'open', label: 'Button', usual: 'Open QR in full size' },
+        ]}
+      />
       <div className="grid gap-6 md:grid-cols-[1fr_220px]">
         <div className="space-y-5">
           <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line bg-ivory/60 px-4 py-3.5">

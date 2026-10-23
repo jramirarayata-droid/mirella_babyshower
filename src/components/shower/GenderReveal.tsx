@@ -95,18 +95,18 @@ export function GenderRevealSection() {
             {reveal.message && <p className="mx-auto mt-5 max-w-md leading-relaxed text-ink-soft">{reveal.message}</p>}
             {reveal.revealAt ? (
               <>
-                <p className="mt-8 text-xs uppercase tracking-[0.3em] text-muted">Revealed in</p>
-                <RoundCountdown at={reveal.revealAt} className="mt-4" onDone={reload} />
+                <p className="mt-8 text-xs uppercase tracking-[0.3em] text-muted">{t('revealedIn', 'Revealed in')}</p>
+                <RoundCountdown at={reveal.revealAt} className="mt-4" onDone={reload} labels={{ days: t('days', ''), hours: t('hours', ''), minutes: t('minutes', '') }} />
               </>
             ) : (
-              <p className="mt-8 text-sm text-muted">Revealed at the shower — stay tuned!</p>
+              <p className="mt-8 text-sm text-muted">{t('stayTuned', 'Revealed at the shower — stay tuned!')}</p>
             )}
             <div className="mt-8 flex justify-center gap-3">
               <span className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium" style={{ background: '#F9D3DD', color: '#7A2E43' }}>
-                Team Girl
+                {t('teamGirl', 'Team Girl')}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium" style={{ background: '#D4E5F7', color: '#23466F' }}>
-                Team Boy
+                {t('teamBoy', 'Team Boy')}
               </span>
             </div>
             <Link to="/predict" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-gold underline-offset-4 hover:underline">

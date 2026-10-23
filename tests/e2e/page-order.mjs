@@ -24,7 +24,7 @@ const settings = {
   seating_config: { finder: { from: null, mode: 'hidden', preassign: false } }, theme: { template: 'clouds-blue' },
   page_order: ['intro', 'rsvp', 'venue'],
   venue_title: 'The Celebration', venue_eyebrow: 'Join us at',
-  section_text: { intro: { eyebrow: 'Welcome, friends' }, info: { title: 'Little Things to Know' } },
+  section_text: { intro: { eyebrow: 'Welcome, friends' }, info: { title: 'Little Things to Know' }, venue: { mapButton: 'Open the map' } },
 }
 const patches = []
 
@@ -76,6 +76,7 @@ try {
   const motifY = await top(page, 'Our Colours')
   ok('home: RSVP moved above the venue', rsvpY < venueY, `${rsvpY} < ${venueY}`)
   ok('home: sections not in the saved list keep their usual place after it', venueY < motifY, `${venueY} < ${motifY}`)
+  ok('home: a label inside a section can be changed too', (await page.getByText('Open the map').count()) === 1)
   ok('home: a section’s own small line shows', (await page.getByText('Welcome, friends', { exact: true }).count()) === 1)
   ok('home: the venue section uses its own title', (await page.getByRole('heading', { name: 'The Celebration' }).count()) === 1 && (await page.getByText('Join us at', { exact: true }).count()) === 1)
   ok('home: no page background unless switched on', (await page.locator('[data-page-background]').count()) === 0)

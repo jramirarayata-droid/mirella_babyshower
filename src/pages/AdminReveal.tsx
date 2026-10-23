@@ -94,7 +94,18 @@ export default function AdminReveal() {
               }}
             />
             <p className="-mt-2 text-xs text-muted">A countdown first, then the answer at the reveal time.</p>
-            <SectionWords sectionKey="reveal" fields={[smallLine('Gender Reveal'), { field: 'after', label: 'Title after the reveal', usual: 'The secret is out!' }]} />
+            <SectionWords
+              sectionKey="reveal"
+              fields={[
+                smallLine('Gender Reveal'),
+                { field: 'after', label: 'Title after the reveal', usual: 'The secret is out!' },
+                { field: 'revealedIn', label: 'Above the countdown', usual: 'Revealed in' },
+                { field: 'stayTuned', label: 'When there’s no countdown', usual: 'Revealed at the shower — stay tuned!' },
+                { field: 'teamGirl', label: 'Team girl label', usual: 'Team Girl' },
+                { field: 'teamBoy', label: 'Team boy label', usual: 'Team Boy' },
+                { field: 'days', label: 'Countdown: days', usual: 'days' }, { field: 'hours', label: 'Countdown: hours', usual: 'hours' }, { field: 'minutes', label: 'Countdown: minutes', usual: 'minutes' },
+              ]}
+            />
 
             <fieldset>
               <legend className="mb-2 flex w-full items-center justify-between text-sm font-medium text-ink">

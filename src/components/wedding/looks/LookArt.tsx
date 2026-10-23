@@ -60,6 +60,7 @@ export function RoundCountdown({
   onPhoto = false,
   big = false,
   showSeconds = false,
+  labels,
   onDone,
 }: {
   date?: string
@@ -71,6 +72,8 @@ export function RoundCountdown({
   /** For the big screen. */
   big?: boolean
   showSeconds?: boolean
+  /** The shower's own words for the rings (Admin; empty = day/days…). */
+  labels?: { days?: string; hours?: string; minutes?: string }
   /** Called once when the moment arrives. */
   onDone?: () => void
 }) {
@@ -90,9 +93,9 @@ export function RoundCountdown({
   const p = parts(target - now)
   const secs = Math.max(0, Math.floor((target - now) / 1000) % 60)
   const cells: [number, string][] = [
-    ...(p.days > 0 || !showSeconds ? ([[p.days, p.days === 1 ? 'day' : 'days']] as [number, string][]) : []),
-    [p.hours, p.hours === 1 ? 'hour' : 'hours'],
-    [p.minutes, p.minutes === 1 ? 'minute' : 'minutes'],
+    ...(p.days > 0 || !showSeconds ? ([[p.days, labels?.days || (p.days === 1 ? 'day' : 'days')]] as [number, string][]) : []),
+    [p.hours, labels?.hours || (p.hours === 1 ? 'hour' : 'hours')],
+    [p.minutes, labels?.minutes || (p.minutes === 1 ? 'minute' : 'minutes')],
     ...(showSeconds ? ([[secs, secs === 1 ? 'second' : 'seconds']] as [number, string][]) : []),
   ]
   return (

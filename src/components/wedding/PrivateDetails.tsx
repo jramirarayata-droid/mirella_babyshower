@@ -19,14 +19,14 @@ export function PrivateDetails({ venues, info, rsvpOpen }: { venues: boolean; in
         </h2>
         <Ornament className="mt-6" />
         <p className="mt-6 leading-relaxed text-ink-soft">
-          {what} shared with guests who have confirmed they’re coming. Once you RSVP, you’ll find everything on your invitation.
+          {t('body', `${what} shared with guests who have confirmed they’re coming. Once you RSVP, you’ll find everything on your invitation.`)}
         </p>
         {rsvpOpen && (
           <Link
             to="/rsvp"
             className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-ink px-8 text-[0.95rem] font-medium text-ivory shadow-soft transition hover:bg-ink-soft"
           >
-            Find my invitation
+            {t('button', 'Find my invitation')}
           </Link>
         )}
       </Reveal>

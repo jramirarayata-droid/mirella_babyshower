@@ -24,7 +24,7 @@ export function Introduction({ settings }: { settings: WeddingSettings }) {
         <Ornament className="mt-10" />
         <p className="mt-8 font-serif text-xl italic text-ink-soft">{formatWeddingDate(settings.weddingDate, 'full')}</p>
         <p className="mt-2 text-xs uppercase tracking-[0.4em] text-muted">{formatDotDate(settings.weddingDate)}</p>
-        <RoundCountdown date={settings.weddingDate} time={settings.ceremonyTime} className="lux-countdown mt-9" />
+        <RoundCountdown date={settings.weddingDate} time={settings.ceremonyTime} className="lux-countdown mt-9" labels={{ days: t('days', ''), hours: t('hours', ''), minutes: t('minutes', '') }} />
         {arriving && (
           <p className="lux-arriving mt-8 inline-flex items-center gap-2 rounded-full border border-champagne/50 bg-paper/70 px-5 py-2 text-sm text-ink-soft">
             <Twinkle className="size-3.5 text-champagne" />

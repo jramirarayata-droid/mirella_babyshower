@@ -31,6 +31,7 @@ import { siteLinks } from '../utils/share'
 import { cn } from '../components/ui/cn'
 import { uploadWeddingAsset } from '../services/settingsService'
 import { GiftIdeasAdmin } from '../components/admin/GiftIdeasAdmin'
+import { SectionWords, smallLine } from '../components/admin/SectionWords'
 
 const EMPTY: RegistryItemInput = { kind: 'gift', title: '', note: '', link: '', imageUrl: '', priceHint: '', quantity: 1, isVisible: true }
 
@@ -342,6 +343,15 @@ export default function AdminRegistry() {
             <>
               <TextField label="Title" value={s.title} onChange={(title) => settings.update({ title })} maxLength={60} />
               <TextAreaField label="A short note for guests" value={s.intro} onChange={(intro) => settings.update({ intro })} maxLength={300} rows={3} />
+              <SectionWords
+                heading="Card on the home page"
+                sectionKey="fun"
+                fields={[
+                  { field: 'registryTitle', label: 'Title', usual: 'Gift Wishlist' },
+                  { field: 'registryText', label: 'Text', usual: 'See what our little one still needs, and mark what you’ll bring so nothing is doubled.', long: true },
+                  { field: 'registryButton', label: 'Button', usual: 'See the wishlist' },
+                ]}
+              />
             </>
           )}
           <p className="text-sm text-muted">

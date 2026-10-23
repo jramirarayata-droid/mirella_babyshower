@@ -19,9 +19,9 @@ interface Props {
   motifColors?: MotifColor[]
 }
 
-const TABS: { value: OutfitGender; label: string }[] = [
-  { value: 'male', label: 'For Him' },
-  { value: 'female', label: 'For Her' },
+const TABS: { value: OutfitGender; label: string; key: string }[] = [
+  { value: 'male', label: 'For Him', key: 'forHim' },
+  { value: 'female', label: 'For Her', key: 'forHer' },
 ]
 
 /** What the enlarged view shows: one photo, or a pair side by side. */
@@ -32,7 +32,7 @@ interface View {
 
 /** "Attire inspiration" — admin-managed outfit images in a swipeable carousel. */
 export function OutfitGallery({ title, subtitle, images, layout = 'tabs', motifTitle = '', motifColors = [] }: Props) {
-  const t = useSectionText('attire')
+  const words = useSectionText('attire')
   const reduce = useReducedMotion()
   const groups = useMemo(
     () => ({
@@ -54,7 +54,7 @@ export function OutfitGallery({ title, subtitle, images, layout = 'tabs', motifT
     <section aria-labelledby="outfits-heading" className="overflow-hidden bg-cream/60 px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <Reveal className="section-title text-center">
-          <p className="eyebrow">{t('eyebrow', 'Dress Code')}</p>
+          <p className="eyebrow">{words('eyebrow', 'Dress Code')}</p>
           <h2 id="outfits-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
             {title}
           </h2>
@@ -105,7 +105,7 @@ export function OutfitGallery({ title, subtitle, images, layout = 'tabs', motifT
                           transition={{ type: 'spring', stiffness: 380, damping: 34 }}
                         />
                       )}
-                      <span className="relative">{t.label}</span>
+                      <span className="relative">{words(t.key, t.label)}</span>
                     </button>
                   )
                 })}
@@ -123,7 +123,7 @@ export function OutfitGallery({ title, subtitle, images, layout = 'tabs', motifT
                 >
                   <Carousel
                     count={groups[active].length}
-                    label={`${TABS.find((t) => t.value === active)?.label ?? ''} outfit ideas`}
+                    label={`${words(TABS.find((t) => t.value === active)?.key ?? '', TABS.find((t) => t.value === active)?.label ?? '')} outfit ideas`}
                     itemClassName="w-[78%] shrink-0 snap-center sm:w-[calc((100%-1.25rem)/2)] sm:snap-start lg:w-[calc((100%-2.5rem)/3)]"
                     ariaFor={(i) => {
                       const img = groups[active][i]

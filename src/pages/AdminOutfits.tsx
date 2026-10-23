@@ -169,7 +169,11 @@ export default function AdminOutfits() {
                 : 'Guests switch between the looks for him and for her; each photo shows its own label.'}
             </p>
           </div>
-          <SectionWords className="mt-5" sectionKey="attire" fields={[smallLine('Dress Code')]} />
+          <SectionWords
+            className="mt-5"
+            sectionKey="attire"
+            fields={[smallLine('Dress Code'), { field: 'forHim', label: 'Tab: for him', usual: 'For Him' }, { field: 'forHer', label: 'Tab: for her', usual: 'For Her' }]}
+          />
           <SectionAccess
             what="attire"
             className="mt-5"
