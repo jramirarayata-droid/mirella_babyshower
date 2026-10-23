@@ -78,6 +78,8 @@ export interface RegistryView {
   title: string
   intro: string
   me: string | null
+  /** Gift ideas are the live tab instead (the wishlist page then sends guests there). */
+  ideasLive: boolean
   items: RegistryItem[]
 }
 
@@ -109,6 +111,7 @@ export async function getRegistry(token?: string | null): Promise<RegistryView> 
     title: str(o.title) || 'Gift Wishlist',
     intro: str(o.intro),
     me: str(o.me) || null,
+    ideasLive: o.ideasLive === true,
     items: arr(o.items).map(toItem),
   }
 }
@@ -148,13 +151,19 @@ export async function getGuestAccess(token?: string | null): Promise<GuestAccess
 
 // gift ideas (their own section on the home page)
 
-/** 'cards' = photo cards with title and caption; the rest are the photo gallery designs. */
-export type IdeasLayout = 'cards' | GalleryLayout
-export const IDEAS_LAYOUTS: { id: IdeasLayout; name: string; description: string }[] = [
+/** Designs made for gift ideas (recommended), then idea cards, then every photo gallery design. */
+export type IdeaDesign = 'wishboard' | 'tags' | 'shelf' | 'ribbon'
+export type IdeasLayout = IdeaDesign | 'cards' | GalleryLayout
+export const IDEA_DESIGNS: IdeaDesign[] = ['wishboard', 'tags', 'shelf', 'ribbon']
+export const IDEAS_LAYOUTS: { id: IdeasLayout; name: string; description: string; recommended?: boolean }[] = [
+  { id: 'wishboard', name: 'Wish board', description: 'Photos pinned with washi tape on a soft board', recommended: true },
+  { id: 'tags', name: 'Gift tags', description: 'Each photo on a gift tag hanging from a ribbon', recommended: true },
+  { id: 'shelf', name: 'Nursery shelf', description: 'Photos standing on little wooden shelves', recommended: true },
+  { id: 'ribbon', name: 'Ribbon showcase', description: 'One big photo at a time with a bow — swipe to the next', recommended: true },
   { id: 'cards', name: 'Idea cards', description: 'Photo, title and caption on soft cards' },
   ...GALLERY_LAYOUTS,
 ]
-const ideasLayout = (v: unknown): IdeasLayout => (IDEAS_LAYOUTS.some((l) => l.id === v) ? (v as IdeasLayout) : 'cards')
+const ideasLayout = (v: unknown): IdeasLayout => (IDEAS_LAYOUTS.some((l) => l.id === v) ? (v as IdeasLayout) : 'wishboard')
 
 export interface GiftIdea {
   id: string
@@ -171,8 +180,10 @@ export interface GiftIdeasView {
   intro: string
   layout: IdeasLayout
   items: GiftIdea[]
+  /** The gift list is the live tab instead (the ideas page then sends guests there). */
+  listLive: boolean
 }
-const NO_IDEAS: GiftIdeasView = { visible: false, private: false, title: '', intro: '', layout: 'cards', items: [] }
+const NO_IDEAS: GiftIdeasView = { visible: false, private: false, title: '', intro: '', layout: 'wishboard', items: [], listLive: false }
 
 /** The Gift ideas section, as a guest sees it. Never throws: on any problem the section is simply left out. */
 export async function getGiftIdeas(token?: string | null): Promise<GiftIdeasView> {
@@ -188,6 +199,7 @@ export async function getGiftIdeas(token?: string | null): Promise<GiftIdeasView
     title: str(o.title) || 'Gift Ideas',
     intro: str(o.intro),
     layout: ideasLayout(o.layout),
+    listLive: o.listLive === true,
     items: arr(o.items)
       .map((x) => {
         const r = obj(x)
@@ -233,7 +245,7 @@ export interface GiftIdeasSettings {
   intro: string
   layout: IdeasLayout
 }
-export const DEFAULT_GIFT_IDEAS: GiftIdeasSettings = { visible: true, title: 'Gift Ideas', intro: '', layout: 'cards' }
+export const DEFAULT_GIFT_IDEAS: GiftIdeasSettings = { visible: true, title: 'Gift Ideas', intro: '', layout: 'wishboard' }
 
 export async function getGiftIdeasSettings(): Promise<GiftIdeasSettings> {
   const v = obj(await getAdminPreference('gift_ideas'))
@@ -249,12 +261,20 @@ export interface RegistrySettings {
   from: string | null
   title: string
   intro: string
+  /** Which tab guests see: the gift list (default) or the gift ideas photos. */
+  active: 'list' | 'ideas'
 }
-export const DEFAULT_REGISTRY: RegistrySettings = { mode: 'visible', from: null, title: 'Gift Wishlist', intro: '' }
+export const DEFAULT_REGISTRY: RegistrySettings = { mode: 'visible', from: null, title: 'Gift Wishlist', intro: '', active: 'list' }
 
 export async function getRegistrySettings(): Promise<RegistrySettings> {
   const v = obj(await getAdminPreference('registry'))
-  return { mode: v.mode === undefined ? DEFAULT_REGISTRY.mode : visibility(v.mode), from: str(v.from) || null, title: str(v.title) || DEFAULT_REGISTRY.title, intro: str(v.intro) }
+  return {
+    mode: v.mode === undefined ? DEFAULT_REGISTRY.mode : visibility(v.mode),
+    from: str(v.from) || null,
+    title: str(v.title) || DEFAULT_REGISTRY.title,
+    intro: str(v.intro),
+    active: v.active === 'ideas' ? 'ideas' : 'list',
+  }
 }
 export const saveRegistrySettings = (s: RegistrySettings) => saveAdminPreference('registry', s)
 

@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { ExternalLink, Lightbulb } from 'lucide-react'
-import { currentShowerGuest, getGiftIdeas, type GiftIdea, type GiftIdeasView } from '../../services/showerService'
-import type { GalleryImage } from '../../types/wedding'
-import { CoupleGallery } from '../wedding/CoupleGallery'
+import { currentShowerGuest, getGiftIdeas, IDEA_DESIGNS, type GiftIdea, type GiftIdeasView, type IdeaDesign } from '../../services/showerService'
+import type { GalleryImage, GalleryLayout } from '../../types/wedding'
+import { CoupleGallery, Lightbox } from '../wedding/CoupleGallery'
+
+// The gift-ideas designs are downloaded only when one is chosen.
+const IdeaLayoutView = lazy(() => import('./IdeaLayouts'))
 import { Ornament } from '../ui/Ornament'
 import { Reveal } from '../wedding/Reveal'
 
@@ -39,18 +42,36 @@ export const hasIdeas = (v: GiftIdeasView | null | undefined) => Boolean(v?.visi
 
 /** The ideas in the chosen design. Gallery designs show "Title — caption" with each photo. */
 export function GiftIdeasGallery({ view, headingId = 'ideas-heading', page = false }: { view: GiftIdeasView; headingId?: string; page?: boolean }) {
+  const images: GalleryImage[] = view.items.map((i, n) => ({
+    id: i.id,
+    imageUrl: i.image,
+    caption: [i.title, i.note].filter(Boolean).join(' — '),
+    sortOrder: n,
+    isVisible: true,
+  }))
+  if (IDEA_DESIGNS.includes(view.layout as IdeaDesign)) return <IdeaDesignSection view={view} images={images} headingId={headingId} page={page} />
   if (view.layout !== 'cards') {
-    const images: GalleryImage[] = view.items.map((i, n) => ({
-      id: i.id,
-      imageUrl: i.image,
-      caption: [i.title, i.note].filter(Boolean).join(' — '),
-      sortOrder: n,
-      isVisible: true,
-    }))
-    return <CoupleGallery title={view.title} subtitle={view.intro || DEFAULT_INTRO} layout={view.layout} images={images} headingId={headingId} eyebrow="Ideas & inspiration" bare={page} />
+    return <CoupleGallery title={view.title} subtitle={view.intro || DEFAULT_INTRO} layout={view.layout as GalleryLayout} images={images} headingId={headingId} eyebrow="Ideas & inspiration" bare={page} />
   }
   return (
-    <section aria-labelledby={headingId} className={page ? '' : 'px-5 py-24 sm:px-8 sm:py-28'}>
+    <IdeasFrame view={view} headingId={headingId} page={page}>
+        <ul className={`${page ? '' : 'mt-12 '}grid gap-5 sm:grid-cols-2 lg:grid-cols-3`} aria-label={view.title}>
+          {view.items.map((item, i) => (
+            <li key={item.id}>
+              <Reveal delay={(i % 3) * 0.06} className="h-full">
+                <IdeaCard item={item} />
+              </Reveal>
+            </li>
+          ))}
+        </ul>
+    </IdeasFrame>
+  )
+}
+
+/** The section around the ideas: its heading on the home page; just the photos on #/ideas. */
+function IdeasFrame({ view, headingId, page, children }: { view: GiftIdeasView; headingId: string; page: boolean; children: ReactNode }) {
+  return (
+    <section aria-labelledby={page ? undefined : headingId} aria-label={page ? view.title : undefined} className={page ? '' : 'px-5 py-24 sm:px-8 sm:py-28'}>
       <div className="mx-auto max-w-5xl">
         {!page && (
           <Reveal className="section-title text-center">
@@ -62,17 +83,24 @@ export function GiftIdeasGallery({ view, headingId = 'ideas-heading', page = fal
             <Ornament className="mt-8" />
           </Reveal>
         )}
-        <ul className={`${page ? '' : 'mt-12 '}grid gap-5 sm:grid-cols-2 lg:grid-cols-3`} aria-label={view.title}>
-          {view.items.map((item, i) => (
-            <li key={item.id}>
-              <Reveal delay={(i % 3) * 0.06} className="h-full">
-                <IdeaCard item={item} />
-              </Reveal>
-            </li>
-          ))}
-        </ul>
+        {children}
       </div>
     </section>
+  )
+}
+
+/** Wish board, gift tags, nursery shelf or ribbon showcase, with the full-screen viewer. */
+function IdeaDesignSection({ view, images, headingId, page }: { view: GiftIdeasView; images: GalleryImage[]; headingId: string; page: boolean }) {
+  const [open, setOpen] = useState<number | null>(null)
+  return (
+    <IdeasFrame view={view} headingId={headingId} page={page}>
+      <div className={page ? '-mt-12' : ''}>
+        <Suspense fallback={<div className="mt-12 h-72 animate-pulse rounded-sm bg-linen/60" />}>
+          <IdeaLayoutView design={view.layout as IdeaDesign} title={view.title} items={view.items} onOpen={setOpen} />
+        </Suspense>
+      </div>
+      <Lightbox images={images} index={open} onChange={setOpen} />
+    </IdeasFrame>
   )
 }
 
@@ -89,12 +117,12 @@ export function GiftIdeasSection() {
 export function IdeaCard({ item }: { item: GiftIdea }) {
   return (
     <div className="fine-frame flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-paper shadow-soft">
-      <img src={item.image} alt={item.title} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+      <img src={item.image} alt={item.title || 'Gift idea'} loading="lazy" className="aspect-[4/3] w-full object-cover" />
       <div className="relative z-[2] flex flex-1 flex-col p-5">
         <p className="inline-flex items-center gap-1.5 text-[0.7rem] font-medium uppercase tracking-[0.24em] text-gold">
           <Lightbulb aria-hidden="true" className="size-3.5" /> Idea
         </p>
-        <h3 className="mt-2 font-serif text-2xl leading-tight text-ink">{item.title}</h3>
+        {item.title && <h3 className="mt-2 font-serif text-2xl leading-tight text-ink">{item.title}</h3>}
         {item.note && <p className="mt-2 text-sm leading-relaxed text-ink-soft">{item.note}</p>}
         {item.link && (
           <a href={item.link} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm text-gold underline-offset-4 hover:underline">

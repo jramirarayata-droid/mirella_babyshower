@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { Check, ExternalLink, Gift, Minus, Plus } from 'lucide-react'
 import { ShowerShell, GuestGate, NotYet, SignedInAs, ForAttending } from '../components/shower/ShowerShell'
 import { PageLoader } from '../components/ui/Spinner'
@@ -81,6 +82,8 @@ export default function Registry() {
         <PageLoader label="Loading the wishlist" />
       ) : error && !view ? (
         <p className="text-center text-ink-soft">{error}</p>
+      ) : view && view.ideasLive ? (
+        <Navigate to="/ideas" replace />
       ) : view && !view.visible ? (
         <NotYet what="The gift wishlist" />
       ) : view && view.private ? (

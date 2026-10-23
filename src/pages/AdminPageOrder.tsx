@@ -16,7 +16,7 @@ import { listVisibleGallery } from '../services/galleryService'
 import { listProgram } from '../services/programService'
 import { listVisibleOutfits } from '../services/outfitService'
 import { getPublicGift } from '../services/giftService'
-import { getPublicReveal, getRegistry, getPredictionsInfo, getNameIdeasInfo, getGiftIdeasSettings, listRegistryAdmin } from '../services/showerService'
+import { getPublicReveal, getRegistry, getPredictionsInfo, getNameIdeasInfo, getRegistrySettings, listRegistryAdmin } from '../services/showerService'
 import { getGuestPhotosInfo } from '../services/guestPhotosService'
 import { getWebsitePrivacy } from '../services/adminDisplayService'
 import type { WeddingSettings } from '../types/wedding'
@@ -67,7 +67,7 @@ export default function AdminPageOrder() {
         getNameIdeasInfo().catch(() => null),
         getGuestPhotosInfo().catch(() => null),
         getWebsitePrivacy().catch(() => null),
-        getGiftIdeasSettings().catch(() => null),
+        getRegistrySettings().catch(() => null),
         listRegistryAdmin().catch(() => []),
       ])
 
@@ -101,10 +101,12 @@ export default function AdminPageOrder() {
             : s.motifColors.length > 0
               ? ON('Motif colours only')
               : OFF(s.outfitSectionVisible ? 'No outfit photos or colours yet' : 'Switched off', '/admin/outfits', 'What to Wear'),
-        ideas: !ideasCfg?.visible
-          ? OFF('Switched off', '/admin/registry', 'Gift Registry')
+        ideas: ideasCfg?.active !== 'ideas'
+          ? OFF('The gift list is live instead', '/admin/registry', 'Gift Registry')
+          : ideasCfg.mode === 'hidden'
+            ? OFF('Hidden', '/admin/registry', 'Gift Registry')
           : !regItems.some((i) => i.kind === 'idea' && i.isVisible && i.imageUrl)
-            ? OFF('No ideas with a photo yet', '/admin/registry', 'Add an idea')
+            ? OFF('No photos yet', '/admin/registry', 'Upload photos')
             : (guestOnly(privacy?.hideIdeas, 'Attending guests only') ?? ON()),
         fun: funOn.length ? ON(`Showing: ${funOn.join(', ')}`) : OFF('All three are off', '/admin/registry', 'Shower fun'),
         gift: gift ? ON() : OFF('Not set up', '/admin/settings', 'Website Settings'),
