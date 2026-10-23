@@ -12,6 +12,7 @@ import { addRegistryItem, deleteRegistryItem, IDEAS_LAYOUTS, reorderRegistry, up
 import { removeAssetByUrl, uploadIdeaPhoto } from '../../services/galleryService'
 import { toFriendlyMessage } from '../../utils/errors'
 import { siteLinks } from '../../utils/share'
+import { SectionWords, smallLine } from './SectionWords'
 
 export const IDEAS_LIMIT = 40
 
@@ -181,6 +182,7 @@ export function GiftIdeasAdmin({
             <p className="text-sm text-muted">Who sees it is set at the top of this page, for whichever tab is live.</p>
             <TextField label="Title" value={v.title} onChange={(title) => settings.update({ title })} maxLength={80} />
             <TextAreaField label="A short note (optional)" value={v.intro} onChange={(intro) => settings.update({ intro })} maxLength={300} rows={2} placeholder="Just ideas we love — no need to tell us if you choose one." />
+            <SectionWords sectionKey="ideas" fields={[smallLine('Ideas & inspiration')]} />
             <fieldset>
               <legend className="mb-2 text-sm font-medium text-ink">Gallery design</legend>
               <div role="radiogroup" aria-label="Gallery design" className="grid gap-1.5">

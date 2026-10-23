@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowDown, ArrowUp, ExternalLink, Eye, EyeOff, Lock, Pencil, RotateCcw, Save } from 'lucide-react'
-import { SectionTextEditor, sectionFields } from '../components/admin/SectionTextEditor'
+import { ArrowDown, ArrowUp, ExternalLink, Eye, EyeOff, Lock, RotateCcw, Save } from 'lucide-react'
 import { PageHeader } from '../components/admin/PageHeader'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
@@ -52,7 +51,6 @@ export default function AdminPageOrder() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [previewKey, setPreviewKey] = useState(0)
-  const [editing, setEditing] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -181,7 +179,7 @@ export default function AdminPageOrder() {
     <>
       <PageHeader
         title="Page Order"
-        description="The order of the sections on your home page, and their words (Edit text). The front page always comes first and the footer last. Hidden sections keep their place for when you switch them on."
+        description="The order of the sections on your home page. The front page always comes first and the footer last. Hidden sections keep their place for when you switch them on."
         actions={
           <>
             <SaveStatus dirty={dirty} saving={saving} />
@@ -230,33 +228,9 @@ export default function AdminPageOrder() {
                       </span>
                     </span>
                     <span className="flex shrink-0 gap-1">
-                      {sectionFields(k).fields.length > 0 && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          aria-label={`Edit the text of ${r.name}`}
-                          aria-expanded={editing === k}
-                          onClick={() => setEditing(editing === k ? null : k)}
-                          icon={<Pencil aria-hidden="true" className="size-4" />}
-                        >
-                          <span className="hidden sm:inline">Edit text</span>
-                        </Button>
-                      )}
                       <Button size="sm" variant="ghost" aria-label={`Move ${r.name} up`} disabled={i === 0} onClick={() => move(i, -1)} icon={<ArrowUp aria-hidden="true" className="size-4" />} />
                       <Button size="sm" variant="ghost" aria-label={`Move ${r.name} down`} disabled={i === order.length - 1} onClick={() => move(i, 1)} icon={<ArrowDown aria-hidden="true" className="size-4" />} />
                     </span>
-                    {editing === k && settings && (
-                      <SectionTextEditor
-                        sectionKey={k}
-                        settings={settings}
-                        onClose={() => setEditing(null)}
-                        onSaved={(s) => {
-                          setCachedWeddingSettings(s)
-                          setSettings(s)
-                          setPreviewKey((x) => x + 1)
-                        }}
-                      />
-                    )}
                   </li>
                 )
               })}

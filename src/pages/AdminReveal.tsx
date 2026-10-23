@@ -13,6 +13,7 @@ import { ANSWER_LABEL, getRevealSettings, saveRevealSettings, type RevealAnswer,
 import { FriendlyError, toFriendlyMessage } from '../utils/errors'
 import { SectionAccess } from '../components/admin/SectionAccess'
 import { formatDateTime } from '../utils/formatting'
+import { SectionWords, smallLine } from '../components/admin/SectionWords'
 
 const ANSWERS: RevealAnswer[] = ['girl', 'boy', 'twin_girls', 'twin_boys', 'twins']
 
@@ -93,6 +94,7 @@ export default function AdminReveal() {
               }}
             />
             <p className="-mt-2 text-xs text-muted">A countdown first, then the answer at the reveal time.</p>
+            <SectionWords sectionKey="reveal" fields={[smallLine('Gender Reveal'), { field: 'after', label: 'Title after the reveal', usual: 'The secret is out!' }]} />
 
             <fieldset>
               <legend className="mb-2 flex w-full items-center justify-between text-sm font-medium text-ink">
