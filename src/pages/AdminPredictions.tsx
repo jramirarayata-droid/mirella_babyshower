@@ -20,7 +20,7 @@ import {
 } from '../services/showerService'
 import { toFriendlyMessage } from '../utils/errors'
 import { formatShortDate, formatWeddingDate } from '../utils/formatting'
-import { SectionWords, smallLine } from '../components/admin/SectionWords'
+import { SectionWords } from '../components/admin/SectionWords'
 
 /** Admin → Predictions: when guessing is open, every guess, and — after the birth — the real answers. */
 export default function AdminPredictions() {

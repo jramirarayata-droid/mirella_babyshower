@@ -31,7 +31,7 @@ import { siteLinks } from '../utils/share'
 import { cn } from '../components/ui/cn'
 import { uploadWeddingAsset } from '../services/settingsService'
 import { GiftIdeasAdmin } from '../components/admin/GiftIdeasAdmin'
-import { SectionWords, smallLine } from '../components/admin/SectionWords'
+import { SectionWords } from '../components/admin/SectionWords'
 
 const EMPTY: RegistryItemInput = { kind: 'gift', title: '', note: '', link: '', imageUrl: '', priceHint: '', quantity: 1, isVisible: true }
 

@@ -10,7 +10,7 @@ import { Skeleton } from '../ui/Skeleton'
 import { cn } from '../ui/cn'
 import { useUnsavedChanges } from '../../hooks/unsavedChanges'
 import { SaveStatus } from '../../components/ui/SaveStatus'
-import { SectionWords, smallLine } from './SectionWords'
+import { SectionWords } from './SectionWords'
 
 /** Upload / show / hide the couple's gift QR and choose where it appears. */
 export function GiftSettingsCard() {

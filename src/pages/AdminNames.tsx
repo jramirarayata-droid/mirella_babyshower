@@ -12,7 +12,7 @@ import { useToast } from '../hooks/useToast'
 import { deleteNameIdea, getNamesSettings, listNameIdeasAdmin, saveNamesSettings, setNameIdeaStatus, type AdminNameIdea } from '../services/showerService'
 import { toFriendlyMessage } from '../utils/errors'
 import { formatShortDate } from '../utils/formatting'
-import { SectionWords, smallLine } from '../components/admin/SectionWords'
+import { SectionWords } from '../components/admin/SectionWords'
 
 type Filter = 'all' | 'pending' | 'hidden'
 const FOR_LABEL = { girl: 'Girl', boy: 'Boy', any: 'Either' } as const
