@@ -23,6 +23,7 @@ import { VerseSettingsCard } from '../components/admin/VerseSettingsCard'
 import { ProgramCard } from '../components/admin/ProgramCard'
 import { useUnsavedChanges } from '../hooks/unsavedChanges'
 import { SaveStatus } from '../components/ui/SaveStatus'
+import { SectionWords, smallLine } from '../components/admin/SectionWords'
 
 type FieldErrors = Partial<Record<'coupleNames' | 'babyName' | 'weddingDate' | 'dueDate' | 'heroImageUrl' | 'churchMapUrl' | 'sections', string>>
 
@@ -239,6 +240,17 @@ export default function AdminSettings() {
             />
             <TextField label="Hero title" value={values.heroTitle} onChange={(v) => set('heroTitle', v)} maxLength={80} hint="Shown large on the hero; empty = the baby’s name." />
             <TextField label="Hero subtitle" value={values.heroSubtitle} onChange={(v) => set('heroSubtitle', v)} maxLength={120} hint="e.g. “A baby shower for Juan & Maria”." />
+            <SectionWords
+              className="sm:col-span-2"
+              heading="Front page — words"
+              sectionKey="hero"
+              fields={[
+                { field: 'eyebrow', label: 'Small line above the names', usual: 'Your design’s own line' },
+                { field: 'details', label: 'Menu link to the details', usual: 'Details' },
+                { field: 'seat', label: 'Menu link to Find my seat', usual: 'Find My Seat' },
+                { field: 'scroll', label: 'Scroll hint at the bottom', usual: 'Scroll' },
+              ]}
+            />
             <TextAreaField
               className="sm:col-span-2"
               label="Introduction text"
@@ -248,6 +260,7 @@ export default function AdminSettings() {
               showCounter
               rows={3}
             />
+            <SectionWords className="sm:col-span-2" heading="Introduction section — words" sectionKey="intro" fields={[smallLine('The Baby Shower'), { field: 'days', label: 'Countdown: days', usual: 'days' }, { field: 'hours', label: 'Countdown: hours', usual: 'hours' }, { field: 'minutes', label: 'Countdown: minutes', usual: 'minutes' }]} />
             <TextAreaField
               className="sm:col-span-2"
               label="Footer closing message"
@@ -310,6 +323,25 @@ export default function AdminSettings() {
             <TextField label="Start time (optional)" value={values.ceremonyTime} onChange={(v) => set('ceremonyTime', v)} maxLength={40} placeholder="e.g. 2:00 PM" hint="Shown on the website, invitations and envelopes; the countdown uses it." />
             <TextField label="Google Maps URL" type="url" value={values.churchMapUrl} onChange={(v) => set('churchMapUrl', v)} error={errors.churchMapUrl} />
           </div>
+          <SectionWords
+            className="mt-5"
+            heading="Venue card — words"
+            sectionKey="venue"
+            fields={[
+              { field: 'cardLabel', label: 'Small label on the card', usual: 'Venue' },
+              { field: 'mapButton', label: 'Map button', usual: 'View Location' },
+            ]}
+          />
+          <SectionWords
+            className="mt-3"
+            heading="When the venue is kept for confirmed guests"
+            sectionKey="private"
+            fields={[
+              { field: 'title', label: 'Title', usual: 'Shared with our confirmed guests' },
+              { field: 'button', label: 'Button', usual: 'Find my invitation' },
+              { field: 'body', label: 'Message', usual: 'The venue details are shared with guests who have confirmed they’re coming…', long: true },
+            ]}
+          />
         </Card>
 
         <WebsitePrivacyCard />
@@ -323,6 +355,12 @@ export default function AdminSettings() {
             </Button>
           }
         >
+          <SectionWords
+            className="mb-5"
+            heading="Section words"
+            sectionKey="info"
+            fields={[smallLine('Good to Know'), { field: 'title', label: 'Title', usual: 'Shower Details' }, { field: 'subtitle', label: 'Note under the title (optional)', usual: '', long: true }]}
+          />
           {errors.sections && (
             <p role="alert" className="mb-4 text-sm text-rose">
               {errors.sections}
@@ -432,6 +470,18 @@ export default function AdminSettings() {
       <ProgramCard />
       <RsvpSettingsCard />
       <RsvpTeaserCard />
+      <Card title="RSVP section" description="The invitation to reply near the end of your home page.">
+        <SectionWords
+          heading="Words"
+          sectionKey="rsvp"
+          fields={[
+            smallLine('Kindly Respond'),
+            { field: 'title', label: 'Title', usual: 'We would be honoured by your presence' },
+            { field: 'subtitle', label: 'Note under the title', usual: 'Please let us know if you can join us on (the date). It only takes a minute.', long: true },
+            { field: 'deadline', label: 'Label above the reply-by date', usual: 'Expiration of the invitation' },
+          ]}
+        />
+      </Card>
       <GiftSettingsCard />
     </div>
     </>

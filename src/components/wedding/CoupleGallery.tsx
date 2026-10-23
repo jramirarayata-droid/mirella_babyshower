@@ -6,6 +6,7 @@ import type { GalleryImage, GalleryLayout } from '../../types/wedding'
 import { Ornament } from '../ui/Ornament'
 import { cn } from '../ui/cn'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 // The other eight layouts are downloaded only when chosen.
 const GalleryLayoutView = lazy(() => import('./GalleryLayouts'))
@@ -20,10 +21,13 @@ interface Props {
   eyebrow?: string
   /** On a page that already has the title (e.g. #/ideas): just the photos. */
   bare?: boolean
+  /** Admin → Page Order → Edit text key for the small line (e.g. "media:gallery"). */
+  textKey?: string
 }
 
 /** "Our Story in Frames" — magazine-style photo grid (or carousel) with a swipeable full-screen view. */
-export function CoupleGallery({ title, subtitle, layout, images, headingId = 'gallery-heading', eyebrow = 'Moments', bare = false }: Props) {
+export function CoupleGallery({ title, subtitle, layout, images, headingId = 'gallery-heading', eyebrow = 'Moments', bare = false, textKey = '' }: Props) {
+  const t = useSectionText(textKey)
   const [open, setOpen] = useState<number | null>(null)
   if (!images.length) return null
 
@@ -32,7 +36,7 @@ export function CoupleGallery({ title, subtitle, layout, images, headingId = 'ga
       <div className="mx-auto max-w-6xl">
         {!bare && (
           <Reveal className="section-title text-center">
-            <p className="eyebrow">{eyebrow}</p>
+            <p className="eyebrow">{t('eyebrow', eyebrow)}</p>
             <h2 id={headingId} className="mt-4 text-4xl text-ink sm:text-5xl">
               {title}
             </h2>

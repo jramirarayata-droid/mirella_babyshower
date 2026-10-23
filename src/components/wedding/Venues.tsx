@@ -1,6 +1,7 @@
 import { ExternalLink, PartyPopper, type LucideIcon } from 'lucide-react'
 import type { WeddingSettings } from '../../types/wedding'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 interface Venue {
   label: string
@@ -11,8 +12,9 @@ interface Venue {
 }
 
 export function Venues({ settings }: { settings: WeddingSettings }) {
+  const t = useSectionText('venue')
   const venues: Venue[] = [
-    { label: 'Venue', name: settings.churchName, time: settings.ceremonyTime, mapUrl: settings.churchMapUrl, icon: PartyPopper },
+    { label: t('cardLabel', 'Venue'), name: settings.churchName, time: settings.ceremonyTime, mapUrl: settings.churchMapUrl, icon: PartyPopper },
   ].filter((v) => v.name)
 
   if (!venues.length) return null
@@ -41,7 +43,7 @@ export function Venues({ settings }: { settings: WeddingSettings }) {
                     rel="noopener noreferrer"
                     className="lux-link relative z-10 mt-8 inline-flex min-h-11 items-center gap-2 rounded-full border border-champagne/70 px-6 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-ink transition hover:bg-champagne-light/50"
                   >
-                    View Location
+                    {t('mapButton', 'View Location')}
                     <ExternalLink aria-hidden="true" className="size-3.5" />
                     <span className="sr-only">for the {v.label.toLowerCase()} (opens Google Maps in a new tab)</span>
                   </a>

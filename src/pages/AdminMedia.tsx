@@ -35,6 +35,7 @@ import { LayoutThumb, PhotoTile } from '../components/admin/MediaTiles'
 import { MediaSectionsAdmin } from '../components/admin/MediaSectionsAdmin'
 import { MediaOrderCard } from '../components/admin/MediaOrderCard'
 import { PhotoOptimiser } from '../components/admin/PhotoOptimiser'
+import { SectionWords, smallLine } from '../components/admin/SectionWords'
 
 const isSample = (url: string) => url.startsWith('samples/') || url.includes('images.unsplash.com')
 
@@ -296,6 +297,7 @@ export default function AdminMedia() {
           <div className="grid gap-5 md:grid-cols-2">
             <TextField label="Section title" value={gallery.galleryTitle} onChange={(v) => setGallery({ ...gallery, galleryTitle: v })} maxLength={80} />
             <TextField label="Short description" value={gallery.gallerySubtitle} onChange={(v) => setGallery({ ...gallery, gallerySubtitle: v })} maxLength={200} />
+            <SectionWords className="md:col-span-2" sectionKey="media:gallery" fields={[smallLine('Moments')]} />
             <fieldset className="md:col-span-2">
               <legend className="mb-2 text-[0.95rem] font-medium text-ink-soft">Layout</legend>
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
@@ -454,6 +456,7 @@ export default function AdminMedia() {
               </div>
               <TextField label="Section title" value={video.videoTitle} onChange={(v) => setVideo({ ...video, videoTitle: v })} maxLength={80} />
               <TextAreaField label="Caption (optional)" value={video.videoCaption} onChange={(v) => setVideo({ ...video, videoCaption: v })} maxLength={240} rows={2} />
+              <SectionWords sectionKey="media:video" fields={[smallLine('A Film')]} />
               <label className="flex cursor-pointer items-center gap-3 text-sm text-ink-soft">
                 <input type="checkbox" checked={video.videoVisible} onChange={(e) => setVideo({ ...video, videoVisible: e.target.checked })} className="size-5 accent-ink" />
                 Show the video on the website

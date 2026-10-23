@@ -1,6 +1,7 @@
 import { supabase, WEDDING_ASSETS_BUCKET } from '../lib/supabase'
 import type { Json, Tables } from '../types/database'
 import type {
+  SectionText,
   EntourageGroup,
   EntourageSettings,
   GallerySettings,
@@ -138,6 +139,23 @@ export function isRsvpOpen(s: Pick<WeddingSettings, 'rsvpOpen' | 'rsvpDeadline'>
   return now < new Date(s.rsvpDeadline).getTime()
 }
 
+/** A section's label names: letters and digits, e.g. "eyebrow", "mapButton". */
+const LABEL_KEY = /^[a-zA-Z][a-zA-Z0-9]{0,30}$/
+
+const sectionTexts = (v: unknown): Record<string, SectionText> => {
+  const out: Record<string, SectionText> = {}
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return out
+  for (const [k, x] of Object.entries(v as Record<string, unknown>)) {
+    if (!x || typeof x !== 'object' || Array.isArray(x)) continue
+    const t: SectionText = {}
+    for (const [f, val] of Object.entries(x as Record<string, unknown>)) {
+      if (LABEL_KEY.test(f) && typeof val === 'string' && val.trim()) t[f] = val.trim().slice(0, 300)
+    }
+    if (Object.keys(t).length) out[k] = t
+  }
+  return out
+}
+
 const stringList = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [])
 
 function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
@@ -155,6 +173,7 @@ function fromRow(row: Tables<'wedding_settings'>): WeddingSettings {
     churchName: row.church_name ?? '',
     venueTitle: row.venue_title ?? '',
     venueEyebrow: row.venue_eyebrow ?? '',
+    sectionText: sectionTexts((row as unknown as { section_text?: unknown }).section_text),
     ceremonyTime: row.ceremony_time ?? '',
     receptionTime: row.reception_time ?? '',
     churchMapUrl: row.church_map_url ?? '',
@@ -267,6 +286,20 @@ async function updatePartial(id: string, patch: Record<string, unknown>, context
     throw new FriendlyError(message)
   }
   return fromRow(data as Tables<'wedding_settings'>)
+}
+
+/**
+ * Admin → Page Order → Edit text: the sections' own wording, plus any titles
+ * that live in their own columns (e.g. the photo gallery's), in one save.
+ */
+export function updateSectionTexts(id: string, sectionText: Record<string, SectionText>, columns: Record<string, string | null> = {}): Promise<WeddingSettings> {
+  const clean: Record<string, SectionText> = {}
+  for (const [k, t] of Object.entries(sectionText)) {
+    const c: SectionText = {}
+    for (const [f, val] of Object.entries(t).slice(0, 40)) if (LABEL_KEY.test(f) && val?.trim()) c[f] = val.trim().slice(0, 300)
+    if (Object.keys(c).length) clean[k] = c
+  }
+  return updatePartial(id, { section_text: clean, ...columns }, 'updateSectionTexts', 'We couldn’t save the text. Please try again.')
 }
 
 /** Admin: RSVP deadline / open switch / closed message. */

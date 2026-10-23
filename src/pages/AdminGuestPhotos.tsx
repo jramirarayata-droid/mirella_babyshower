@@ -26,6 +26,7 @@ import { Button } from '../components/ui/Button'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { Skeleton } from '../components/ui/Skeleton'
 import { cn } from '../components/ui/cn'
+import { SectionWords, smallLine } from '../components/admin/SectionWords'
 
 type Save = 'idle' | 'saving' | 'saved' | 'error'
 type Filter = 'all' | 'pending' | 'visible' | 'hidden'
@@ -281,6 +282,10 @@ export default function AdminGuestPhotos() {
               <span className="font-medium text-ink">Message</span>
               <textarea className="input-base mt-1.5" rows={2} maxLength={200} value={cfg.subtitle} onChange={(e) => update({ subtitle: e.target.value })} />
             </label>
+            <SectionWords
+              sectionKey="guestPhotos"
+              fields={[smallLine('From our guests'), { field: 'addButton', label: 'Button to add photos', usual: 'Add your photos' }, { field: 'seeAll', label: 'Link to all photos', usual: 'See all photos' }]}
+            />
           </section>
 
           <div className="space-y-6">

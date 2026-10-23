@@ -18,6 +18,7 @@ import { cn } from '../components/ui/cn'
 import { PageHeader } from '../components/admin/PageHeader'
 import { MotifCard } from '../components/admin/MotifCard'
 import { outfitPairs, type OutfitPair } from '../utils/outfitPairs'
+import { SectionWords, smallLine } from '../components/admin/SectionWords'
 
 const GROUPS: { gender: OutfitGender; title: string }[] = [
   { gender: 'male', title: 'For Him' },
@@ -168,6 +169,11 @@ export default function AdminOutfits() {
                 : 'Guests switch between the looks for him and for her; each photo shows its own label.'}
             </p>
           </div>
+          <SectionWords
+            className="mt-5"
+            sectionKey="attire"
+            fields={[smallLine('Dress Code'), { field: 'forHim', label: 'Tab: for him', usual: 'For Him' }, { field: 'forHer', label: 'Tab: for her', usual: 'For Her' }]}
+          />
           <SectionAccess
             what="attire"
             className="mt-5"

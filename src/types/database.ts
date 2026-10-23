@@ -173,6 +173,7 @@ export type Database = {
           church_name: string | null
           venue_title: string | null
           venue_eyebrow: string | null
+          section_text: Json
           ceremony_time: string | null
           reception_time: string | null
           church_map_url: string | null
@@ -232,6 +233,7 @@ export type Database = {
           church_name?: string | null
           venue_title?: string | null
           venue_eyebrow?: string | null
+          section_text?: Json
           ceremony_time?: string | null
           reception_time?: string | null
           church_map_url?: string | null
@@ -291,6 +293,7 @@ export type Database = {
           church_name?: string | null
           venue_title?: string | null
           venue_eyebrow?: string | null
+          section_text?: Json
           ceremony_time?: string | null
           reception_time?: string | null
           church_map_url?: string | null

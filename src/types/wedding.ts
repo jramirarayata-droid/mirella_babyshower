@@ -54,6 +54,8 @@ export interface WeddingSettings {
   venueTitle: string
   /** The small line above it ('' = "Where"). */
   venueEyebrow: string
+  /** Admin → Page Order → Edit text: per section, the small line, title, note ('' = the usual words). */
+  sectionText: Record<string, SectionText>
   /** Optional start time, e.g. "2:00 PM". */
   ceremonyTime: string
   /** Not used by the baby shower (one venue). */
@@ -242,6 +244,7 @@ export type WeddingSettingsInput = Omit<
   | 'outfitLayout'
   | keyof RsvpSettings
   | 'rsvpMode'
+  | 'sectionText'
   | 'openRsvpCompanions'
   | 'pageOrder'
   | keyof EntourageSettings
@@ -280,3 +283,8 @@ export const GALLERY_LAYOUTS: { id: GalleryLayout; name: string; description: st
   { id: 'arches', name: 'Arched frames', description: 'Gallery wall of arches and ovals' },
   { id: 'timeline', name: 'Our timeline', description: 'Photos along a line, chapter by chapter' },
 ]
+
+/** A section's own wording (Admin → Page Order → Edit text). Missing = the usual words. */
+export type SectionText = Partial<Record<string, string>>
+// Common keys: eyebrow (small line above the title), title, subtitle (note under it);
+// each section may have its own labels too (e.g. venue.mapButton, reveal.after).

@@ -9,6 +9,7 @@ import { Reveal } from '../wedding/Reveal'
 import { Confetti } from '../photos/PetalBurst'
 import { BalloonShape } from '../wedding/looks/BabyArt'
 import { cn } from '../ui/cn'
+import { useSectionText } from '../../hooks/useSectionText'
 
 /**
  * The gender reveal as the website and the big screen see it. The answer is
@@ -69,6 +70,7 @@ export function RevealAnswer({ reveal, big = false, celebrate = true }: { reveal
 /** Home page section: the countdown to the reveal, then the answer. Nothing when it's off. */
 export function GenderRevealSection() {
   const [reveal, reload] = useGenderReveal()
+  const t = useSectionText('reveal')
   const shownRef = useRef(false)
   const [celebrate, setCelebrate] = useState(false)
   useEffect(() => {
@@ -80,9 +82,9 @@ export function GenderRevealSection() {
   return (
     <section aria-labelledby="reveal-heading" className="px-5 py-20 sm:px-8 sm:py-24">
       <Reveal className="section-title mx-auto max-w-2xl text-center">
-        <p className="eyebrow">Gender Reveal</p>
+        <p className="eyebrow">{t('eyebrow', 'Gender Reveal')}</p>
         <h2 id="reveal-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
-          {reveal.revealed ? 'The secret is out!' : reveal.title}
+          {reveal.revealed ? t('after', 'The secret is out!') : reveal.title}
         </h2>
         {reveal.revealed ? (
           <div className="mt-10">
@@ -93,18 +95,18 @@ export function GenderRevealSection() {
             {reveal.message && <p className="mx-auto mt-5 max-w-md leading-relaxed text-ink-soft">{reveal.message}</p>}
             {reveal.revealAt ? (
               <>
-                <p className="mt-8 text-xs uppercase tracking-[0.3em] text-muted">Revealed in</p>
-                <RoundCountdown at={reveal.revealAt} className="mt-4" onDone={reload} />
+                <p className="mt-8 text-xs uppercase tracking-[0.3em] text-muted">{t('revealedIn', 'Revealed in')}</p>
+                <RoundCountdown at={reveal.revealAt} className="mt-4" onDone={reload} labels={{ days: t('days', ''), hours: t('hours', ''), minutes: t('minutes', '') }} />
               </>
             ) : (
-              <p className="mt-8 text-sm text-muted">Revealed at the shower — stay tuned!</p>
+              <p className="mt-8 text-sm text-muted">{t('stayTuned', 'Revealed at the shower — stay tuned!')}</p>
             )}
             <div className="mt-8 flex justify-center gap-3">
               <span className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium" style={{ background: '#F9D3DD', color: '#7A2E43' }}>
-                Team Girl
+                {t('teamGirl', 'Team Girl')}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium" style={{ background: '#D4E5F7', color: '#23466F' }}>
-                Team Boy
+                {t('teamBoy', 'Team Boy')}
               </span>
             </div>
             <Link to="/predict" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-gold underline-offset-4 hover:underline">

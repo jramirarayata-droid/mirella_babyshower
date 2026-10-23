@@ -72,13 +72,13 @@ export default function Home() {
     [
       {
         key: 'gallery',
-        node: settings.galleryVisible ? <CoupleGallery title={settings.galleryTitle} subtitle={settings.gallerySubtitle} layout={galleryLayout} images={gallery} /> : null,
+        node: settings.galleryVisible ? <CoupleGallery textKey="media:gallery" title={settings.galleryTitle} subtitle={settings.gallerySubtitle} layout={galleryLayout} images={gallery} /> : null,
       },
       {
         key: 'video',
         node:
           settings.videoVisible && settings.videoUrl ? (
-            <VideoHighlight title={settings.videoTitle} caption={settings.videoCaption} url={settings.videoUrl} posterUrl={settings.videoPosterUrl} />
+            <VideoHighlight textKey="media:video" title={settings.videoTitle} caption={settings.videoCaption} url={settings.videoUrl} posterUrl={settings.videoPosterUrl} />
           ) : null,
       },
       ...mediaSections.map((x) => ({ key: x.s.id, node: <MediaSectionView section={x} /> })),

@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom'
 import { LockKeyhole } from 'lucide-react'
 import { Ornament } from '../ui/Ornament'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 /** Shown on the website in place of details shared only with confirmed guests. */
 export function PrivateDetails({ venues, info, rsvpOpen }: { venues: boolean; info: boolean; rsvpOpen: boolean }) {
+  const t = useSectionText('private')
   const what = venues && info ? 'The venue and other shower details are' : venues ? 'The venue details are' : 'The shower details are'
   return (
     <section aria-labelledby="private-details-heading" className="px-5 py-20 sm:px-8 sm:py-24">
@@ -13,18 +15,18 @@ export function PrivateDetails({ venues, info, rsvpOpen }: { venues: boolean; in
           <LockKeyhole aria-hidden="true" className="size-5" strokeWidth={1.5} />
         </span>
         <h2 id="private-details-heading" className="mt-6 text-3xl leading-tight text-ink sm:text-4xl">
-          Shared with our confirmed guests
+          {t('title', 'Shared with our confirmed guests')}
         </h2>
         <Ornament className="mt-6" />
         <p className="mt-6 leading-relaxed text-ink-soft">
-          {what} shared with guests who have confirmed they’re coming. Once you RSVP, you’ll find everything on your invitation.
+          {t('body', `${what} shared with guests who have confirmed they’re coming. Once you RSVP, you’ll find everything on your invitation.`)}
         </p>
         {rsvpOpen && (
           <Link
             to="/rsvp"
             className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-ink px-8 text-[0.95rem] font-medium text-ivory shadow-soft transition hover:bg-ink-soft"
           >
-            Find my invitation
+            {t('button', 'Find my invitation')}
           </Link>
         )}
       </Reveal>

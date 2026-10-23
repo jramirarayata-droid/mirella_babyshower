@@ -6,6 +6,7 @@ import { listAttire } from '../../services/outfitService'
 import { Reveal } from '../wedding/Reveal'
 import { hasIdeas, loadGiftIdeas } from './GiftIdeas'
 import { useSpace } from '../../hooks/useSpace'
+import { useSectionText } from '../../hooks/useSectionText'
 
 interface Card {
   to: string
@@ -67,18 +68,19 @@ export function useShowerActivities(): ShowerActivities | null {
 /** Home page: the wishlist, the predictions game and name ideas, as three friendly cards. */
 export function ShowerFun() {
   const on = useShowerActivities()
+  const t = useSectionText('fun')
   if (!on) return null
   const cards: Card[] = []
-  if (on.registry) cards.push({ to: '/registry', title: 'Gift Wishlist', text: 'See what our little one still needs, and mark what you’ll bring so nothing is doubled.', cta: 'See the wishlist', icon: Gift })
+  if (on.registry) cards.push({ to: '/registry', title: t('registryTitle', 'Gift Wishlist'), text: t('registryText', 'See what our little one still needs, and mark what you’ll bring so nothing is doubled.'), cta: t('registryButton', 'See the wishlist'), icon: Gift })
   if (on.predict)
     cards.push({
       to: '/predict',
-      title: 'Baby Predictions',
-      text: on.predictOpen ? 'Guess the birthday, the weight — and boy or girl. The closest guesses win!' : 'See everyone’s guesses and who came closest.',
-      cta: on.predictOpen ? 'Make your guess' : 'See the guesses',
+      title: t('predictTitle', 'Baby Predictions'),
+      text: on.predictOpen ? t('predictText', 'Guess the birthday, the weight — and boy or girl. The closest guesses win!') : t('predictTextClosed', 'See everyone’s guesses and who came closest.'),
+      cta: on.predictOpen ? t('predictButton', 'Make your guess') : t('predictButtonClosed', 'See the guesses'),
       icon: Baby,
     })
-  if (on.names) cards.push({ to: '/names', title: 'Name Ideas', text: 'We’re still choosing! Suggest a name you love for the baby.', cta: 'Suggest a name', icon: PenLine })
+  if (on.names) cards.push({ to: '/names', title: t('namesTitle', 'Name Ideas'), text: t('namesText', 'We’re still choosing! Suggest a name you love for the baby.'), cta: t('namesButton', 'Suggest a name'), icon: PenLine })
   if (!cards.length) return null
   return (
     // No section heading: just the cards for what's switched on (each card names itself).

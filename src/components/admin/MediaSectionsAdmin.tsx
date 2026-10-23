@@ -34,6 +34,7 @@ import { cn } from '../ui/cn'
 import { LayoutThumb, PhotoTile } from './MediaTiles'
 import { useUnsavedChanges } from '../../hooks/unsavedChanges'
 import { SaveStatus } from '../../components/ui/SaveStatus'
+import { SectionWords, smallLine } from './SectionWords'
 
 /**
  * Admin → Photos & Video → "More sections": extra photo galleries and videos
@@ -243,6 +244,7 @@ function SectionEditor({
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <TextField label="Section title" value={draft.title} onChange={(v) => setDraft({ ...draft, title: v })} maxLength={120} />
         <TextField label={s.kind === 'video' ? 'Caption (optional)' : 'Short description (optional)'} value={draft.subtitle} onChange={(v) => setDraft({ ...draft, subtitle: v })} maxLength={300} />
+        <SectionWords className="md:col-span-2" sectionKey={`media:${s.id}`} fields={[smallLine(s.kind === 'video' ? 'A Film' : 'Moments')]} />
         {s.kind === 'video' && (
           <TextField
             className="md:col-span-2"

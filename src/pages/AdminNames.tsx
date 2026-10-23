@@ -12,6 +12,7 @@ import { useToast } from '../hooks/useToast'
 import { deleteNameIdea, getNamesSettings, listNameIdeasAdmin, saveNamesSettings, setNameIdeaStatus, type AdminNameIdea } from '../services/showerService'
 import { toFriendlyMessage } from '../utils/errors'
 import { formatShortDate } from '../utils/formatting'
+import { SectionWords } from '../components/admin/SectionWords'
 
 type Filter = 'all' | 'pending' | 'hidden'
 const FOR_LABEL = { girl: 'Girl', boy: 'Boy', any: 'Either' } as const
@@ -105,6 +106,15 @@ export default function AdminNames() {
                 hidden={s.mode === 'hidden'}
                 onHiddenChange={(h) => settings.update({ mode: h ? 'hidden' : 'visible' })}
                 timing={<StartField mode={s.mode} from={s.from} onChange={settings.update} />}
+              />
+              <SectionWords
+                heading="Card on the home page"
+                sectionKey="fun"
+                fields={[
+                  { field: 'namesTitle', label: 'Title', usual: 'Name Ideas' },
+                  { field: 'namesText', label: 'Text', usual: 'We’re still choosing! Suggest a name you love for the baby.', long: true },
+                  { field: 'namesButton', label: 'Button', usual: 'Suggest a name' },
+                ]}
               />
               <fieldset className="space-y-2 text-sm">
                 <legend className="mb-1 font-medium text-ink">When a guest suggests a name</legend>

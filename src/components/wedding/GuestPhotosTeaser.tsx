@@ -6,6 +6,7 @@ import { PhotoMasonryStrip } from '../photos/PhotoMasonryStrip'
 import { Ornament } from '../ui/Ornament'
 import { Lightbox } from './CoupleGallery'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 const PAGE = 30
 
@@ -14,6 +15,7 @@ const PAGE = 30
  * (more load as you go), and a way in to add yours when it's open.
  */
 export function GuestPhotosTeaser() {
+  const t = useSectionText('guestPhotos')
   const [info, setInfo] = useState<GuestPhotosInfo | null>(null)
   const [photos, setPhotos] = useState<GuestPhoto[]>([])
   const [more, setMore] = useState(false)
@@ -66,7 +68,7 @@ export function GuestPhotosTeaser() {
     <section aria-labelledby="guest-photos-heading" className="py-24">
       <div className="mx-auto max-w-5xl px-4 text-center sm:px-8">
         <Reveal className="section-title">
-          <p className="eyebrow">From our guests</p>
+          <p className="eyebrow">{t('eyebrow', 'From our guests')}</p>
           <h2 id="guest-photos-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
             {info.title}
           </h2>
@@ -85,12 +87,12 @@ export function GuestPhotosTeaser() {
             to="/photos"
             className="inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-8 text-sm font-medium uppercase tracking-[0.2em] text-ivory shadow-soft transition hover:bg-ink-soft"
           >
-            <ImagePlus aria-hidden="true" className="size-4" strokeWidth={1.6} /> Add your photos
+            <ImagePlus aria-hidden="true" className="size-4" strokeWidth={1.6} /> {t('addButton', 'Add your photos')}
           </Link>
         )}
         {info.count > 0 && (
           <Link to="/photos" className="text-sm text-gold underline-offset-4 hover:underline">
-            See all {info.count} {info.count === 1 ? 'photo' : 'photos'}
+            {t('seeAll', 'See all photos')} ({info.count})
           </Link>
         )}
       </div>

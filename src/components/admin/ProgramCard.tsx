@@ -13,6 +13,7 @@ import { Button } from '../ui/Button'
 import { TextField } from '../ui/FormField'
 import { SaveStatus } from '../ui/SaveStatus'
 import { Skeleton } from '../ui/Skeleton'
+import { SectionWords, smallLine } from './SectionWords'
 
 const item = (time: string, title: string, description = ''): ProgramItem => ({ id: newProgramItemId(), time, title, description })
 
@@ -149,6 +150,7 @@ export function ProgramCard() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <TextField label="Section title" value={settings.programTitle} onChange={(v) => set({ programTitle: v })} maxLength={80} placeholder="Program" />
+          <SectionWords className="sm:col-span-2" sectionKey="program" fields={[smallLine('Order of the Day')]} />
           <TextField label="Subtitle (optional)" value={settings.programSubtitle} onChange={(v) => set({ programSubtitle: v })} maxLength={300} placeholder="e.g. Saturday afternoon" />
         </div>
 

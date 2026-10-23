@@ -24,6 +24,8 @@ const settings = {
   seating_config: { finder: { from: null, mode: 'hidden', preassign: false } }, theme: { template: 'clouds-blue' },
   page_order: ['intro', 'rsvp', 'venue'],
   venue_title: 'The Celebration', venue_eyebrow: 'Join us at',
+  section_text: { intro: { eyebrow: 'Welcome, friends' }, info: { title: 'Little Things to Know' }, venue: { mapButton: 'Open the map' } },
+  church_map_url: 'https://maps.google.com/?q=garden',
 }
 const patches = []
 
@@ -75,6 +77,8 @@ try {
   const motifY = await top(page, 'Our Colours')
   ok('home: RSVP moved above the venue', rsvpY < venueY, `${rsvpY} < ${venueY}`)
   ok('home: sections not in the saved list keep their usual place after it', venueY < motifY, `${venueY} < ${motifY}`)
+  ok('home: a label inside a section can be changed too', (await page.getByText('Open the map').count()) === 1)
+  ok('home: a section’s own small line shows', (await page.getByText('Welcome, friends', { exact: true }).count()) === 1)
   ok('home: the venue section uses its own title', (await page.getByRole('heading', { name: 'The Celebration' }).count()) === 1 && (await page.getByText('Join us at', { exact: true }).count()) === 1)
   ok('home: no page background unless switched on', (await page.locator('[data-page-background]').count()) === 0)
   shots.push(['page-order-home', await page.screenshot({ fullPage: true })])
@@ -125,6 +129,19 @@ try {
   const saved = patches.at(-1)?.page_order ?? []
   ok('admin: saves the new order', saved[0] === 'intro' && saved.indexOf('venue') >= 0 && saved.indexOf('venue') + 1 === saved.indexOf('rsvp'), saved.join(','))
   shots.push(['admin-page-order', await a.screenshot({ fullPage: true })])
+
+  // Each section's words on its own admin page (Website Settings → Information sections).
+  await a.goto(`${BASE}#/admin/settings`)
+  const words = a.locator('[data-section-words="info"]')
+  await words.waitFor({ timeout: 20000 })
+  ok('admin: the section’s words show what is saved', (await words.getByLabel('Title', { exact: true }).inputValue()) === 'Little Things to Know')
+  ok('admin: empty boxes show the usual words', (await words.getByLabel('Small line above the title').getAttribute('placeholder')) === 'Good to Know')
+  await words.getByLabel('Small line above the title').fill('Before you come')
+  await words.getByRole('button', { name: 'Save words' }).click()
+  await a.waitForTimeout(1000)
+  const tp = patches.filter((x) => x.section_text).at(-1)
+  ok('admin: saving keeps the other sections’ words', tp?.section_text?.info?.eyebrow === 'Before you come' && tp?.section_text?.info?.title === 'Little Things to Know' && tp?.section_text?.intro?.eyebrow === 'Welcome, friends', JSON.stringify(tp?.section_text))
+  ok('admin: Website Settings has words for the introduction, venue note, information and RSVP', (await a.locator('[data-section-words]').count()) >= 4)
 
   // Look & Feel: page background is off by default.
   await a.goto(`${BASE}#/admin/look`)
