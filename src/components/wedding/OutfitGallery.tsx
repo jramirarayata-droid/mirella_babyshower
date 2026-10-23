@@ -7,6 +7,7 @@ import { MotifSwatches } from './MotifSwatches'
 import { cn } from '../ui/cn'
 import { Ornament } from '../ui/Ornament'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 interface Props {
   title: string
@@ -31,6 +32,7 @@ interface View {
 
 /** "Attire inspiration" — admin-managed outfit images in a swipeable carousel. */
 export function OutfitGallery({ title, subtitle, images, layout = 'tabs', motifTitle = '', motifColors = [] }: Props) {
+  const t = useSectionText('attire')
   const reduce = useReducedMotion()
   const groups = useMemo(
     () => ({
@@ -52,7 +54,7 @@ export function OutfitGallery({ title, subtitle, images, layout = 'tabs', motifT
     <section aria-labelledby="outfits-heading" className="overflow-hidden bg-cream/60 px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <Reveal className="section-title text-center">
-          <p className="eyebrow">Dress Code</p>
+          <p className="eyebrow">{t('eyebrow', 'Dress Code')}</p>
           <h2 id="outfits-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
             {title}
           </h2>

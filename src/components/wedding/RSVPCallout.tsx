@@ -3,6 +3,7 @@ import { CalendarClock } from 'lucide-react'
 import { formatDeadlineDate, formatDeadlineTime, formatWeddingDate } from '../../utils/formatting'
 import { Reveal } from './Reveal'
 import { cn } from '../ui/cn'
+import { useSectionText } from '../../hooks/useSectionText'
 
 interface Props {
   weddingDate: string
@@ -14,15 +15,20 @@ interface Props {
 }
 
 export function RSVPCallout({ weddingDate, open, deadline, closedMessage, showDeadline, buttonLabel }: Props) {
+  const t = useSectionText('rsvp')
   return (
     <section aria-labelledby="rsvp-heading" className="px-5 pb-28 pt-20 sm:px-8">
       <Reveal>
         <div className="fine-frame paper-texture mx-auto max-w-3xl rounded-sm px-6 py-16 text-center shadow-card sm:px-12 sm:py-20">
           <div className="section-title">
-            <p className="eyebrow">Kindly Respond</p>
+            <p className="eyebrow">{t('eyebrow', 'Kindly Respond')}</p>
           <h2 id="rsvp-heading" className="mt-5 text-4xl leading-tight text-ink sm:text-5xl">
-            We would be honoured
-            <br className="hidden sm:block" /> by your presence
+            {t('title', '') || (
+              <>
+                We would be honoured
+                <br className="hidden sm:block" /> by your presence
+              </>
+            )}
           </h2>
           </div>
           {open ? (

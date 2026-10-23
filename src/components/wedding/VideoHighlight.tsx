@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Play } from 'lucide-react'
 import { parseVideoUrl } from '../../utils/media'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 interface Props {
   title: string
@@ -11,10 +12,13 @@ interface Props {
   /** Extra sections use their own heading id and small label. */
   headingId?: string
   eyebrow?: string
+  /** Admin → Page Order → Edit text key for the small line. */
+  textKey?: string
 }
 
 /** Cinematic prenup video. Nothing heavy loads until the guest presses play. */
-export function VideoHighlight({ title, caption, url, posterUrl, headingId = 'video-heading', eyebrow = 'A Film' }: Props) {
+export function VideoHighlight({ title, caption, url, posterUrl, headingId = 'video-heading', eyebrow = 'A Film', textKey = '' }: Props) {
+  const t = useSectionText(textKey)
   const video = parseVideoUrl(url)
   const [playing, setPlaying] = useState(false)
   if (video.kind === 'none') return null
@@ -25,7 +29,7 @@ export function VideoHighlight({ title, caption, url, posterUrl, headingId = 'vi
     <section aria-labelledby={headingId} className="bg-[#1d1b19] px-4 py-24 text-[#F6F1E8] sm:px-8 sm:py-28">
       <div className="mx-auto max-w-5xl">
         <Reveal className="section-title text-center">
-          <p className="text-[0.72rem] font-medium uppercase tracking-[0.32em] text-champagne-light/80">{eyebrow}</p>
+          <p className="text-[0.72rem] font-medium uppercase tracking-[0.32em] text-champagne-light/80">{t('eyebrow', eyebrow)}</p>
           <h2 id={headingId} className="mt-4 text-4xl text-[#F6F1E8] sm:text-5xl">
             {title}
           </h2>

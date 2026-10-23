@@ -4,13 +4,15 @@ import { Ornament } from '../ui/Ornament'
 import { RoundCountdown } from './looks/LookArt'
 import { Twinkle } from './looks/BabyArt'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 export function Introduction({ settings }: { settings: WeddingSettings }) {
+  const t = useSectionText('intro')
   const arriving = arrivalText(settings)
   return (
     <section id="details" aria-labelledby="intro-heading" className="scroll-mt-6 px-6 py-24 focus:outline-none sm:py-32">
       <Reveal className="section-title mx-auto max-w-2xl text-center">
-        <p className="eyebrow">The Baby Shower</p>
+        <p className="eyebrow">{t('eyebrow', 'The Baby Shower')}</p>
         <h2 id="intro-heading" className="sr-only">
           Our invitation
         </h2>

@@ -6,6 +6,7 @@ import { PhotoMasonryStrip } from '../photos/PhotoMasonryStrip'
 import { Ornament } from '../ui/Ornament'
 import { Lightbox } from './CoupleGallery'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 const PAGE = 30
 
@@ -14,6 +15,7 @@ const PAGE = 30
  * (more load as you go), and a way in to add yours when it's open.
  */
 export function GuestPhotosTeaser() {
+  const t = useSectionText('guestPhotos')
   const [info, setInfo] = useState<GuestPhotosInfo | null>(null)
   const [photos, setPhotos] = useState<GuestPhoto[]>([])
   const [more, setMore] = useState(false)
@@ -66,7 +68,7 @@ export function GuestPhotosTeaser() {
     <section aria-labelledby="guest-photos-heading" className="py-24">
       <div className="mx-auto max-w-5xl px-4 text-center sm:px-8">
         <Reveal className="section-title">
-          <p className="eyebrow">From our guests</p>
+          <p className="eyebrow">{t('eyebrow', 'From our guests')}</p>
           <h2 id="guest-photos-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
             {info.title}
           </h2>

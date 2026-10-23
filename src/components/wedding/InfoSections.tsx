@@ -3,9 +3,11 @@ import { Ornament } from '../ui/Ornament'
 import { cn } from '../ui/cn'
 import { Reveal } from './Reveal'
 import { SectionIcon } from './SectionIcon'
+import { useSectionText } from '../../hooks/useSectionText'
 
 /** Admin-managed information sections (Dress Code, Gifts, …) loaded from Supabase. */
 export function InfoSections({ sections }: { sections: InfoSection[] }) {
+  const t = useSectionText('info')
   const visible = sections.filter((s) => s.visible && (s.title.trim() || s.body.trim()))
   if (!visible.length) return null
 
@@ -13,10 +15,11 @@ export function InfoSections({ sections }: { sections: InfoSection[] }) {
     <section aria-labelledby="info-heading" className="px-5 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <Reveal className="section-title text-center">
-          <p className="eyebrow">Good to Know</p>
+          <p className="eyebrow">{t('eyebrow', 'Good to Know')}</p>
           <h2 id="info-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
-            Shower Details
+            {t('title', 'Shower Details')}
           </h2>
+          {t('subtitle', '') && <p className="mx-auto mt-4 max-w-lg text-ink-soft">{t('subtitle', '')}</p>}
           <Ornament className="mt-8" />
         </Reveal>
 

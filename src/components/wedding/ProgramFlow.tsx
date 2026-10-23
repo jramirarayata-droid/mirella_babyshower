@@ -2,6 +2,7 @@ import type { ProgramItem } from '../../types/wedding'
 import { Ornament } from '../ui/Ornament'
 import { cn } from '../ui/cn'
 import { Reveal } from './Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 /** The moments on a fine line, time on the left (also used for the preview in Website Settings). */
 export function ProgramTimeline({ items, className }: { items: ProgramItem[]; className?: string }) {
@@ -39,13 +40,14 @@ export function ProgramTimeline({ items, className }: { items: ProgramItem[]; cl
 
 /** Program flow on the home page (Admin → Website Settings → Program flow). */
 export function ProgramFlow({ title, subtitle, items }: { title: string; subtitle: string; items: ProgramItem[] }) {
+  const t = useSectionText('program')
   const visible = items.filter((i) => i.title.trim())
   if (!visible.length) return null
   return (
     <section aria-labelledby="program-heading" className="px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-3xl">
         <Reveal className="section-title text-center">
-          <p className="eyebrow">Order of the Day</p>
+          <p className="eyebrow">{t('eyebrow', 'Order of the Day')}</p>
           <h2 id="program-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
             {title.trim() || 'Program'}
           </h2>

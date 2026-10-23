@@ -9,6 +9,7 @@ import { Reveal } from '../wedding/Reveal'
 import { Confetti } from '../photos/PetalBurst'
 import { BalloonShape } from '../wedding/looks/BabyArt'
 import { cn } from '../ui/cn'
+import { useSectionText } from '../../hooks/useSectionText'
 
 /**
  * The gender reveal as the website and the big screen see it. The answer is
@@ -69,6 +70,7 @@ export function RevealAnswer({ reveal, big = false, celebrate = true }: { reveal
 /** Home page section: the countdown to the reveal, then the answer. Nothing when it's off. */
 export function GenderRevealSection() {
   const [reveal, reload] = useGenderReveal()
+  const t = useSectionText('reveal')
   const shownRef = useRef(false)
   const [celebrate, setCelebrate] = useState(false)
   useEffect(() => {
@@ -80,9 +82,9 @@ export function GenderRevealSection() {
   return (
     <section aria-labelledby="reveal-heading" className="px-5 py-20 sm:px-8 sm:py-24">
       <Reveal className="section-title mx-auto max-w-2xl text-center">
-        <p className="eyebrow">Gender Reveal</p>
+        <p className="eyebrow">{t('eyebrow', 'Gender Reveal')}</p>
         <h2 id="reveal-heading" className="mt-4 text-4xl text-ink sm:text-5xl">
-          {reveal.revealed ? 'The secret is out!' : reveal.title}
+          {reveal.revealed ? t('after', 'The secret is out!') : reveal.title}
         </h2>
         {reveal.revealed ? (
           <div className="mt-10">

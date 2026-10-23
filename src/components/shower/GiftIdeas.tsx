@@ -8,6 +8,7 @@ import { CoupleGallery, Lightbox } from '../wedding/CoupleGallery'
 const IdeaLayoutView = lazy(() => import('./IdeaLayouts'))
 import { Ornament } from '../ui/Ornament'
 import { Reveal } from '../wedding/Reveal'
+import { useSectionText } from '../../hooks/useSectionText'
 
 /*
  * Gift ideas: photos of things the parents love (a title and a caption each),
@@ -51,7 +52,7 @@ export function GiftIdeasGallery({ view, headingId = 'ideas-heading', page = fal
   }))
   if (IDEA_DESIGNS.includes(view.layout as IdeaDesign)) return <IdeaDesignSection view={view} images={images} headingId={headingId} page={page} />
   if (view.layout !== 'cards') {
-    return <CoupleGallery title={view.title} subtitle={view.intro || DEFAULT_INTRO} layout={view.layout as GalleryLayout} images={images} headingId={headingId} eyebrow="Ideas & inspiration" bare={page} />
+    return <CoupleGallery title={view.title} subtitle={view.intro || DEFAULT_INTRO} layout={view.layout as GalleryLayout} images={images} headingId={headingId} eyebrow="Ideas & inspiration" textKey="ideas" bare={page} />
   }
   return (
     <IdeasFrame view={view} headingId={headingId} page={page}>
@@ -70,12 +71,13 @@ export function GiftIdeasGallery({ view, headingId = 'ideas-heading', page = fal
 
 /** The section around the ideas: its heading on the home page; just the photos on #/ideas. */
 function IdeasFrame({ view, headingId, page, children }: { view: GiftIdeasView; headingId: string; page: boolean; children: ReactNode }) {
+  const t = useSectionText('ideas')
   return (
     <section aria-labelledby={page ? undefined : headingId} aria-label={page ? view.title : undefined} className={page ? '' : 'px-5 py-24 sm:px-8 sm:py-28'}>
       <div className="mx-auto max-w-5xl">
         {!page && (
           <Reveal className="section-title text-center">
-            <p className="eyebrow">Ideas &amp; inspiration</p>
+            <p className="eyebrow">{t('eyebrow', 'Ideas & inspiration')}</p>
             <h2 id={headingId} className="mt-4 text-4xl text-ink sm:text-5xl">
               {view.title}
             </h2>

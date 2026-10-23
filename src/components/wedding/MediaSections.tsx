@@ -34,9 +34,9 @@ export function useMediaSections(): LoadedSection[] {
 /** One extra section, as on the home page. */
 export function MediaSectionView({ section: { s, photos } }: { section: LoadedSection }) {
   return s.kind === 'photos' ? (
-    <CoupleGallery headingId={`section-${s.id}`} eyebrow="Moments" title={s.title} subtitle={s.subtitle} layout={s.layout} images={photos} />
+    <CoupleGallery headingId={`section-${s.id}`} textKey={`media:${s.id}`} eyebrow="Moments" title={s.title} subtitle={s.subtitle} layout={s.layout} images={photos} />
   ) : (
-    <VideoHighlight headingId={`section-${s.id}`} eyebrow="A Film" title={s.title} caption={s.subtitle} url={s.videoUrl} posterUrl={s.posterUrl} />
+    <VideoHighlight headingId={`section-${s.id}`} textKey={`media:${s.id}`} eyebrow="A Film" title={s.title} caption={s.subtitle} url={s.videoUrl} posterUrl={s.posterUrl} />
   )
 }
 

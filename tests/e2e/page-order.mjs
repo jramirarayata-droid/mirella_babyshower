@@ -24,6 +24,7 @@ const settings = {
   seating_config: { finder: { from: null, mode: 'hidden', preassign: false } }, theme: { template: 'clouds-blue' },
   page_order: ['intro', 'rsvp', 'venue'],
   venue_title: 'The Celebration', venue_eyebrow: 'Join us at',
+  section_text: { intro: { eyebrow: 'Welcome, friends' }, info: { title: 'Little Things to Know' } },
 }
 const patches = []
 
@@ -75,6 +76,7 @@ try {
   const motifY = await top(page, 'Our Colours')
   ok('home: RSVP moved above the venue', rsvpY < venueY, `${rsvpY} < ${venueY}`)
   ok('home: sections not in the saved list keep their usual place after it', venueY < motifY, `${venueY} < ${motifY}`)
+  ok('home: a section’s own small line shows', (await page.getByText('Welcome, friends', { exact: true }).count()) === 1)
   ok('home: the venue section uses its own title', (await page.getByRole('heading', { name: 'The Celebration' }).count()) === 1 && (await page.getByText('Join us at', { exact: true }).count()) === 1)
   ok('home: no page background unless switched on', (await page.locator('[data-page-background]').count()) === 0)
   shots.push(['page-order-home', await page.screenshot({ fullPage: true })])
@@ -119,6 +121,22 @@ try {
   ok('admin: lists the sections in the saved order', keys[0] === 'intro' && keys.indexOf('rsvp') >= 0 && keys.indexOf('rsvp') + 1 === keys.indexOf('venue'), keys.join(','))
   ok('admin: says what each section shows', (await a.locator('[data-section="verse"]').getByText('Switched off').count()) === 1 && (await a.locator('[data-section="rsvp"]').getByText('Showing').count()) === 1)
   ok('admin: the menu has Page Order', (await a.getByRole('link', { name: 'Page Order' }).count()) >= 1)
+  // Edit text: the RSVP title.
+  await a.getByRole('button', { name: 'Edit the text of RSVP' }).click()
+  const ed = a.locator('[data-text-editor="rsvp"]')
+  await ed.waitFor({ timeout: 10000 })
+  ok('admin: Edit text shows the usual words greyed out', (await ed.getByLabel('Title').getAttribute('placeholder')) === 'We would be honoured by your presence')
+  await ed.getByLabel('Title').fill('Will you celebrate with us?')
+  await ed.getByRole('button', { name: 'Save text' }).click()
+  await a.waitForTimeout(800)
+  const tp = patches.filter((x) => x.section_text).at(-1)
+  ok('admin: the new title is saved, the other sections’ words are kept', tp?.section_text?.rsvp?.title === 'Will you celebrate with us?' && tp?.section_text?.intro?.eyebrow === 'Welcome, friends', JSON.stringify(tp?.section_text))
+  // Venue: its words live in their own fields.
+  await a.getByRole('button', { name: 'Edit the text of Venue & time' }).click()
+  const ved = a.locator('[data-text-editor="venue"]')
+  await ved.waitFor({ timeout: 10000 })
+  ok('admin: the venue editor shows its current title', (await ved.getByLabel('Title', { exact: true }).inputValue()) === 'The Celebration')
+  await ved.getByRole('button', { name: 'Cancel' }).click()
   await a.getByRole('button', { name: 'Move Venue & time up' }).click()
   await a.getByRole('button', { name: 'Save order' }).click()
   await a.waitForTimeout(800)
