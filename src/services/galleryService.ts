@@ -120,6 +120,15 @@ export async function addGalleryFromFile(file: File, sortOrder: number, sectionI
   }
 }
 
+/** Admin → Gift Registry → Gift ideas: one photo, resized like the gallery's. Returns its link. */
+export async function uploadIdeaPhoto(file: File): Promise<string> {
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/heic', 'image/heif']
+  if (!allowed.includes(file.type)) throw new FriendlyError(`“${file.name}” isn’t a supported photo. Please use JPG, PNG or WebP.`)
+  const main = await compressImage(file, PHOTO_MAX, 0.82)
+  if (main.size > 10 * 1024 * 1024) throw new FriendlyError(`“${file.name}” is too large even after resizing.`)
+  return uploadToBucket('ideas', main)
+}
+
 /**
  * Makes the small copy for photos that don't have one yet (photos uploaded
  * before this existed). Done in the browser, one photo at a time; the full

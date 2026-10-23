@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import { ShowerShell, NotYet, ForAttending } from '../components/shower/ShowerShell'
 import { PageLoader } from '../components/ui/Spinner'
 import { DEFAULT_INTRO, GiftIdeasGallery } from '../components/shower/GiftIdeas'
@@ -22,6 +23,8 @@ export default function Ideas() {
   }, [guest])
 
   if (!view) return <PageLoader />
+  // The gift list is the live tab: that's where the gifts are.
+  if (view.listLive) return <Navigate to="/registry" replace />
   const shown = view.visible && !view.private && view.items.length > 0
   return (
     <ShowerShell title={view.title || 'Gift Ideas'} intro={shown ? view.intro || DEFAULT_INTRO : undefined}>

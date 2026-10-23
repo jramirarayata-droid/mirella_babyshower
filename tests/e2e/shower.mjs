@@ -274,14 +274,12 @@ try {
   ok('admin: Show lets you see and change it', (await a.locator('button[aria-pressed="true"]').count()) === 1)
   await a.getByRole('button', { name: 'Hide', exact: true }).click()
   ok('admin: and hide it again', (await a.getByText(/••••••/).count()) === 1)
-  // Admin → Gift Registry: a gift or an idea (photo, title, caption).
+  // Admin → Gift Registry: the gift list tab (gift ideas photos have their own tab — tests/e2e/gift-ideas.mjs).
   await a.goto(`${BASE}#/admin/registry`)
-  await a.getByRole('button', { name: 'Add an idea' }).click()
+  await a.getByRole('button', { name: 'Add a gift' }).click()
   const dlg = a.getByRole('dialog')
-  ok('admin: an idea has a photo upload and a caption', (await dlg.getByText('Upload a photo').count()) === 1 && (await dlg.getByLabel('Caption').count()) === 1 && (await dlg.getByLabel('How many do you need?').count()) === 0)
-  await dlg.getByRole('radio', { name: 'Gift to bring' }).click()
-  ok('admin: a gift has a quantity', (await dlg.getByLabel('How many do you need?').count()) === 1)
-  shots.push(['admin-registry-idea', await dlg.screenshot()])
+  ok('admin: a gift has a photo upload and a quantity', (await dlg.getByText('Upload a photo').count()) === 1 && (await dlg.getByLabel('How many do you need?').count()) === 1)
+  shots.push(['admin-registry-gift', await dlg.screenshot()])
   await dlg.getByRole('button', { name: 'Cancel' }).click()
   // Who can see it — right on the page (same setting as Website Settings → Privacy).
   const who = a.getByRole('radiogroup', { name: 'Who can see the wishlist' })

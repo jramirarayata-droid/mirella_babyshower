@@ -24,6 +24,7 @@ const items = [
 ]
 let ideas = { visible: true, private: false, title: 'Gift Ideas', intro: '', layout: 'cards', items }
 const saves = []
+const added = []
 const regItems = [
   { id: 'i1', kind: 'idea', title: 'Cloud nursery', note: 'Soft blues', link: null, image_url: 'https://example.com/a.jpg', price_hint: null, quantity: 1, sort_order: 0, is_visible: true, created_at: '2026-09-01T00:00:00Z' },
   { id: 'g1', kind: 'gift', title: 'Diapers', note: null, link: null, image_url: null, price_hint: null, quantity: 3, sort_order: 1, is_visible: true, created_at: '2026-09-01T00:00:00Z' },
@@ -43,11 +44,16 @@ async function handle(route) {
     if (fn === 'public_display_prefs') return json({ card: {}, website: {}, sharePreviewUrl: null, raffleVisible: false, monogram: null })
     if (fn === 'gift_ideas_list') return json(ideas)
     if (fn === 'rsvp_extras') return json({})
+    if (fn === 'registry_list') return json({ visible: false, guestVisible: false, ideasLive: true, items: [] })
     return json(null)
   }
   if (p.startsWith('/auth/v1/user')) return json({ id: 'u1', aud: 'authenticated', role: 'authenticated', email: 'admin@test' })
   if (p.startsWith('/realtime') || p.startsWith('/storage')) return json({})
   const table = p.replace('/rest/v1/', '')
+  if (table === 'registry_items' && req.method() === 'POST') {
+    added.push(JSON.parse(req.postData() || '{}'))
+    return json(null, 201)
+  }
   if (table === 'admin_preferences' && req.method() === 'POST') {
     saves.push(JSON.parse(req.postData() || '{}'))
     return json(null, 201)
@@ -90,6 +96,23 @@ try {
   await page.getByRole('heading', { name: 'Gift Ideas' }).scrollIntoViewIfNeeded()
   shots.push(['ideas-polaroid', await page.screenshot()])
 
+  for (const design of ['wishboard', 'tags', 'shelf', 'ribbon']) {
+    ideas = { ...ideas, layout: design }
+    await page.reload()
+    await page.getByRole('heading', { name: 'Gift Ideas' }).waitFor({ timeout: 20000 })
+    const box = page.locator(`[data-design="${design}"]`)
+    await box.waitFor({ timeout: 20000 })
+    const imgs = await box.locator('img').count()
+    ok(`home: the ${design} design shows the photos`, design === 'ribbon' ? imgs === 1 : imgs === 2, String(imgs))
+    await box.scrollIntoViewIfNeeded()
+    await page.waitForTimeout(400)
+    shots.push([`ideas-${design}`, await page.screenshot()])
+  }
+  // Ribbon showcase: next photo, and the full-screen viewer.
+  await page.getByRole('button', { name: 'Next idea' }).click()
+  await page.waitForTimeout(700)
+  ok('ribbon: next shows the second idea', (await page.locator('[data-design="ribbon"]').getByText('Wooden toys').count()) >= 1)
+
   ideas = { ...ideas, visible: false, items: [] }
   await page.reload()
   await page.getByText(/Kindly respond/i).first().waitFor({ timeout: 20000 })
@@ -109,6 +132,9 @@ try {
   await page.reload()
   await page.getByText('Wooden toys').waitFor({ timeout: 20000 })
   ok('page: shows the ideas', (await page.getByText('Cloud nursery').count()) >= 1)
+  await page.goto(`${BASE}#/registry`)
+  await page.waitForURL(/#\/ideas/, { timeout: 20000 }).catch(() => undefined)
+  ok('wishlist page sends guests to the ideas when they are live', /#\/ideas/.test(page.url()), page.url())
   ok('no page errors (guest)', errors.length === 0, errors.join(' | '))
   await ctx.close()
 
@@ -125,16 +151,29 @@ try {
   const aerr = []
   a.on('pageerror', (e) => aerr.push(String(e)))
   await a.goto(`${BASE}#/admin/registry`)
-  const panel = a.getByRole('complementary', { name: 'Gift ideas section' })
-  await panel.waitFor({ timeout: 20000 })
-  await panel.getByRole('radio', { name: 'Hide' }).waitFor({ timeout: 20000 })
-  await panel.getByRole('radio', { name: 'Hide' }).click()
-  await panel.getByRole('radio', { name: /Polaroid wall/ }).click()
+  const live = a.getByRole('radiogroup', { name: 'Guests see' })
+  await live.waitFor({ timeout: 20000 })
+  ok('admin: the gift list is live by default', (await live.getByRole('radio', { name: /Gift list/ }).getAttribute('aria-checked')) === 'true')
+  await live.getByRole('radio', { name: /Gift ideas/ }).click()
   await a.waitForTimeout(1200)
-  const last = saves.filter((s) => s.key === 'gift_ideas').at(-1)?.value
-  ok('admin: Hide and the design are saved', last?.visible === false && last?.layout === 'polaroid', JSON.stringify(last))
-  ok('admin: each panel can keep it off the RSVP confirmation', (await a.getByText('Show on the RSVP confirmation').count()) === 2)
-  shots.push(['admin-ideas', await panel.screenshot()])
+  const reg = saves.filter((x) => x.key === 'registry').at(-1)?.value
+  ok('admin: switching makes gift ideas live', reg?.active === 'ideas', JSON.stringify(reg))
+  ok('admin: the Gift ideas tab opens', (await a.getByRole('tab', { name: /Gift ideas/ }).getAttribute('aria-selected')) === 'true')
+  const panel = a.getByRole('complementary', { name: 'Gift ideas on the website' })
+  await panel.waitFor({ timeout: 20000 })
+  ok('admin: designs made for gift ideas are marked', (await panel.getByText('For gift ideas').count()) === 4)
+  await panel.getByRole('radio', { name: /Gift tags/ }).click()
+  await a.waitForTimeout(1200)
+  const last = saves.filter((x) => x.key === 'gift_ideas').at(-1)?.value
+  ok('admin: the design is saved', last?.layout === 'tags', JSON.stringify(last))
+  ok('admin: the ideas can be kept off the RSVP confirmation', (await panel.getByText('Show on the RSVP confirmation').count()) === 1)
+  // Several photos at once.
+  const svg = (c) => ({ name: `${c}.png`, mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64') })
+  await a.locator('input[type="file"][multiple]').setInputFiles([svg('one'), svg('two')])
+  await a.waitForTimeout(3000)
+  const ideasAdded = added.filter((x) => x.kind === 'idea')
+  ok('admin: several photos upload at once, each as an idea', ideasAdded.length === 2 && ideasAdded.every((x) => x.title === '' && /^https:/.test(x.image_url ?? '')), JSON.stringify(ideasAdded).slice(0, 300))
+  shots.push(['admin-ideas', await a.screenshot({ fullPage: true })])
   ok('no page errors (admin)', aerr.length === 0, aerr.join(' | '))
   await actx.close()
 } catch (e) {
