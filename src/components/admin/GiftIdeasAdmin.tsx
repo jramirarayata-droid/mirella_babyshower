@@ -8,8 +8,6 @@ import { Skeleton } from '../ui/Skeleton'
 import { cn } from '../ui/cn'
 import { useToast } from '../../hooks/useToast'
 import { SavedText, type useAutoSaved } from './ShowerAdminBits'
-import { GuestOnlySwitch } from './GuestOnlySwitch'
-import { OnRsvpSwitch } from './OnRsvpSwitch'
 import { addRegistryItem, deleteRegistryItem, IDEAS_LAYOUTS, reorderRegistry, updateRegistryItem, type AdminRegistryItem, type GiftIdeasSettings, type RegistryItemInput } from '../../services/showerService'
 import { removeAssetByUrl, uploadIdeaPhoto } from '../../services/galleryService'
 import { toFriendlyMessage } from '../../utils/errors'
@@ -180,8 +178,7 @@ export function GiftIdeasAdmin({
           <Skeleton className="h-40" />
         ) : (
           <>
-            <GuestOnlySwitch what="ideas" stacked />
-            <OnRsvpSwitch what="ideas" />
+            <p className="text-sm text-muted">Who sees it is set at the top of this page, for whichever tab is live.</p>
             <TextField label="Title" value={v.title} onChange={(title) => settings.update({ title })} maxLength={80} />
             <TextAreaField label="A short note (optional)" value={v.intro} onChange={(intro) => settings.update({ intro })} maxLength={300} rows={2} placeholder="Just ideas we love — no need to tell us if you choose one." />
             <fieldset>

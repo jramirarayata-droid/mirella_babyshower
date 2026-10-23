@@ -10,7 +10,8 @@ import { SaveStatus } from '../components/ui/SaveStatus'
 import { cn } from '../components/ui/cn'
 import { useToast } from '../hooks/useToast'
 import { ANSWER_LABEL, getRevealSettings, saveRevealSettings, type RevealAnswer, type RevealSettings } from '../services/showerService'
-import { toFriendlyMessage } from '../utils/errors'
+import { FriendlyError, toFriendlyMessage } from '../utils/errors'
+import { SectionAccess } from '../components/admin/SectionAccess'
 import { formatDateTime } from '../utils/formatting'
 
 const ANSWERS: RevealAnswer[] = ['girl', 'boy', 'twin_girls', 'twin_boys', 'twins']
@@ -80,13 +81,18 @@ export default function AdminReveal() {
       ) : (
         <div className="grid items-start gap-6 lg:grid-cols-2">
           <section className="space-y-5 rounded-xl border border-line bg-paper p-5 shadow-soft">
-            <label className="flex items-center justify-between gap-3">
-              <span>
-                <span className="block font-medium text-ink">Show the gender reveal on the website</span>
-                <span className="block text-sm text-muted">A countdown first, then the answer at the reveal time.</span>
-              </span>
-              <input type="checkbox" className="size-5 accent-ink" checked={v.enabled} onChange={(e) => setV({ ...v, enabled: e.target.checked })} />
-            </label>
+            <SectionAccess
+              what="reveal"
+              hidden={!(saved ?? v).enabled}
+              onHiddenChange={async (h) => {
+                const next = { ...v, enabled: !h }
+                if (next.enabled && !next.answer) throw new FriendlyError('Choose the answer first (it stays secret).')
+                await saveRevealSettings(next)
+                setSaved(next)
+                setV(next)
+              }}
+            />
+            <p className="-mt-2 text-xs text-muted">A countdown first, then the answer at the reveal time.</p>
 
             <fieldset>
               <legend className="mb-2 flex w-full items-center justify-between text-sm font-medium text-ink">

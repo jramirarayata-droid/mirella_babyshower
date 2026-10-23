@@ -281,16 +281,19 @@ try {
   ok('admin: a gift has a photo upload and a quantity', (await dlg.getByText('Upload a photo').count()) === 1 && (await dlg.getByLabel('How many do you need?').count()) === 1)
   shots.push(['admin-registry-gift', await dlg.screenshot()])
   await dlg.getByRole('button', { name: 'Cancel' }).click()
-  // Who can see it — right on the page (same setting as Website Settings → Privacy).
-  const who = a.getByRole('radiogroup', { name: 'Who can see the wishlist' })
-  ok('admin: the wishlist page has the “who can see it” choice', (await who.getByRole('radio', { name: /Everyone/ }).getAttribute('aria-checked')) === 'true')
-  await who.getByRole('radio', { name: /Only guests who RSVP/ }).click()
+  // Who sees it — one choice per section, right on its page.
+  const who = a.getByRole('radiogroup', { name: 'Who sees it' })
+  await who.getByRole('radio', { name: /^Website Default/ }).waitFor({ timeout: 15000 })
+  ok('admin: the registry has the five “Who sees it” choices', (await who.getByRole('radio').count()) === 5)
+  await a.waitForTimeout(500)
+  ok('admin: Website is chosen by default', (await who.getByRole('radio', { name: /^Website Default/ }).getAttribute('aria-checked')) === 'true')
+  await who.getByRole('radio', { name: /Attending guests only/ }).click()
   await a.waitForTimeout(800)
-  ok('admin: choosing “attending only” saves it', (await who.getByRole('radio', { name: /Only guests who RSVP/ }).getAttribute('aria-checked')) === 'true')
+  ok('admin: choosing “attending only” saves it', (await who.getByRole('radio', { name: /Attending guests only/ }).getAttribute('aria-checked')) === 'true')
   await a.goto(`${BASE}#/admin/outfits`)
-  const whoAttire = a.getByRole('radiogroup', { name: 'Who can see the outfit photos' })
+  const whoAttire = a.getByRole('radiogroup', { name: 'Who sees it' })
   await whoAttire.waitFor({ timeout: 15000 })
-  ok('admin: What to Wear has the same choice', (await whoAttire.getByRole('radio').count()) === 2)
+  ok('admin: What to Wear has the same choice', (await whoAttire.getByRole('radio').count()) === 5)
   shots.push(['admin-attire-who', await a.screenshot()])
   // The home page shows what guests see, even for a signed-in admin.
   wishlistPrivate = false

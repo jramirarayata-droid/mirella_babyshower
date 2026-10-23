@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
-import { ANSWER_COLOURS, ANSWER_LABEL, getPublicReveal, type PublicReveal } from '../../services/showerService'
+import { ANSWER_COLOURS, ANSWER_LABEL, currentShowerGuest, getPublicReveal, type PublicReveal } from '../../services/showerService'
+import { HostContext } from '../../hooks/hostContext'
 import { RoundCountdown } from '../wedding/looks/LookArt'
 import { Reveal } from '../wedding/Reveal'
 import { Confetti } from '../photos/PetalBurst'
@@ -17,9 +18,11 @@ import { cn } from '../ui/cn'
  */
 export function useGenderReveal(): [PublicReveal | null, () => void] {
   const [reveal, setReveal] = useState<PublicReveal | null>(null)
+  const host = useContext(HostContext)
   const load = useCallback(() => {
-    void getPublicReveal().then(setReveal)
-  }, [])
+    // A guest's pass (invited/attending-only reveals), or the host's code on the big screen.
+    void getPublicReveal(currentShowerGuest()?.token ?? host?.token ?? null).then(setReveal)
+  }, [host?.token])
   useEffect(() => {
     load()
   }, [load])

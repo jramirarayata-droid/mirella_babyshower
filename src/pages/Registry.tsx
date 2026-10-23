@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Check, ExternalLink, Gift, Minus, Plus } from 'lucide-react'
-import { ShowerShell, GuestGate, NotYet, SignedInAs, ForAttending } from '../components/shower/ShowerShell'
+import { ShowerShell, GuestGate, NotYet, SignedInAs, KeptFor } from '../components/shower/ShowerShell'
 import { PageLoader } from '../components/ui/Spinner'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
@@ -93,7 +93,7 @@ export default function Registry() {
               Hi {guest.name.split(' ')[0]}! We don’t have a “yes” from your invitation yet.
             </p>
           )}
-          <ForAttending what="Our gift wishlist" onReady={setGuest} />
+          <KeptFor section="registry" what="Our gift wishlist" onReady={setGuest} />
         </>
       ) : view ? (
         <>

@@ -61,9 +61,6 @@ export function WebsitePrivacyCard() {
           [
             ['hideVenues', 'Keep the venue private', 'Hides the venue section (name, time and map).'],
             ['hideInfo', 'Keep “Good to know” private', 'Hides the information sections below.'],
-            ['hideWishlist', 'Gift wishlist for attending guests only', 'Hidden from the website. Guests who RSVP “attending” get it on their confirmation.'],
-            ['hideAttire', 'What to Wear for attending guests only', 'Hidden from the website. Guests who RSVP “attending” get it on their confirmation.'],
-            ['hideIdeas', 'Gift ideas for attending guests only', 'Hidden from the website. Guests who RSVP “attending” get it on their confirmation.'],
           ] as const
         ).map(([key, label, hint]) => (
           <label key={key} className="flex cursor-pointer items-start gap-3 rounded-lg border border-line p-3 text-sm has-[:checked]:border-champagne has-[:checked]:bg-champagne-light/30">
@@ -75,6 +72,7 @@ export function WebsitePrivacyCard() {
           </label>
         ))}
       </div>
+      <p className="mt-3 text-xs text-muted">Gift Registry, What to Wear, Gender Reveal, Baby Predictions and Name Ideas each have their own “Who sees it” on their page.</p>
       {recommend.length > 0 && (
         <p className="mt-4 flex items-start gap-2 rounded-lg border border-champagne/60 bg-champagne-light/40 p-3 text-sm text-ink-soft">
           <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-gold" />

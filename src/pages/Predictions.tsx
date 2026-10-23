@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { CalendarHeart, Scale, Sparkles } from 'lucide-react'
-import { ShowerShell, GuestGate, NotYet, SignedInAs } from '../components/shower/ShowerShell'
+import { ShowerShell, GuestGate, NotYet, SignedInAs, KeptFor } from '../components/shower/ShowerShell'
 import { PredictionsSummary } from '../components/shower/PredictionsSummary'
 import { PageLoader } from '../components/ui/Spinner'
 import { Button } from '../components/ui/Button'
@@ -27,7 +27,7 @@ export default function Predictions() {
 
   const load = useCallback(async (token?: string | null) => {
     try {
-      const [i, b] = await Promise.all([getPredictionsInfo(token), getPredictionsBoard()])
+      const [i, b] = await Promise.all([getPredictionsInfo(token), getPredictionsBoard(token)])
       setInfo(i)
       setBoard(b)
       setError(null)
@@ -85,6 +85,8 @@ export default function Predictions() {
         <PageLoader label="Loading the game" />
       ) : error && !info ? (
         <p className="text-center text-ink-soft">{error}</p>
+      ) : info && info.private ? (
+        <KeptFor section="predictions" what="The predictions game" onReady={setGuest} />
       ) : info && !info.visible ? (
         <NotYet what="The predictions game" />
       ) : info ? (

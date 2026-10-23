@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { ShowerShell, NotYet, ForAttending } from '../components/shower/ShowerShell'
+import { ShowerShell, NotYet, KeptFor } from '../components/shower/ShowerShell'
 import { PageLoader } from '../components/ui/Spinner'
 import { DEFAULT_INTRO, GiftIdeasGallery } from '../components/shower/GiftIdeas'
 import { currentShowerGuest, getGiftIdeas, type GiftIdeasView, type ShowerGuest } from '../services/showerService'
@@ -31,7 +31,7 @@ export default function Ideas() {
       {!view.visible ? (
         <NotYet what="Our gift ideas" />
       ) : view.private ? (
-        <ForAttending what="Our gift ideas" onReady={setGuest} />
+        <KeptFor section="registry" what="Our gift ideas" onReady={setGuest} />
       ) : view.items.length === 0 ? (
         <p className="text-center text-muted">The ideas are being put together — please check back soon.</p>
       ) : (

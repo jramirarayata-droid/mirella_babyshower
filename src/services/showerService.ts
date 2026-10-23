@@ -209,35 +209,6 @@ export async function getGiftIdeas(token?: string | null): Promise<GiftIdeasView
   }
 }
 
-/** Which "Just for you" links the RSVP confirmation offers (each on unless switched off). */
-export interface RsvpExtras {
-  wishlist: boolean
-  ideas: boolean
-  attire: boolean
-}
-const ALL_EXTRAS: RsvpExtras = { wishlist: true, ideas: true, attire: true }
-const readExtras = (v: unknown): RsvpExtras => {
-  const o = obj(v)
-  return { wishlist: o.wishlist !== false, ideas: o.ideas !== false, attire: o.attire !== false }
-}
-
-/** Guests: never throws (before database update 054 everything stays on, as before). */
-export async function getRsvpExtras(): Promise<RsvpExtras> {
-  const { data, error } = await supabase.rpc('rsvp_extras')
-  if (error) {
-    logError('getRsvpExtras', error)
-    return ALL_EXTRAS
-  }
-  return readExtras(data)
-}
-
-/** Admin: switch one link on or off (reads the latest first, so other switches aren't undone). */
-export async function saveRsvpExtra(what: keyof RsvpExtras, on: boolean): Promise<RsvpExtras> {
-  const next = { ...readExtras(await getAdminPreference('rsvp_extras')), [what]: on }
-  await saveAdminPreference('rsvp_extras', next)
-  return next
-}
-export const getRsvpExtrasAdmin = async (): Promise<RsvpExtras> => readExtras(await getAdminPreference('rsvp_extras'))
 
 export interface GiftIdeasSettings {
   visible: boolean
@@ -253,6 +224,61 @@ export async function getGiftIdeasSettings(): Promise<GiftIdeasSettings> {
 }
 export const saveGiftIdeasSettings = (s: GiftIdeasSettings) =>
   saveAdminPreference('gift_ideas', { visible: s.visible, title: s.title.trim().slice(0, 80), intro: s.intro.trim().slice(0, 300), layout: s.layout })
+
+// who sees each section
+
+/** The sections with a "Who sees it" choice. */
+export type AccessSection = 'registry' | 'attire' | 'reveal' | 'predictions' | 'names'
+/** Who a switched-on section is for (Hidden is each section's own on/off switch). */
+export type Audience = 'website' | 'website_invite' | 'invite' | 'attending'
+const AUDIENCES: Audience[] = ['website', 'website_invite', 'invite', 'attending']
+const SECTIONS: AccessSection[] = ['registry', 'attire', 'reveal', 'predictions', 'names']
+const audience = (v: unknown, fallback: Audience): Audience => (AUDIENCES.includes(v as Audience) ? (v as Audience) : fallback)
+
+/** Admin: who each section is for (until a choice is saved: attending if Privacy kept it for attending guests). */
+export async function getSectionAudiences(): Promise<Record<AccessSection, Audience>> {
+  const [a, w] = await Promise.all([getAdminPreference('section_access'), getAdminPreference('website_privacy')])
+  const o = obj(a)
+  const priv = obj(w)
+  const legacy: Partial<Record<AccessSection, Audience>> = { registry: priv.hideWishlist === true ? 'attending' : 'website', attire: priv.hideAttire === true ? 'attending' : 'website' }
+  return Object.fromEntries(SECTIONS.map((k) => [k, audience(o[k], legacy[k] ?? 'website')])) as Record<AccessSection, Audience>
+}
+
+/** Admin: saves one section's audience (reads the latest first, so other sections aren't undone). */
+export async function saveSectionAudience(what: AccessSection, who: Audience): Promise<void> {
+  const next = { ...(await getSectionAudiences()), [what]: who }
+  await saveAdminPreference('section_access', next)
+  // Kept in step for older screens that read Website Settings → Privacy.
+  if (what === 'registry' || what === 'attire') {
+    const priv = obj(await getAdminPreference('website_privacy'))
+    const closed = who === 'invite' || who === 'attending'
+    await saveAdminPreference('website_privacy', what === 'registry' ? { ...priv, hideWishlist: closed, hideIdeas: closed } : { ...priv, hideAttire: closed })
+  }
+}
+
+export interface GuestSection {
+  who: Audience
+  /** Switched on (and its start date reached). */
+  on: boolean
+  /** This visitor may open it. */
+  open: boolean
+}
+export type GuestSections = Record<AccessSection, GuestSection> & { registryTab: 'list' | 'ideas' }
+
+/** For the invitation page, the RSVP confirmation and the menu. Null if it can't be loaded. */
+export async function getGuestSections(token?: string | null): Promise<GuestSections | null> {
+  const { data, error } = await supabase.rpc('guest_sections', { p_token: token ?? null })
+  if (error) {
+    logError('getGuestSections', error)
+    return null
+  }
+  const o = obj(data)
+  const one = (k: AccessSection): GuestSection => {
+    const x = obj(o[k])
+    return { who: audience(x.who, 'website'), on: x.on === true, open: x.open === true }
+  }
+  return { registry: one('registry'), attire: one('attire'), reveal: one('reveal'), predictions: one('predictions'), names: one('names'), registryTab: obj(o.registry).tab === 'ideas' ? 'ideas' : 'list' }
+}
 
 // admin
 
@@ -389,8 +415,8 @@ export const ANSWER_COLOURS: Record<RevealAnswer, string[]> = {
   twins: ['#F4A7B9', '#8DB8E8', '#F9C9D4', '#B9D5F2'],
 }
 
-export async function getPublicReveal(): Promise<PublicReveal> {
-  const { data, error } = await supabase.rpc('public_gender_reveal')
+export async function getPublicReveal(token?: string | null): Promise<PublicReveal> {
+  const { data, error } = await supabase.rpc('public_gender_reveal', { p_token: token ?? null })
   if (error) {
     logError('getPublicReveal', error)
     return { enabled: false, revealAt: null, revealed: false, answer: null, title: '', message: '', serverNow: null }
@@ -451,6 +477,8 @@ export interface Prediction {
 
 export interface PredictionsInfo {
   visible: boolean
+  /** Switched on, but only for invited or attending guests — and this visitor isn't one (yet). */
+  private: boolean
   open: boolean
   closeAt: string | null
   count: number
@@ -468,7 +496,7 @@ export async function getPredictionsInfo(token?: string | null): Promise<Predict
   const { data, error } = await supabase.rpc('predictions_info', { p_token: token ?? null })
   if (error) fail('getPredictionsInfo', error, 'The predictions couldn’t be loaded. Please try again.')
   const o = obj(data)
-  return { visible: o.visible === true, open: o.open === true, closeAt: str(o.closeAt) || null, count: num(o.count) ?? 0, me: str(o.me) || null, mine: toPrediction(o.mine) }
+  return { visible: o.visible === true, private: o.private === true, open: o.open === true, closeAt: str(o.closeAt) || null, count: num(o.count) ?? 0, me: str(o.me) || null, mine: toPrediction(o.mine) }
 }
 
 export type SaveResult = { ok: true } | { ok: false; reason: 'closed' | 'who' | 'invalid' | 'empty' }
@@ -495,8 +523,8 @@ export interface PredictionsBoard {
   genderRight: string[]
 }
 
-export async function getPredictionsBoard(): Promise<PredictionsBoard> {
-  const { data, error } = await supabase.rpc('predictions_board')
+export async function getPredictionsBoard(token?: string | null): Promise<PredictionsBoard> {
+  const { data, error } = await supabase.rpc('predictions_board', { p_token: token ?? null })
   if (error) fail('getPredictionsBoard', error, 'The results couldn’t be loaded.')
   const o = obj(data)
   const a = obj(o.actual)
@@ -582,6 +610,8 @@ export interface MyNameIdea {
 }
 export interface NameIdeasInfo {
   visible: boolean
+  /** Switched on, but only for invited or attending guests — and this visitor isn't one (yet). */
+  private: boolean
   approval: 'instant' | 'approve'
   perGuest: number
   me: string | null
@@ -596,6 +626,7 @@ export async function getNameIdeasInfo(token?: string | null): Promise<NameIdeas
   const o = obj(data)
   return {
     visible: o.visible === true,
+    private: o.private === true,
     approval: o.approval === 'approve' ? 'approve' : 'instant',
     perGuest: num(o.perGuest) ?? 3,
     me: str(o.me) || null,
@@ -606,8 +637,8 @@ export async function getNameIdeasInfo(token?: string | null): Promise<NameIdeas
   }
 }
 
-export async function listNameIdeas(): Promise<NameIdea[]> {
-  const { data, error } = await supabase.rpc('name_ideas_list')
+export async function listNameIdeas(token?: string | null): Promise<NameIdea[]> {
+  const { data, error } = await supabase.rpc('name_ideas_list', { p_token: token ?? null })
   if (error) fail('listNameIdeas', error, 'The name ideas couldn’t be loaded.')
   return arr(data).map((x) => {
     const r = obj(x)

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Trash2 } from 'lucide-react'
-import { ShowerShell, GuestGate, NotYet, SignedInAs } from '../components/shower/ShowerShell'
+import { ShowerShell, GuestGate, NotYet, SignedInAs, KeptFor } from '../components/shower/ShowerShell'
 import { NameCloud } from '../components/shower/NameCloud'
 import { PageLoader } from '../components/ui/Spinner'
 import { Button } from '../components/ui/Button'
@@ -42,7 +42,7 @@ export default function NameIdeas() {
 
   const load = useCallback(async (token?: string | null) => {
     try {
-      const [i, list] = await Promise.all([getNameIdeasInfo(token), listNameIdeas()])
+      const [i, list] = await Promise.all([getNameIdeasInfo(token), listNameIdeas(token)])
       setInfo(i)
       setIdeas(list)
       setError(null)
@@ -96,6 +96,8 @@ export default function NameIdeas() {
         <PageLoader label="Loading the name ideas" />
       ) : error && !info ? (
         <p className="text-center text-ink-soft">{error}</p>
+      ) : info && info.private ? (
+        <KeptFor section="names" what="Name ideas" onReady={setGuest} />
       ) : info && !info.visible ? (
         <NotYet what="Name ideas" />
       ) : info ? (

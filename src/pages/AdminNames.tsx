@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Eye, EyeOff, Trash2, Tv } from 'lucide-react'
+import { SectionAccess } from '../components/admin/SectionAccess'
 import { PageHeader } from '../components/admin/PageHeader'
-import { SavedText, useAutoSaved, VisibilityField } from '../components/admin/ShowerAdminBits'
+import { SavedText, useAutoSaved, StartField } from '../components/admin/ShowerAdminBits'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { Skeleton } from '../components/ui/Skeleton'
@@ -99,7 +100,12 @@ export default function AdminNames() {
             <Skeleton className="h-48" />
           ) : (
             <>
-              <VisibilityField label="Name ideas page" mode={s.mode} from={s.from} onChange={settings.update} />
+              <SectionAccess
+                what="names"
+                hidden={s.mode === 'hidden'}
+                onHiddenChange={(h) => settings.update({ mode: h ? 'hidden' : 'visible' })}
+                timing={<StartField mode={s.mode} from={s.from} onChange={settings.update} />}
+              />
               <fieldset className="space-y-2 text-sm">
                 <legend className="mb-1 font-medium text-ink">When a guest suggests a name</legend>
                 {(
