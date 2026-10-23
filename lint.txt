@@ -1,0 +1,84 @@
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/admin/SectionWords.tsx
+  20:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/admin/ShowerAdminBits.tsx
+  75:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/invitation/InviteEnvelope.tsx
+  23:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/printables/PrintShared.tsx
+  122:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  271:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  300:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  302:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/raffle/BigReveal.tsx
+  133:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/raffle/BingoGame.tsx
+  99:5  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/raffle/PresentSides.tsx
+  170:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  177:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/seating/FloorPlan.tsx
+  59:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/shower/GenderReveal.tsx
+  20:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/shower/GiftIdeas.tsx
+  23:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  29:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  42:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/shower/ShowerFun.tsx
+  33:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  38:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/space/Locked.tsx
+  11:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/wedding/GuestMenu.tsx
+  18:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  40:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/wedding/MediaSections.tsx
+  14:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/components/wedding/looks/BabyArt.tsx
+  74:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  83:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/hooks/useSpace.tsx
+  45:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/layouts/AdminLayout.tsx
+  138:5  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/pages/AdminLookFeel.tsx
+  99:7  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/pages/AdminOutfits.tsx
+  443:6  warning  React Hook useEffect has a missing dependency: 'suggestedLabel'. Either include it or remove the dependency array. If 'setLabel' needs the current value of 'suggestedLabel', you can also switch to useReducer instead of useState and read 'suggestedLabel' in the reducer  react-hooks/exhaustive-deps
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/pages/AdminPrintables.tsx
+    98:148  warning  React Hook useMemo has an unnecessary dependency: 'settings.theme'. Either exclude it or remove the dependency array                                                                              react-hooks/exhaustive-deps
+   572:9    warning  The 'gtkEdits' logical expression could make the dependencies of useMemo Hook (at line 581) change on every render. To fix this, wrap the initialization of 'gtkEdits' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   573:9    warning  The 'gtkExtra' logical expression could make the dependencies of useMemo Hook (at line 581) change on every render. To fix this, wrap the initialization of 'gtkExtra' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   662:148  warning  React Hook useMemo has an unnecessary dependency: 'settings.theme'. Either exclude it or remove the dependency array                                                                              react-hooks/exhaustive-deps
+   670:6    warning  React Hook useEffect has a missing dependency: 'setShowAll'. Either include it or remove the dependency array                                                                                     react-hooks/exhaustive-deps
+  1386:148  warning  React Hook useMemo has an unnecessary dependency: 'settings.theme'. Either exclude it or remove the dependency array                                                                              react-hooks/exhaustive-deps
+  1517:148  warning  React Hook useMemo has an unnecessary dependency: 'settings.theme'. Either exclude it or remove the dependency array                                                                              react-hooks/exhaustive-deps
+  1781:148  warning  React Hook useMemo has an unnecessary dependency: 'settings.theme'. Either exclude it or remove the dependency array                                                                              react-hooks/exhaustive-deps
+
+/home/runner/work/mirella_babyshower/mirella_babyshower/src/pages/printables/TablePrintables.tsx
+  23:17   warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  25:138  warning  React Hook useMemo has an unnecessary dependency: 'settings.theme'. Either exclude it or remove the dependency array            react-hooks/exhaustive-deps
+
+✖ 38 problems (0 errors, 38 warnings)
+  0 errors and 2 warnings potentially fixable with the `--fix` option.
+

@@ -1,0 +1,703 @@
+PASS fixtures — /tmp/guest-1.jpg 0.9 MB, /tmp/guest-2.jpg 0.9 MB, /tmp/guest-3.jpg 0.9 MB
+PASS photos page asks for name
+PASS unknown name is refused
+PASS “Did you mean …?” offers the close name
+PASS known name starts a session
+PASS the phone remembers the guest
+PASS menu lists pages by name — Shower details, RSVP, Find my seat, Photos, Host mode
+PASS menu greets the remembered guest
+PASS music button shows on photos page — Music on
+PASS 3 photos uploaded
+PASS petals fall after sharing — 26 petals
+PASS photos were shrunk — full 221 KB, 194 KB, 207 KB; thumbs 22 KB, 19 KB, 21 KB; sizes 2048x1536, 2048x1536, 2048x1536, 480x360, 480x360, 480x360
+PASS music started on first tap — Music on
+PASS music button turns it off — Music off
+PASS gallery shows the 3 photos — count 3
+PASS polaroid style: white frames with the name
+PASS new photos are highlighted — 3
+PASS guests see no slideshow / present button
+PASS photo opens full screen
+PASS first batch only — 30 photos on the page
+PASS several photos in one view (masonry) — 5 photos in view
+PASS next batch loads near the end — 90 photos after swiping to the end
+PASS home: shared photos as a swipe strip
+PASS photos follow the new name after an RSVP under another name
+PASS remembered guest skips the name question
+PASS menu: no Raffle for guests, Host mode instead
+PASS after the code, the menu shows the host tools
+PASS old slideshow link asks for the host code
+PASS wrong host code is refused
+PASS host code opens the presentation
+PASS host menu: present guest photos, our photos & videos, raffle
+PASS host sees the present button on the photos page
+PASS no page errors (photos)
+PASS start screen counts the photos
+PASS start screen offers the website music
+PASS no music before Begin
+PASS music starts with Begin
+PASS music loops seamlessly (each pass crossfades into the next) — 5 passes scheduled, overlaps 2.50, 2.50, 2.50 s
+PASS presentation shows a photo with the name
+PASS moves on by itself after about 5 seconds — 1 / 3 → 2 / 3
+PASS music button in the controls
+PASS M turns the music off and on again — off: off,0 · on: on,1
+PASS presentation listens for new guest photos live
+PASS new photo joins the show within seconds — 1.5 s
+PASS new photo is shown next, with the guest’s name — 6.5 s after sharing
+PASS a hidden photo leaves the show
+PASS our photos & films: start screen — S
+
+BABY SANTOS
+
+Our Story
+
+3 PHOTOS · 1 FILM
+
+BEGIN
+BACK
+WITH OUR MUSIC
+
+Opens full screen · ← → to move · Space to pause · M music on/off
+PASS our photos show their captions
+PASS the film comes up in the show
+PASS music steps aside while a film plays — resting, on
+PASS no page errors (presentation)
+PASS home top bar fits a small phone — {"x":0,"y":0,"width":375,"height":61}
+PASS no wedding-day layout (removed for the shower)
+PASS no page errors (home)
+PASS uploaded monogram replaces the initials
+PASS welcome screen shows (autoplay blocked without a tap)
+PASS tap to enter starts the music — Music on
+PASS welcome screen closes
+PASS autoplay starts without a tap when allowed — Music on
+PASS music admin draws the waveform — 226 bars in the chosen part
+PASS music admin shows the part
+PASS preview plays
+PASS admin lists guest photos — tiles 3
+PASS admin offers the Polaroid style
+PASS admin has Present slideshow
+PASS admin slideshow link goes to the presentation
+PASS schedule page lists what guests see
+PASS no backup-copy banner on localhost
+PASS admin: raffle note card shows its preview
+PASS order card lists the main gallery and film — 1 Our Story Main | 2 Our Prenup Film Main
+PASS the new order is saved — ["video","gallery"]
+PASS says it’s saved
+PASS no page errors (admin)
+PASS home follows the saved order (film before gallery) — {"film":1778.140625,"gallery":2753.140625}
+PASS the gallery shows the small copy — https://mock.supabase.test/storage/v1/object/public/guest-photos/t/00000000-0000-4000-8000-791838076002.jpg
+PASS RSVP page highlights the raffle prize
+PASS raffle note sits above the name search — 360 < 610.875
+PASS no page errors (RSVP)
+
+78/78 passed
+PASS names drawn — 65 name lines
+PASS names do not overlap (first names) — 0 overlaps among 65
+PASS downloaded with first names
+PASS downloaded with full names
+PASS emptying a chair removes the seat
+PASS the message says what can be undone — Mark Anthony Aquino taken off Bloom
+
+Undo
+PASS Undo puts the guest back in the same chair — {"id":"new-1","created_at":"2026-10-12T00:00:00Z","guest_id":null,"table_id":"t5","seat_index":0,"invitation_id":"inv-t5-0"}
+PASS Redo empties it again
+PASS Ctrl+Z undoes too
+PASS undo refuses when the seat was changed since
+PASS sidebar open by default — 256
+PASS collapses to icons — 72
+PASS the page gets the room — 72
+PASS opens on hover, over the page
+PASS closes again when the mouse leaves
+PASS remembered after reload
+PASS opens again
+PASS table fits the screen (its scrollbar is visible) — {"bottom":976,"vh":1000,"scrolls":true}
+PASS column headings stay at the top — 0
+PASS no page errors
+
+20/20 passed
+PASS a sample card shows before anyone is ticked
+PASS the print button waits for guests
+PASS guest rows are one line, card editing tucked away
+PASS nothing is pre-filled
+PASS editor opens empty
+PASS suggestions for a couple — Juan & Maria dela Cruz · The dela Cruz Family · Juan & Maria · Tito Juan & Tita Maria
+PASS a suggestion only fills the box
+PASS a title replaces the one in front — Ninong Juan & Tita Maria
+PASS saved to that invitation only — [{"id":"inv-1","body":{"addressed_as":"Juan & Maria dela Cruz"}}]
+PASS suggestions for a family — The Garcia Family · Ramon & Family · Ramon Garcia Jr. & Family
+PASS cancel saves nothing
+PASS card says Juan & Maria dela Cruz
+PASS no “together with” line when addressed
+PASS Tito … & Tita … print on separate lines
+PASS Juan & Maria stays on one line
+PASS attire card shows the labels
+PASS attire photos are sharp enough
+PASS attire guide is one card
+PASS each label printed once
+PASS attire: the gentle-request note is off at first
+PASS attire: the note is at the bottom — A GENTLE REQUEST
+Strong perfume·Smoking near the mom-to-be
+PASS attire: the note fits under the photos
+PASS attire: the list can be changed (commas or lines) — A GENTLE REQUEST
+Slippers·Shorts·Ripped jeans
+PASS attire: the list is saved — {"on":true,"title":"A gentle request","items":"Slippers, Shorts\nRipped jeans"}
+PASS the spread layout is still there
+PASS attire: spread over cards, the note is on the last card only
+PASS attire: the note can be left off
+PASS thank-you card shows the message
+PASS ten copies by default
+PASS message fits
+PASS back is the monogram
+PASS personal thank-you uses the addressed-as
+PASS the print bar and the settings stay on screen while scrolling the preview — {"bar":16,"settings":-32,"settingsBottom":936,"vh":1000}
+PASS search finds part of a name — 1
+PASS search finds an included guest, any case
+PASS search says when no one matches
+PASS the back shows Good to know from the website
+PASS Good to know: gold marks the selected word — ==Pastels== or your team colour, pink or blue.
+PASS Good to know prints the gold word
+PASS Good to know edited for print
+PASS the website keeps its own text
+PASS your own Good to know is printed
+PASS saved for print only — {"e":{"g1":{"title":"What to wear","body":"==Pastels== or your team colour, pink or blue."}},"x":[{"id":"own-mvli240q","title":"Parking","body":"Free parking at the venue."}]}
+PASS our details: date and monogram off on the back — Baby Santos
+KINDLY RSVP
+SCAN TO RSVP
+localhost:4173
+Personal QR for Juan dela Cruz
+GOOD TO KNOW
+What to wear
+Pastels or 
+PASS the front keeps names and date
+PASS the venue can be left off the front
+PASS venue editor starts from the website’s text — Sample Garden Venue · 2:00 PM
+PASS Bold marks the selected place name — **Sample Garden Venue** · 2:00 PM
+PASS preview shows it in bold
+PASS Ctrl+I makes the time italic — **Sample Garden Venue** · __2:00 PM__
+PASS Bold again takes it off — Sample Garden Venue · __2:00 PM__
+PASS the card prints the place name in bold
+PASS no marks are printed
+PASS the website keeps its venue text
+PASS venue shows “Edited”
+PASS saved for print only — {"ceremony":"**Sample Garden Venue** · __2:00 PM__"}
+PASS my paper starts at exact A4
+PASS says the sheet is 1 mm longer — My paper measures
+×
+cm
+
+Your sheet is 1.0 mm longer on the long side — the design is centred on it. Backs still off? Use the line-up test under Print. Exact A4
+PASS the sheet is centred on the real paper (0.5 mm) — position:absolute;inset:0;transform:translate(0.5mm,0mm)
+PASS a wild measurement is refused
+PASS my paper is saved — {"a4":{"w":210,"h":298}}
+PASS the Printing section opens straight after typing the size
+PASS invitations have the back line-up
+PASS the back moves by 0.1 mm steps — <div data-paper-shift="" style="position:absolute;inset:0;transform:translate(0.5mm,0mm)"><div style="position:absolute;inset:0;transform:translate(-1.2mm,0.3mm)"><div style="position:absolute;left:15
+PASS the front does not move
+PASS the line-up test replaces the cards
+PASS print button prints the test
+PASS the test back carries the same shift
+PASS exact A4 again
+PASS “Lining up both sides” shows with Fronts, inside a 1280 px window — {"x":313,"y":253.25,"width":362,"height":136.9375}
+PASS “Line-up test” shows with Fronts, inside a 1280 px window — {"x":313,"y":406.1875,"width":362,"height":136.9375}
+PASS Hide removes the border from the cards — 3 → 1
+PASS corner marks for cutting stay
+PASS border choice is saved — false
+PASS Show brings it back
+PASS fits my envelope: smaller than 5×7 for 3 cards — Envelope inside — width in Envelope inside — height in Cards in each envelope Each card’s thickness mm Cards print at 12.2 × 17.1 cm — 4 mm of room plus the stack (1.05 mm).
+PASS the card prints at that size — 121.9
+PASS more cards in the envelope → a smaller card
+PASS envelope: date and venue off, names stay — FOR THE BABY · WITH LOVE Baby Santos A WISH FOR THE BABY FROM GLUE · FOLDS INSIDE GLUE · FOLDS INSIDE Print at 100% (Actual size) — this bar should measure 5 cm
+PASS prints as designed by default
+PASS as designed: the card background prints — rgb(250, 252, 254)
+PASS no paper colour picker as designed
+PASS paper colours offered, with the motif
+PASS champagne paper by default
+PASS coloured paper: no background printed — rgba(0, 0, 0, 0)
+PASS the preview shows the paper colour — #EADBC0 · rgb(234, 219, 192) · multiply
+PASS seal and ornaments have no fill
+PASS the paper colour is never printed — rgb(255, 255, 255) · none
+PASS kraft: the gold prints a shade deeper
+PASS kraft: no dark-paper warning
+PASS dark paper gets a warning
+PASS a custom colour shows on the preview
+PASS saved with your setup — {"paper":"a4","design":null,"printOn":"coloured","paperColour":"#A8977A","size":"5x7","qrPlace":"back","backIds":null,"boldIds":[],"printSide":"front","showPosi
+PASS envelope: no paper fill, light woven band — 3 · 0 · 2
+PASS attire: photo frames are a fine line, no white or shadow — rgb(212, 225, 240) 0px 0px 0px 0.944882px inset
+PASS back to as designed
+PASS paper sizes show their dimensions — A4 · 210 × 297 mm (8.3 × 11.7 in) | Letter · 8.5 × 11 in (216 × 279 mm) | Legal · 8.5 × 14 in (216 × 356 mm)
+PASS Letter: landscape 11 × 8.5 in sheet, 2 cards that fit — {"width":"279.4mm","n":2,"fits":true}
+PASS Letter: the print dialog gets the Letter page size
+PASS Letter: the envelope fits the sheet — {"width":"279.4mm","n":1,"fits":true}
+PASS Letter is saved with your setup — letter
+PASS envelope: GLUE marks on the two inside flaps
+PASS envelope: no GLUE on the back
+PASS envelope: folding steps say inwards
+PASS name cards: nothing ticked yet
+PASS name cards: 9 stands on 5 sheets — 5
+PASS name cards: the name reads on both faces
+PASS name cards: one face upside down
+PASS name cards: shows the table from Seating
+PASS name cards: extra names with their table
+PASS name cards: included guests too
+PASS name cards: 4 per sheet
+PASS table names: 4 names → 2 fronts + 2 backs — 4
+PASS table names: front left card is Godparents — [["12mm",true],["154.5mm",false]]
+PASS table names: its back is on the mirrored side — [["154.5mm",true],["12mm",false]]
+PASS table names: the printer offset moves the back — [["156mm",true],["13.5mm",false]]
+PASS table names: the front stays put
+PASS line-up test: front and back
+PASS table names: big stand, one per sheet
+PASS leaflets: start from a ready-made one
+PASS leaflets: info card, 4 per sheet — 4
+PASS leaflets: three QR codes each
+PASS leaflets: fits
+PASS leaflets: a new block shows on the card
+PASS leaflets: program prints both sides — 4
+PASS leaflets: program lines
+PASS leaflets are saved — 2
+PASS no page errors (table printables)
+PASS admin shows the layout choice
+PASS pairs show one label each
+PASS no per-photo label boxes when side by side
+PASS a pair label is saved to both photos — [{"table":"outfit_images","id":"o3","body":{"label":"Team Pink"}},{"table":"outfit_images","id":"o6","body":{"label":"Team Pink"}}]
+PASS tabs layout brings back per-photo labels
+PASS no page errors (printables)
+PASS website shows four pairs
+PASS one label per pair
+PASS no For Him / For Her tabs
+PASS all photos load in 3:4 — ["attire/sponsors-him.jpg","attire/sponsors-her.jpg","attire/family-him.jpg","attire/family-her.jpg","attire/guests-him.jpg","attire/guests-her.jpg","attire/look4-him.jpg","attire/look4-her.jpg"]
+PASS enlarged view shows the pair
+PASS tabs layout still works
+PASS no page errors (website)
+PASS online envelope is addressed
+PASS others keep their usual name
+PASS no page errors (online)
+
+144/144 passed
+PASS Present goes true full screen
+PASS full-screen and close buttons
+PASS lists beside the wheel
+PASS winners list starts empty
+PASS Present fits the screen (1600 × 900) — 900 ≤ 900
+PASS five names knocked out on the left — 5
+PASS newest knocked-out name on top — Ana Santos / Ana Santos
+PASS wheel shows 3 left
+PASS reveal holds the winners list
+PASS 3rd place joins the winners after the reveal — 3RD PLACE
+
+Ben Reyes
+
+₱2,000
+PASS Escape on a reveal doesn’t close Present
+PASS three winners, newest on top — WINNER Faye Mendoza ₱10,000 | 2ND PLACE Hana Castillo ₱5,000 | 3RD PLACE Ben Reyes ₱2,000
+PASS the winner gets the crown and the prize
+PASS places aren’t in the knocked-out list
+PASS round complete
+PASS Present fits the screen (1280 × 720) — 720 ≤ 720
+PASS Present fits the screen (1920 × 1080) — 1080 ≤ 1080
+PASS Close leaves full screen and Present
+PASS Bingo Present goes true full screen
+PASS Bingo Close leaves full screen
+PASS no page errors
+
+21/21 passed
+PASS confirm waits for a choice
+PASS himself is not offered — Carmina Pugay
+with Vishal Arya
+Family
+Mom | Violeta Pugay
+Family
+Mom | Gerry Santos
+Dad
+PASS same side listed first — Carmina Pugay
+with Vishal Arya
+Family
+Mom | Violeta Pugay
+Family
+Mom | Gerry Santos
+Dad
+PASS search narrows the list
+PASS search finds by included guest too
+PASS explains the move — What happens
+Arielito Pugay joins Violeta Pugay’s invitation as an included guest, and Arielito Pugay’s own invitation is removed.
+Keeps their chair at Family in Seating.
+The position on their own card (“Father of the Bride”) is kept aside and comes back if you separate them again.
+Their link still works — it now opens Violeta Pugay’s invitation (opened 3 times so far).
+
+Changed your mind later? Edit Violeta Pugay’s invitation and choose “Own invitation” next to Arielito Pugay.
+PASS keeps the chair
+PASS no entourage wording — What happens
+Arielito Pugay joins Violeta Pugay’s invitation as an included guest, and Arielito Pugay’s own invitation is removed.
+Keeps their chair at Family in Seating.
+The position on their own card (“Father of the Bride”) is kept aside and comes back if you separate them again.
+Their link still works — it now opens Violeta Pugay’s invitation (opened 3 times so far).
+
+Changed your mind later? Edit Violeta Pugay’s invitation and choose “Own invitation” next to Arielito Pugay.
+PASS old link still works
+PASS how to undo later
+PASS asks the database once, with the right two — [{"fn":"admin_include_invitation","a":{"p_from":"inv-a","p_into":"inv-v"}}]
+PASS Arielito’s own row is gone
+PASS listed under Violeta
+PASS undo separates the same guest — {"fn":"admin_separate_guest","a":{"p_guest":"g-inv-a"}}
+PASS his row is back, with his old link
+PASS second include uses his current invitation
+PASS form says he had his own invitation
+PASS edit form steps aside
+PASS says the old link comes back
+PASS separated
+PASS friendly message before migration 039
+PASS dialog stays open to try again
+PASS no page errors
+
+23/23 passed
+PASS “Invite & print” groups Invitations, Printables and Share & QR — [["",["Dashboard"]],["Invite & print",["Invitations","Printables","Share & QR"]],["Guests",["Responses","Extra guests","RSVP Questions","Seating"]],["Shower fun",["Gift Registry","Gender Reveal","Predictions","Name Ideas","Raffle & Bingo"]],["Website",["Photos & Video","Guest Photos","Music","What to Wear","Schedule","Page Order","Look & Feel","Website Settings"]]]
+PASS “Additional Guests” is now “Extra guests”
+PASS “All changes saved” before editing — All changes saved
+PASS “Unsaved changes” after editing
+PASS leaving asks first, naming what’s unsaved
+PASS “Stay” keeps you on the page with your edit
+PASS “Leave without saving” goes on
+PASS no question when nothing is unsaved
+PASS Ctrl+K opens quick search
+PASS finds an included guest, and says whose invitation — Maria dela Cruz
+Included in Juan dela Cruz’s invitation · No reply yet
+PASS Enter opens Invitations, already searched
+PASS finds pages too
+PASS delete is red — rgb(162, 87, 79)
+PASS every control shows a focus outline when reached with Tab
+PASS no page errors
+
+15/15 passed
+PASS classic: page still uses the “classic” style — classic
+PASS maison-noir: page still uses the “maison” style — maison
+PASS deco-sunshine: page still uses the “deco” style — deco
+PASS heritage-capiz: page still uses the “heritage” style — heritage
+PASS clouds-blue: home page uses the Over the Moon look — clouds
+PASS clouds-blue: the baby’s name shows
+PASS clouds-blue: the countdown to the shower is on the page
+PASS clouds-blue: no sideways scrolling on a phone
+PASS clouds-blue: RSVP page opens with its name search
+PASS clouds-blue: Find My Seat opens with its search
+PASS clouds-pink: home page uses the Over the Moon look — clouds
+PASS clouds-pink: the baby’s name shows
+PASS clouds-lilac: home page uses the Over the Moon look — clouds
+PASS clouds-lilac: the baby’s name shows
+PASS clouds-neutral: home page uses the Over the Moon look — clouds
+PASS clouds-neutral: the baby’s name shows
+PASS Over the Moon: admin pages stay in the classic style — classic
+PASS Over the Moon: Printables design stays “classic” — classic
+PASS balloons-pastel: home page uses the Oh Baby! Balloons look — balloons
+PASS balloons-pastel: the baby’s name shows
+PASS balloons-pastel: the countdown to the shower is on the page
+PASS balloons-pastel: no sideways scrolling on a phone
+PASS balloons-pastel: RSVP page opens with its name search
+PASS balloons-pastel: Find My Seat opens with its search
+PASS balloons-blue: home page uses the Oh Baby! Balloons look — balloons
+PASS balloons-blue: the baby’s name shows
+PASS balloons-pink: home page uses the Oh Baby! Balloons look — balloons
+PASS balloons-pink: the baby’s name shows
+PASS balloons-sage: home page uses the Oh Baby! Balloons look — balloons
+PASS balloons-sage: the baby’s name shows
+PASS Oh Baby! Balloons: admin pages stay in the classic style — classic
+PASS Oh Baby! Balloons: Printables design stays “classic” — classic
+PASS arch-terracotta: home page uses the Boho Rainbow look — arch
+PASS arch-terracotta: the baby’s name shows
+PASS arch-terracotta: the countdown to the shower is on the page
+PASS arch-terracotta: no sideways scrolling on a phone
+PASS arch-terracotta: RSVP page opens with its name search
+PASS arch-terracotta: Find My Seat opens with its search
+PASS arch-blush: home page uses the Boho Rainbow look — arch
+PASS arch-blush: the baby’s name shows
+PASS arch-sage: home page uses the Boho Rainbow look — arch
+PASS arch-sage: the baby’s name shows
+PASS arch-blue: home page uses the Boho Rainbow look — arch
+PASS arch-blue: the baby’s name shows
+PASS Boho Rainbow: admin pages stay in the classic style — classic
+PASS Boho Rainbow: Printables design stays “classic” — classic
+PASS leaf-ivory: home page uses the Sweet Greenery look — leaf
+PASS leaf-ivory: the baby’s name shows
+PASS leaf-ivory: the countdown to the shower is on the page
+PASS leaf-ivory: no sideways scrolling on a phone
+PASS leaf-ivory: RSVP page opens with its name search
+PASS leaf-ivory: Find My Seat opens with its search
+PASS leaf-sage: home page uses the Sweet Greenery look — leaf
+PASS leaf-sage: the baby’s name shows
+PASS leaf-blue: home page uses the Sweet Greenery look — leaf
+PASS leaf-blue: the baby’s name shows
+PASS leaf-blush: home page uses the Sweet Greenery look — leaf
+PASS leaf-blush: the baby’s name shows
+PASS Sweet Greenery: admin pages stay in the classic style — classic
+PASS Sweet Greenery: Printables design stays “classic” — classic
+PASS garden-blush: home page uses the Little Blossom look — garden
+PASS garden-blush: the baby’s name shows
+PASS garden-blush: the countdown to the shower is on the page
+PASS garden-blush: no sideways scrolling on a phone
+PASS garden-blush: RSVP page opens with its name search
+PASS garden-blush: Find My Seat opens with its search
+PASS garden-peach: home page uses the Little Blossom look — garden
+PASS garden-peach: the baby’s name shows
+PASS garden-lilac: home page uses the Little Blossom look — garden
+PASS garden-lilac: the baby’s name shows
+PASS garden-ivory: home page uses the Little Blossom look — garden
+PASS garden-ivory: the baby’s name shows
+PASS Little Blossom: admin pages stay in the classic style — classic
+PASS Little Blossom: Printables design stays “classic” — classic
+PASS Look & Feel offers “Over the Moon”
+PASS Over the Moon: 4 colour choices — 4
+PASS Over the Moon: the live preview shows the look — clouds
+PASS Look & Feel offers “Oh Baby! Balloons”
+PASS Oh Baby! Balloons: 4 colour choices — 4
+PASS Oh Baby! Balloons: the live preview shows the look — balloons
+PASS Look & Feel offers “Boho Rainbow”
+PASS Boho Rainbow: 4 colour choices — 4
+PASS Boho Rainbow: the live preview shows the look — arch
+PASS Look & Feel offers “Sweet Greenery”
+PASS Sweet Greenery: 4 colour choices — 4
+PASS Sweet Greenery: the live preview shows the look — leaf
+PASS Look & Feel offers “Little Blossom”
+PASS Little Blossom: 4 colour choices — 4
+PASS Little Blossom: the live preview shows the look — garden
+PASS nothing was saved while trying looks
+PASS no page errors
+
+91/91 passed
+PASS a broken guest page shows the friendly page, not a blank screen
+PASS …with the baby’s name and the venue — Baby Santos
+
+MARCH 13, 2027
+
+Something went wrong on this page.
+
+It’s not you — please try again. Your details are safe.
+
+TRY AGAIN
+GO TO THE HOME PAGE
+Find my 
+PASS “Try again” brings the page back
+PASS “Go to the home page” works
+PASS a broken admin page shows its own message
+PASS …and the admin menu is still there
+PASS “Try again” brings the admin page back
+PASS a page file that can’t download shows the friendly page (after one automatic reload) — file requested 2×
+PASS the offline helper starts
+PASS the page tells guests to look their seat up before leaving home
+PASS online: the seat is found
+PASS …and the guest is told it’s saved on their phone
+PASS offline: Find My Seat still opens
+PASS offline: it shows the saved seat with a “no signal” note
+PASS offline: nothing was fetched from the server
+PASS only the site’s own files and fonts are kept — no wedding or admin data — 16 files kept
+PASS back online: the seat is looked up fresh, not from the saved copy — look-ups 1
+
+17/17 passed
+PASS the guest home page makes no Google calls — 0
+PASS Guest Photos has a “Save to Google Drive” button
+PASS first time: it asks for the Google Client ID
+PASS a wrong-looking Client ID is caught
+PASS the Client ID is saved in the admin settings — {"clientId":"123456789012-abcdefghijk.apps.googleusercontent.com"}
+PASS …and the window tells you to keep the page open
+PASS Google sign-in asks only for the drive.file permission — [{"client_id":"123456789012-abcdefghijk.apps.googleusercontent.com","scope":"https://www.googleapis.com/auth/drive.file"}]
+PASS a Drive folder “Baby Santos — Guest Photos” is made — ["Baby Santos — Guest Photos"]
+PASS only shown guest photos are saved (3 of 5) — 3
+PASS file names carry who shared the photo — Tita Baby — 2026-12-19 18.42 — gp0001.jpg | Juan dela Cruz — 2026-12-19 18.42 — gp0002.jpg | Maria Jose — 2026-12-19 18.42 — gp0005.jpg
+PASS names are made safe for Drive (no “/”) — Tita Baby — 2026-12-19 18.42 — gp0001.jpg | Juan dela Cruz — 2026-12-19 18.42 — gp0002.jpg | Maria Jose — 2026-12-19 18.42 — gp0005.jpg
+PASS the window shows the result with a link to the folder
+PASS running again uploads nothing that’s already there
+PASS …and only adds new photos — 1 new
+PASS the same folder is reused
+PASS closing the tab while saving asks first
+PASS Cancel stops part-way — 16 in folder
+PASS finishing later saves the rest with no duplicates — 28 files, 28 distinct
+PASS an expired Google sign-in gives a clear “click again” message
+PASS Photos & Video has a “Save to Google Drive” button
+PASS a separate folder “Baby Santos — Our Photos” is made
+PASS your photos are saved, sample photos are not (3 of 4) — Our Photos — 001 — At the beach.jpg | Our Photos — 002.png | Prenup Shoot — 001 — Prenup.jpg
+PASS names follow the gallery and its sections — Our Photos — 001 — At the beach.jpg | Our Photos — 002.png | Prenup Shoot — 001 — Prenup.jpg
+PASS a big photo (over 4 MB) goes up in full
+PASS no page errors
+
+25/25 passed
+PASS both cards start hidden
+PASS verse preview updates
+PASS verse saved to the settings — {"verse_visible":true,"verse_text":"Love is patient, love is kind.\nIt always protects, always trusts, always hopes, always perseveres.","verse_reference":"1 Corinthians 13:4, 7"}
+PASS verse now shows as Showing
+PASS a typical program fills in
+PASS the first moment takes the start time
+PASS an unnamed moment is caught
+PASS program saved in its own table, in order — ["Welcome & Snacks","Opening Prayer","Shower Games","Baby Predictions","Gender Reveal","Lunch / Merienda","Diaper Raffle","Wishes for the Baby","Send-off"]
+PASS moved moment keeps its new place — Welcome & Snacks | Opening Prayer | Shower Games | Baby Predictions | Gender Reveal | Lunch / Merienda | Diaper Raffle | Wishes for the Baby | Send-off
+PASS removed moments are cleaned up after saving
+PASS program switched on
+PASS a removed moment is deleted — Welcome & Snacks | Opening Prayer | Shower Games | Baby Predictions | Gender Reveal | Lunch / Merienda | Diaper Raffle | Wishes for the Baby
+PASS no page errors (admin)
+PASS verse is highlighted on the website
+PASS program shows on the website
+PASS order: introduction → verse → … → venues → program → details — {"intro":-1867.09375,"verse":-1162.3125,"venues":-775.5,"program":-118.734375,"info":962.859375}
+PASS no page errors (website)
+PASS hidden: no verse, no program
+PASS hidden: the program isn’t even fetched
+PASS program leaflet prints the program from Website Settings
+PASS the block says where it comes from
+PASS the back carries the Bible verse
+PASS leaflet fits
+PASS no page errors (printables)
+
+24/24 passed
+PASS wishlist shows what is still needed
+PASS nobody’s name shows on an item
+PASS “I’ll bring this” asks who you are first
+PASS an unknown name is not let in
+PASS signing in finishes the claim, with the number chosen — {"fn":"registry_claim","args":{"p_token":"tttttttttttttttttttttttttttttttttttttttt","p_item":"r1","p_qty":2}}
+PASS the guest stays signed in after the claim
+PASS the guest pass is remembered
+PASS the last one taken by someone else: a kind message
+PASS the sold-out item shows as taken care of
+PASS undo frees it again
+PASS predictions: no second sign-in
+PASS a guess is saved — {"fn":"prediction_save","args":{"p_token":"tttttttttttttttttttttttttttttttttttttttt","p_due":"2027-04-18","p_weight":3.25,"p_gender":"girl"}}
+PASS the guess can be updated later
+PASS a name idea is sent — {"fn":"name_idea_add","args":{"p_token":"tttttttttttttttttttttttttttttttttttttttt","p_suggestion":"Sofia","p_for":"girl","p_note":""}}
+PASS your ideas are listed with a count
+PASS before: a countdown, no answer anywhere
+PASS the answer is never sent early
+PASS shower activities are linked from home
+PASS after: the secret is out
+PASS no page errors (guest)
+PASS private: no wishlist card or attire on the home page
+PASS private wishlist: asks to RSVP, shows no items
+PASS private What to Wear: asks to RSVP
+PASS attending guest: the wishlist opens
+PASS wishlist page: gifts only, no ideas
+PASS attending guest: What to Wear opens
+PASS no page errors (guest-only)
+PASS admin: the answer is masked
+PASS admin: Show lets you see and change it
+PASS admin: and hide it again
+PASS admin: a gift has a photo upload and a quantity
+PASS admin: the registry has the five “Who sees it” choices
+PASS admin: Website is chosen by default
+PASS admin: choosing “attending only” saves it
+PASS admin: What to Wear has the same choice
+PASS admin on the home page: a hidden wishlist doesn’t show there
+PASS no page errors (admin)
+
+37/37 passed
+PASS root shows the sign-in card
+PASS root shows the three plans
+PASS plan prices show in pesos
+PASS a plan on sale shows the sale price and what you save
+PASS root sends no space header
+PASS a wrong password is refused kindly
+PASS username sign-in goes to /baby-cruz/#/admin
+PASS dashboard shows her plan
+PASS dashboard shows guests used of the limit
+PASS requests carry the x-space header
+PASS Little Sprout: Predictions admin shows the upgrade card
+PASS guest home of a shower opens at its address
+PASS Little Sprout: no predictions card for guests
+PASS Little Sprout: no gender reveal section
+PASS Little Sprout: /predict tells guests it isn’t part of this shower
+PASS a switched-off shower rests for guests
+PASS an unknown address says so
+PASS owner signs in to the owner page
+PASS owner sees every shower
+PASS owner sees Plans & discounts with the sale on
+PASS the web address follows the name
+PASS creating a shower saves slug, plan and on/off — {"fn":"owner_save_space","p_id":null,"p_slug":"baby-reyes","p_title":"Baby Reyes","p_plan":"sprout","p_active":true,"p_until":null,"p_notes":""}
+PASS creating a login calls the server with username and a password — {"action":"create","username":"reyes","password":"daisy-cloud-6254","displayName":"","spaceId":null}
+PASS the message to send includes the username
+PASS no page errors
+
+25/25 passed
+PASS open link: the page asks for your name, not a guest-list search
+PASS open link: the button says Continue
+PASS a first name alone asks for the last name (no search yet)
+PASS a new name goes straight to the invitation (no extra step, no red message)
+PASS companions: up to the limit the customer set
+PASS saved as an open sign-up with name, mobile and companion — {"p_name":"Mark Reyes","p_attendance_status":"attending","p_has_transportation":null,"p_needs_transportation":null,"p_vehicle_type":null,"p_coming_from":null,"p_food_preferences":[],"p_has_food_restrictions":null,"p_food_restrictions":null,"p_accessibility_needs":null,"p_additional_guests":["Ana Reyes"],"p_message_to_couple":null,"p_mobile_number":"+639171234567","p_custom_answers":{}}
+PASS not saved through the guest-list function
+PASS companion request is acknowledged
+PASS a name already here opens their own invitation
+PASS close spelling: “No, I’m new” continues as the typed name
+PASS no page errors (guest)
+PASS admin: "How guests RSVP" is the first thing in Website Settings
+PASS admin: open link is blocked while the list has names
+PASS admin: removing needs the word typed
+PASS admin: after clearing, the open link is in use
+PASS no page errors (admin)
+
+16/16 passed
+PASS home: RSVP moved above the venue — 1617.59375 < 2595.171875
+PASS home: sections not in the saved list keep their usual place after it — 2595.171875 < 3595.625
+PASS home: a label inside a section can be changed too
+PASS home: a section’s own small line shows
+PASS home: the venue section uses its own title
+PASS home: no page background unless switched on
+PASS background: the photo layer is there when switched on
+PASS background: it stays still (fixed) behind the page
+PASS background: still covers the screen after scrolling — {"x":0,"y":0,"width":390,"height":844}
+PASS background: shows through the front page when it has no photo — rgba(0, 0, 0, 0)
+PASS no page errors (home)
+PASS admin: lists the sections in the saved order — intro,verse,reveal,media:gallery,media:video,guestPhotos,rsvp,venue,program,info,attire,ideas,fun,gift
+PASS admin: says what each section shows
+PASS admin: the menu has Page Order
+PASS admin: saves the new order — intro,verse,reveal,media:gallery,media:video,guestPhotos,venue,rsvp,program,info,attire,ideas,fun,gift
+PASS admin: the section’s words show what is saved
+PASS admin: empty boxes show the usual words
+PASS admin: saving keeps the other sections’ words — {"intro":{"eyebrow":"Welcome, friends"},"info":{"title":"Little Things to Know","eyebrow":"Before you come"},"venue":{"mapButton":"Open the map"}}
+PASS admin: Website Settings has words for the introduction, venue note, information and RSVP
+PASS Look & Feel: page background starts as None
+PASS Look & Feel: front-page photo needs a photo first
+PASS no page errors (admin)
+
+22/22 passed
+PASS home: the ideas have their own section
+PASS home: idea cards show title and caption
+PASS home: a gallery design shows the photos
+PASS home: the wishboard design shows the photos — 2
+PASS home: the tags design shows the photos — 2
+PASS home: the shelf design shows the photos — 2
+PASS home: the ribbon design shows the photos — 1
+PASS ribbon: next shows the second idea
+PASS home: switched off = no section
+PASS home: attending guests only = not shown to others
+PASS page: asks others to RSVP first
+PASS page: shows the ideas
+PASS wishlist page sends guests to the ideas when they are live — http://localhost:4173/#/ideas
+PASS no page errors (guest)
+PASS admin: the gift list is live by default
+PASS admin: switching makes gift ideas live — {"mode":"visible","from":null,"title":"Gift Wishlist","intro":"","active":"ideas"}
+PASS admin: the Gift ideas tab opens
+PASS admin: designs made for gift ideas are marked
+PASS admin: the design is saved — {"visible":true,"title":"Gift Ideas","intro":"","layout":"tags"}
+PASS admin: who sees it is set once, at the top
+PASS admin: several photos upload at once, each as an idea — [{"kind":"idea","title":"","note":null,"link":null,"image_url":"https://mock.supabase.test/storage/v1/object/public/wedding-assets/ideas/ec9dc262-4729-4576-b7de-fcf24e9853e7.png","price_hint":null,"quantity":1,"is_visible":true,"sort_order":1},{"kind":"idea","title":"","note":null,"link":null,"image
+PASS no page errors (admin)
+
+22/22 passed
+PASS admin: five choices — Hidden | Website | Website + invitation | Invited guests only | Attending guests only
+PASS admin: Website by default
+PASS admin: “When it starts” shows while it isn’t hidden
+PASS admin: Invited guests only is saved — {"key":"section_access","value":{"registry":"website","attire":"website","reveal":"website","predictions":"invite","names":"website"},"updated_at":"2026-10-23T21:54:56.262Z"}
+PASS admin: Hidden switches the section off — {"key":"predictions","value":{"mode":"hidden","from":null,"closeAt":null,"birthDate":null,"weightKg":null},"updated_at":"2026-10-23T21:54:57.581Z"}
+PASS admin: “When it starts” is gone while hidden
+PASS no page errors (admin)
+PASS guest: invited-only asks for their name
+PASS guest: attending-only asks them to RSVP
+PASS no page errors (guest)
+
+10/10 passed
+PASS the link sign-up shows "No side"
+PASS the others keep Mom / Dad
+PASS the head count lists No side
+PASS the "No side" filter shows only them — Lia Santos
+Signed up via link
+	No side	—	—	0	Pending	Not yet	Active	Sep 1, 2026	
+Copy invitation
+Edit
+Include in…
+View RSVP
+Print
+Delete
+PASS no page errors
+
+5/5 passed
