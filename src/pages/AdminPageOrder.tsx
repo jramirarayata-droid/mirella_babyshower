@@ -16,7 +16,7 @@ import { listVisibleGallery } from '../services/galleryService'
 import { listProgram } from '../services/programService'
 import { listVisibleOutfits } from '../services/outfitService'
 import { getPublicGift } from '../services/giftService'
-import { getPublicReveal, getRegistry, getPredictionsInfo, getNameIdeasInfo, getRegistrySettings, listRegistryAdmin } from '../services/showerService'
+import { getPublicReveal, getRegistry, getPredictionsInfo, getNameIdeasInfo, getRegistrySettings, listRegistryAdmin, getSectionAudiences, type AccessSection } from '../services/showerService'
 import { getGuestPhotosInfo } from '../services/guestPhotosService'
 import { getWebsitePrivacy } from '../services/adminDisplayService'
 import type { WeddingSettings } from '../types/wedding'
@@ -55,7 +55,7 @@ export default function AdminPageOrder() {
   const load = useCallback(async () => {
     try {
       const s = await getWeddingSettings()
-      const [media, gallery, program, outfits, gift, reveal, registry, predictions, names, photos, privacy, ideasCfg, regItems] = await Promise.all([
+      const [media, gallery, program, outfits, gift, reveal, registry, predictions, names, photos, privacy, ideasCfg, regItems, aud] = await Promise.all([
         listMediaSections().catch(() => []),
         listVisibleGallery().catch(() => []),
         listProgram().catch(() => []),
@@ -69,6 +69,7 @@ export default function AdminPageOrder() {
         getWebsitePrivacy().catch(() => null),
         getRegistrySettings().catch(() => null),
         listRegistryAdmin().catch(() => []),
+        getSectionAudiences().catch(() => null),
       ])
 
       // Photo sections in the Photos & Video order (hidden ones too — they keep their place).
@@ -86,18 +87,21 @@ export default function AdminPageOrder() {
       )
 
       const guestOnly = (on: boolean | undefined, text: string): Status | null => (on ? { tone: 'guests', text } : null)
-      const funOn = [registry?.guestVisible && 'Wishlist', predictions?.visible && space.has('predictions') && 'Predictions', names?.visible && space.has('names') && 'Name ideas'].filter(Boolean) as string[]
+      // Who sees it (each section's page): invited or attending guests only.
+      const keptFor = (k: AccessSection): Status | null =>
+        aud?.[k] === 'invite' ? { tone: 'guests', text: 'Invited guests only' } : aud?.[k] === 'attending' ? { tone: 'guests', text: 'Attending guests only' } : null
+      const funOn = [(registry?.guestVisible || (registry?.visible && !registry.ideasLive && aud?.registry !== 'website' && aud?.registry !== 'website_invite')) && 'Wishlist', (predictions?.visible || predictions?.private) && space.has('predictions') && 'Predictions', (names?.visible || names?.private) && space.has('names') && 'Name ideas'].filter(Boolean) as string[]
       const status: Record<FixedSectionKey, Status> = {
         intro: ON(),
         verse: s.verseVisible ? ON() : OFF('Switched off', '/admin/settings', 'Website Settings'),
-        reveal: !space.has('reveal') ? { tone: 'plan', text: 'Not in this plan' } : reveal?.enabled ? ON() : OFF('Switched off', '/admin/reveal', 'Gender Reveal'),
+        reveal: !space.has('reveal') ? { tone: 'plan', text: 'Not in this plan' } : reveal?.enabled ? (keptFor('reveal') ?? ON()) : OFF('Switched off', '/admin/reveal', 'Gender Reveal'),
         guestPhotos: !space.has('guest_photos') ? { tone: 'plan', text: 'Not in this plan' } : photos?.visible ? ON() : OFF('Not shown yet', '/admin/guest-photos', 'Guest Photos'),
         venue: guestOnly(privacy?.hideVenues, 'Confirmed guests only — a short note shows instead') ?? ON(),
         program: !s.programVisible ? OFF('Switched off', '/admin/settings', 'Website Settings') : program.length === 0 ? OFF('No program items yet', '/admin/settings', 'Add the program') : ON(),
         info: guestOnly(privacy?.hideInfo, 'Confirmed guests only') ?? (s.sections.some((x) => x.visible) ? ON() : OFF('Nothing to show', '/admin/settings', 'Website Settings')),
         attire:
           s.outfitSectionVisible && outfits.length > 0
-            ? (guestOnly(privacy?.hideAttire, 'Outfit photos for attending guests only — motif colours show') ?? ON())
+            ? (keptFor('attire') ?? ON())
             : s.motifColors.length > 0
               ? ON('Motif colours only')
               : OFF(s.outfitSectionVisible ? 'No outfit photos or colours yet' : 'Switched off', '/admin/outfits', 'What to Wear'),
@@ -107,7 +111,7 @@ export default function AdminPageOrder() {
             ? OFF('Hidden', '/admin/registry', 'Gift Registry')
           : !regItems.some((i) => i.kind === 'idea' && i.isVisible && i.imageUrl)
             ? OFF('No photos yet', '/admin/registry', 'Upload photos')
-            : (guestOnly(privacy?.hideIdeas, 'Attending guests only') ?? ON()),
+            : (keptFor('registry') ?? ON()),
         fun: funOn.length ? ON(`Showing: ${funOn.join(', ')}`) : OFF('All three are off', '/admin/registry', 'Shower fun'),
         gift: gift ? ON() : OFF('Not set up', '/admin/settings', 'Website Settings'),
         rsvp: ON(),

@@ -47,6 +47,25 @@ export function VisibilityField({ label, mode, from, onChange }: { label: string
   )
 }
 
+/** When a switched-on section starts showing (Who sees it handles Hidden). */
+export function StartField({ mode, from, onChange }: { mode: Visibility; from: string | null; onChange: (patch: { mode?: Visibility; from?: string | null }) => void }) {
+  const m = mode === 'hidden' ? 'visible' : mode
+  return (
+    <div className="space-y-3">
+      <label className="block text-sm text-ink-soft">
+        <span className="font-medium text-ink">When it starts</span>
+        <select className="input-base mt-1.5" value={m} onChange={(e) => onChange({ mode: e.target.value as Visibility })}>
+          <option value="visible">Right away</option>
+          <option value="scheduled">From a date</option>
+          <option value="reveal">On the reveal date</option>
+        </select>
+      </label>
+      {m === 'reveal' && <RevealNote />}
+      {m === 'scheduled' && <DateTimeField label="Starts on" value={from} onChange={(v) => onChange({ from: v })} />}
+    </div>
+  )
+}
+
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 /**

@@ -42,8 +42,8 @@ export function useShowerActivities(): ShowerActivities | null {
     const token = currentShowerGuest()?.token
     activities ??= Promise.all([
       getRegistry(token).catch(() => null),
-      getPredictionsInfo().catch(() => null),
-      getNameIdeasInfo().catch(() => null),
+      getPredictionsInfo(token).catch(() => null),
+      getNameIdeasInfo(token).catch(() => null),
       listAttire(token).catch(() => null),
       loadGiftIdeas(),
     ]).then(([r, p, n, a, i]) => ({

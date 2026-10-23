@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ShowerShell, ForAttending } from '../components/shower/ShowerShell'
+import { ShowerShell, KeptFor } from '../components/shower/ShowerShell'
 import { OutfitGallery } from '../components/wedding/OutfitGallery'
 import { PublicHeader } from '../components/wedding/PublicHeader'
 import { Footer } from '../components/wedding/Footer'
@@ -53,7 +53,7 @@ export default function Attire() {
             Hi {guest.name.split(' ')[0]}! We don’t have a “yes” from your invitation yet.
           </p>
         )}
-        <ForAttending what="What to Wear" onReady={setGuest} />
+        <KeptFor section="attire" what="What to Wear" onReady={setGuest} />
       </ShowerShell>
     )
   }

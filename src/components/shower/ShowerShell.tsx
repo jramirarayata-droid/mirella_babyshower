@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { UserRound } from 'lucide-react'
 import { useWeddingSettings } from '../../hooks/useWeddingSettings'
@@ -9,7 +9,7 @@ import { Ornament } from '../ui/Ornament'
 import { Button } from '../ui/Button'
 import { TextField } from '../ui/FormField'
 import { knownGuest } from '../../utils/guestIdentity'
-import { startShowerGuest, type ShowerGuest } from '../../services/showerService'
+import { getGuestSections, startShowerGuest, type AccessSection, type Audience, type ShowerGuest } from '../../services/showerService'
 import { toFriendlyMessage } from '../../utils/errors'
 
 /** The frame of a baby shower guest page: header, the baby's name, a title, the page, the footer. */
@@ -129,4 +129,22 @@ export function ForAttending({ what, onReady }: { what: string; onReady: (g: Sho
       )}
     </div>
   )
+}
+
+/**
+ * A section kept for some guests (Admin → its page → Who sees it): invited
+ * guests type their name; attending-only sections ask them to RSVP first.
+ */
+export function KeptFor({ section, what, onReady }: { section: AccessSection; what: string; onReady: (g: ShowerGuest) => void }) {
+  const [who, setWho] = useState<Audience | null>(null)
+  useEffect(() => {
+    let alive = true
+    void getGuestSections().then((s) => alive && setWho(s?.[section].who ?? 'attending'))
+    return () => {
+      alive = false
+    }
+  }, [section])
+  if (!who) return null
+  if (who === 'invite') return <GuestGate why={`${what} is for our invited guests. Type your name as it is on your invitation.`} onReady={onReady} />
+  return <ForAttending what={what} onReady={onReady} />
 }

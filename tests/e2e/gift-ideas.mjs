@@ -166,7 +166,7 @@ try {
   await a.waitForTimeout(1200)
   const last = saves.filter((x) => x.key === 'gift_ideas').at(-1)?.value
   ok('admin: the design is saved', last?.layout === 'tags', JSON.stringify(last))
-  ok('admin: the ideas can be kept off the RSVP confirmation', (await panel.getByText('Show on the RSVP confirmation').count()) === 1)
+  ok('admin: who sees it is set once, at the top', (await a.getByRole('radiogroup', { name: 'Who sees it' }).count()) === 1)
   // Several photos at once.
   const svg = (c) => ({ name: `${c}.png`, mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64') })
   await a.locator('input[type="file"][multiple]').setInputFiles([svg('one'), svg('two')])

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Trash2, Tv } from 'lucide-react'
+import { SectionAccess } from '../components/admin/SectionAccess'
 import { PageHeader } from '../components/admin/PageHeader'
-import { DateTimeField, SavedText, useAutoSaved, VisibilityField } from '../components/admin/ShowerAdminBits'
+import { DateTimeField, SavedText, useAutoSaved, StartField } from '../components/admin/ShowerAdminBits'
 import { PredictionsSummary } from '../components/shower/PredictionsSummary'
 import { Button } from '../components/ui/Button'
 import { Skeleton } from '../components/ui/Skeleton'
@@ -102,7 +103,12 @@ export default function AdminPredictions() {
             <Skeleton className="h-60" />
           ) : (
             <>
-              <VisibilityField label="Predictions page" mode={s.mode} from={s.from} onChange={settings.update} />
+              <SectionAccess
+                what="predictions"
+                hidden={s.mode === 'hidden'}
+                onHiddenChange={(h) => settings.update({ mode: h ? 'hidden' : 'visible' })}
+                timing={<StartField mode={s.mode} from={s.from} onChange={settings.update} />}
+              />
               <DateTimeField label="Guessing closes (optional)" value={s.closeAt} onChange={(closeAt) => settings.update({ closeAt })} clearable hint="Empty = it closes at the gender reveal (if set)." />
               <div className="border-t border-line pt-4">
                 <p className="font-medium text-ink">After the birth: the real answers</p>

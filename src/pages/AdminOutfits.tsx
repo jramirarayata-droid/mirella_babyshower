@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { GuestOnlySwitch } from '../components/admin/GuestOnlySwitch'
-import { OnRsvpSwitch } from '../components/admin/OnRsvpSwitch'
+import { SectionAccess } from '../components/admin/SectionAccess'
 import { ArrowDown, ArrowUp, Eye, EyeOff, ImagePlus, Save, Trash2 } from 'lucide-react'
 import { useToast } from '../hooks/useToast'
 import { setCachedWeddingSettings } from '../hooks/useWeddingSettings'
@@ -169,18 +168,19 @@ export default function AdminOutfits() {
                 : 'Guests switch between the looks for him and for her; each photo shows its own label.'}
             </p>
           </div>
-          <GuestOnlySwitch what="attire" className="mt-5" />
-          <OnRsvpSwitch what="attire" className="mt-3" />
-          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <label className="flex cursor-pointer items-center gap-3 text-sm text-ink-soft">
-              <input
-                type="checkbox"
-                checked={section.outfitSectionVisible}
-                onChange={(e) => setSection({ ...section, outfitSectionVisible: e.target.checked })}
-                className="size-5 accent-ink"
-              />
-              Show this section on the website
-            </label>
+          <SectionAccess
+            what="attire"
+            className="mt-5"
+            hidden={!section.outfitSectionVisible}
+            onHiddenChange={async (h) => {
+              if (!settingsId) return
+              const next = { ...section, outfitSectionVisible: !h }
+              setCachedWeddingSettings(await updateOutfitSectionSettings(settingsId, next))
+              setSection(next)
+            }}
+          />
+          <p className="mt-2 text-xs text-muted">Your motif colours show on the website whenever you’ve added some (Motif colours below).</p>
+          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
             <Button type="submit" loading={savingSection} loadingText="Saving…" icon={<Save aria-hidden="true" className="size-4" />}>
               Save section
             </Button>

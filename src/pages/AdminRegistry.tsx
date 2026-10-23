@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowDown, ArrowUp, Eye, EyeOff, ExternalLink, Gift, ImagePlus, Lightbulb, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { PageHeader } from '../components/admin/PageHeader'
-import { SavedText, useAutoSaved, VisibilityField } from '../components/admin/ShowerAdminBits'
+import { SavedText, StartField, useAutoSaved } from '../components/admin/ShowerAdminBits'
+import { SectionAccess } from '../components/admin/SectionAccess'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { Modal } from '../components/ui/Modal'
@@ -29,8 +30,6 @@ import { formatShortDate } from '../utils/formatting'
 import { siteLinks } from '../utils/share'
 import { cn } from '../components/ui/cn'
 import { uploadWeddingAsset } from '../services/settingsService'
-import { GuestOnlySwitch } from '../components/admin/GuestOnlySwitch'
-import { OnRsvpSwitch } from '../components/admin/OnRsvpSwitch'
 import { GiftIdeasAdmin } from '../components/admin/GiftIdeasAdmin'
 
 const EMPTY: RegistryItemInput = { kind: 'gift', title: '', note: '', link: '', imageUrl: '', priceHint: '', quantity: 1, isVisible: true }
@@ -177,7 +176,7 @@ export default function AdminRegistry() {
         {!s ? (
           <Skeleton className="mt-4 h-28" />
         ) : (
-          <div className="mt-4 grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
+          <div className="mt-4 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
             <div role="radiogroup" aria-label="Guests see" className="grid gap-3 sm:grid-cols-2">
               {(
                 [
@@ -212,7 +211,12 @@ export default function AdminRegistry() {
                 </button>
               ))}
             </div>
-            <VisibilityField label="Show it on the website" mode={s.mode} from={s.from} onChange={settings.update} />
+            <SectionAccess
+              what="registry"
+              hidden={s.mode === 'hidden'}
+              onHiddenChange={(h) => settings.update({ mode: h ? 'hidden' : 'visible' })}
+              timing={<StartField mode={s.mode} from={s.from} onChange={settings.update} />}
+            />
           </div>
         )}
       </section>
@@ -336,8 +340,6 @@ export default function AdminRegistry() {
             <Skeleton className="h-40" />
           ) : (
             <>
-              <GuestOnlySwitch what="wishlist" stacked />
-              <OnRsvpSwitch what="wishlist" />
               <TextField label="Title" value={s.title} onChange={(title) => settings.update({ title })} maxLength={60} />
               <TextAreaField label="A short note for guests" value={s.intro} onChange={(intro) => settings.update({ intro })} maxLength={300} rows={3} />
             </>

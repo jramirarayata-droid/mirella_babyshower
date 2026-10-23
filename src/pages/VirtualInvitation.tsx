@@ -18,6 +18,7 @@ import { Footer } from '../components/wedding/Footer'
 import { CoupleNames } from '../components/wedding/CoupleNames'
 import { Envelope, FlipCard, useCardWidth } from '../components/invitation/InviteEnvelope'
 import { EventDetails } from '../components/rsvp/EventDetails'
+import { GuestSectionLinks } from '../components/rsvp/AttendingExtras'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
@@ -211,6 +212,7 @@ function Actions({
       {replied === 'attending' && <EventDetails venues={settings} className="mb-5" />}
       {action}
       {message && <p className={`max-w-sm font-serif text-lg italic leading-relaxed text-ink-soft ${action ? 'mt-4' : ''}`}>{message}</p>}
+      <GuestSectionLinks name={inv.inviteeName} attending={replied === 'attending'} className="mt-8" />
       <nav aria-label="More about the baby shower" className="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-1">
         <Link to="/" className={link}>
           <Globe aria-hidden="true" className="size-3.5" strokeWidth={1.6} />
